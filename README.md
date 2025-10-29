@@ -209,7 +209,7 @@ For questions or issues related to this coursework use [the dedicated Discord ch
 
 Use the worksheets listed on [the homepage](https://manighahrmani.github.io/sandwich_shop/) as your primary learning resource for Flutter development. You must refrain from using other online resources such as Stack Overflow, YouTube tutorials, or other websites for this coursework as they may contain outdated or incorrect information.
 
-### Important Git Tips
+## Important Git Tips
 
 **Commit regularly!** Save your progress frequently by committing your changes to Git. This creates checkpoints you can return to if needed.
 
