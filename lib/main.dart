@@ -47,6 +47,12 @@ class _HomeScreenState extends State<HomeScreen> {
     // This is the event handler for buttons that don't work yet
   }
 
+  // Method to open navigation drawer (to be implemented in next subtask)
+  void _openDrawer() {
+    // Will be implemented with Scaffold.of(context).openDrawer() in Subtask 4
+    debugPrint('Hamburger menu tapped - drawer will open here');
+  }
+
   // Helper method to build navigation buttons
   Widget _buildNavButton(String label, VoidCallback onPressed) {
     return TextButton(
@@ -151,6 +157,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             onPressed: placeholderCallbackForButtons,
                             tooltip: 'Cart',
                           ),
+
+                          // Mobile Hamburger Menu
+                          if (!isDesktop)
+                            IconButton(
+                              icon: const Icon(Icons.menu, color: Colors.grey),
+                              onPressed: _openDrawer,
+                              tooltip: 'Menu',
+                            ),
                         ],
                       ),
                     ),
