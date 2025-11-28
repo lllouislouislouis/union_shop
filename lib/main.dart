@@ -76,6 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Row(
                         children: [
+                          // Logo
                           GestureDetector(
                             onTap: () {
                               navigateToHome(context);
@@ -90,13 +91,25 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           const Spacer(),
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 600),
-                            child: const Row(
-                              children: [
-                                // Navigation will be added here in next subtask
-                              ],
-                            ),
+                          // Navigation buttons will be added here in next subtask
+
+                          // Utility Icons (search, profile, cart)
+                          IconButton(
+                            icon: const Icon(Icons.search, color: Colors.grey),
+                            onPressed: placeholderCallbackForButtons,
+                            tooltip: 'Search',
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.person_outline,
+                                color: Colors.grey),
+                            onPressed: placeholderCallbackForButtons,
+                            tooltip: 'Account',
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.shopping_bag_outlined,
+                                color: Colors.grey),
+                            onPressed: placeholderCallbackForButtons,
+                            tooltip: 'Cart',
                           ),
                         ],
                       ),
