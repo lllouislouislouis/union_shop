@@ -47,8 +47,34 @@ class _HomeScreenState extends State<HomeScreen> {
     // This is the event handler for buttons that don't work yet
   }
 
+  // Helper method to build navigation buttons
+  Widget _buildNavButton(String label, VoidCallback onPressed) {
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        foregroundColor: Colors.grey[700],
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+        ),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Get screen width for responsive behavior
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -91,7 +117,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           const Spacer(),
-                          // Navigation buttons will be added here in next subtask
+
+                          // Desktop Navigation Buttons (only show on wide screens)
+                          if (isDesktop) ...[
+                            _buildNavButton(
+                                'Home', () => navigateToHome(context)),
+                            _buildNavButton(
+                                'Shop', placeholderCallbackForButtons),
+                            _buildNavButton('The Print Shack',
+                                placeholderCallbackForButtons),
+                            _buildNavButton(
+                                'SALE!', placeholderCallbackForButtons),
+                            _buildNavButton(
+                                'About', placeholderCallbackForButtons),
+                            const SizedBox(width: 16),
+                          ],
 
                           // Utility Icons (search, profile, cart)
                           IconButton(
