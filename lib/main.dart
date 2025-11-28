@@ -68,21 +68,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Helper method to build navigation buttons
   Widget _buildNavButton(String label, VoidCallback onPressed) {
-    return TextButton(
-      onPressed: onPressed,
-      style: TextButton.styleFrom(
-        foregroundColor: Colors.grey[700],
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.grey[700],
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+        ).copyWith(
+          overlayColor: WidgetStateProperty.resolveWith<Color?>(
+            (Set<WidgetState> states) {
+              if (states.contains(WidgetState.hovered)) {
+                return const Color(0xFF4d2963).withValues(alpha: 0.1);
+              }
+              return null;
+            },
+          ),
         ),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0.5,
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.5,
+          ),
         ),
       ),
     );
@@ -95,7 +107,10 @@ class _HomeScreenState extends State<HomeScreen> {
         _closeMobileMenu();
         onTap();
       },
+      splashColor: const Color(0xFF4d2963).withValues(alpha: 0.1),
+      highlightColor: const Color(0xFF4d2963).withValues(alpha: 0.05),
       child: Container(
+        width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         decoration: BoxDecoration(
           border: Border(
@@ -378,19 +393,26 @@ class _HomeScreenState extends State<HomeScreen> {
               right: 0,
               child: Material(
                 elevation: 8,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  color: Colors.white,
-                  child: Column(
-                    children: [
-                      _buildMobileMenuItem(
-                          'Home', () => navigateToHome(context)),
-                      _buildMobileMenuItem('Shop', placeholderCallbackForButtons),
-                      _buildMobileMenuItem(
-                          'The Print Shack', placeholderCallbackForButtons),
-                      _buildMobileMenuItem('SALE!', placeholderCallbackForButtons),
-                      _buildMobileMenuItem('About', placeholderCallbackForButtons),
-                    ],
+                child: AnimatedSize(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  child: Container(
+                    color: Colors.white,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildMobileMenuItem(
+                            'Home', () => navigateToHome(context)),
+                        _buildMobileMenuItem(
+                            'Shop', placeholderCallbackForButtons),
+                        _buildMobileMenuItem(
+                            'The Print Shack', placeholderCallbackForButtons),
+                        _buildMobileMenuItem(
+                            'SALE!', placeholderCallbackForButtons),
+                        _buildMobileMenuItem(
+                            'About', placeholderCallbackForButtons),
+                      ],
+                    ),
                   ),
                 ),
               ),
