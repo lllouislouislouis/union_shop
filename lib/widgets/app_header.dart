@@ -131,170 +131,160 @@ class _AppHeaderState extends State<AppHeader> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
 
-    return SizedBox(
-      height: 100,
-      child: Stack(
-        children: [
-          // Header content
-          Container(
-            height: 100,
-            color: Colors.white,
-            child: Column(
-              children: [
-                // Top banner
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  color: const Color(0xFF4d2963),
-                  child: const Text(
-                    'BIG SALE! OUR ESSENTIAL RANGE HAS DROPPED IN PRICE! OVER 20% OFF! COME GRAB YOURS WHILE STOCK LASTS!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Header with fixed height
+        Container(
+          height: 100,
+          color: Colors.white,
+          child: Column(
+            children: [
+              // Top banner
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                color: const Color(0xFF4d2963),
+                child: const Text(
+                  'BIG SALE! OUR ESSENTIAL RANGE HAS DROPPED IN PRICE! OVER 20% OFF! COME GRAB YOURS WHILE STOCK LASTS!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
-                // Main header
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      children: [
-                        // Logo
-                        GestureDetector(
-                          onTap: () {
-                            _closeMobileMenu();
-                            navigateToHome(context);
-                          },
+              ),
+              // Main header
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    children: [
+                      // Logo
+                      GestureDetector(
+                        onTap: () {
+                          _closeMobileMenu();
+                          navigateToHome(context);
+                        },
+                        child: SizedBox(
+                          height: 40,
                           child: Image.asset(
                             'assets/images/upsu.png',
-                            height: 40,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 40,
+                                padding: const EdgeInsets.all(8),
+                                child: const Icon(
+                                  Icons.store,
+                                  color: Color(0xFF4d2963),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                        const Spacer(),
+                      ),
+                      const Spacer(),
 
-                        // Desktop Navigation Buttons (only show on wide screens)
-                        if (isDesktop) ...[
-                          _buildNavButton(
-                            'Home',
-                            () => navigateToHome(context),
-                            widget.currentRoute == '/',
-                          ),
-                          _buildNavButton(
-                            'Shop',
-                            placeholderCallbackForButtons,
-                            false,
-                          ),
-                          _buildNavButton(
-                            'The Print Shack',
-                            placeholderCallbackForButtons,
-                            false,
-                          ),
-                          _buildNavButton(
-                            'SALE!',
-                            placeholderCallbackForButtons,
-                            false,
-                          ),
-                          _buildNavButton(
-                            'About',
-                            () => navigateToAbout(context),
-                            widget.currentRoute == '/about',
-                          ),
-                          const SizedBox(width: 16),
-                        ],
-
-                        // Utility Icons (search, profile, cart)
-                        IconButton(
-                          icon: const Icon(Icons.search),
-                          onPressed: placeholderCallbackForButtons,
-                          tooltip: 'Search',
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.person_outline),
-                          onPressed: placeholderCallbackForButtons,
-                          tooltip: 'Account',
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.shopping_cart_outlined),
-                          onPressed: placeholderCallbackForButtons,
-                          tooltip: 'Cart',
-                        ),
-
-                        // Mobile Hamburger Menu
-                        if (!isDesktop)
-                          IconButton(
-                            icon: Icon(
-                                _isMobileMenuOpen ? Icons.close : Icons.menu),
-                            onPressed: _toggleMobileMenu,
-                            tooltip: 'Menu',
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Mobile dropdown menu overlay (appears below header)
-          if (!isDesktop && _isMobileMenuOpen)
-            Positioned(
-              top: 100, // Position below the header
-              left: 0,
-              right: 0,
-              child: Material(
-                elevation: 8,
-                child: AnimatedSize(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeInOut,
-                  child: Container(
-                    color: Colors.white,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildMobileMenuItem(
+                      // Desktop Navigation Buttons (only show on wide screens)
+                      if (isDesktop) ...[
+                        _buildNavButton(
                           'Home',
                           () => navigateToHome(context),
                           widget.currentRoute == '/',
                         ),
-                        _buildMobileMenuItem(
+                        _buildNavButton(
                           'Shop',
                           placeholderCallbackForButtons,
                           false,
                         ),
-                        _buildMobileMenuItem(
+                        _buildNavButton(
                           'The Print Shack',
                           placeholderCallbackForButtons,
                           false,
                         ),
-                        _buildMobileMenuItem(
+                        _buildNavButton(
                           'SALE!',
                           placeholderCallbackForButtons,
                           false,
                         ),
-                        _buildMobileMenuItem(
+                        _buildNavButton(
                           'About',
                           () => navigateToAbout(context),
                           widget.currentRoute == '/about',
                         ),
+                        const SizedBox(width: 16),
                       ],
-                    ),
+
+                      // Utility Icons (search, profile, cart)
+                      IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: placeholderCallbackForButtons,
+                        tooltip: 'Search',
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.person_outline),
+                        onPressed: placeholderCallbackForButtons,
+                        tooltip: 'Account',
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.shopping_cart_outlined),
+                        onPressed: placeholderCallbackForButtons,
+                        tooltip: 'Cart',
+                      ),
+
+                      // Mobile Hamburger Menu
+                      if (!isDesktop)
+                        IconButton(
+                          icon: Icon(
+                              _isMobileMenuOpen ? Icons.close : Icons.menu),
+                          onPressed: _toggleMobileMenu,
+                          tooltip: 'Menu',
+                        ),
+                    ],
                   ),
                 ),
               ),
-            ),
+            ],
+          ),
+        ),
 
-          // Overlay to close menu when tapping outside
-          if (!isDesktop && _isMobileMenuOpen)
-            Positioned.fill(
-              top: 100, // Start below header
-              child: GestureDetector(
-                onTap: _closeMobileMenu,
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.3),
-                ),
+        // Mobile dropdown menu (below header, not in Stack)
+        if (!isDesktop && _isMobileMenuOpen)
+          Material(
+            elevation: 8,
+            child: Container(
+              color: Colors.white,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildMobileMenuItem(
+                    'Home',
+                    () => navigateToHome(context),
+                    widget.currentRoute == '/',
+                  ),
+                  _buildMobileMenuItem(
+                    'Shop',
+                    placeholderCallbackForButtons,
+                    false,
+                  ),
+                  _buildMobileMenuItem(
+                    'The Print Shack',
+                    placeholderCallbackForButtons,
+                    false,
+                  ),
+                  _buildMobileMenuItem(
+                    'SALE!',
+                    placeholderCallbackForButtons,
+                    false,
+                  ),
+                  _buildMobileMenuItem(
+                    'About',
+                    () => navigateToAbout(context),
+                    widget.currentRoute == '/about',
+                  ),
+                ],
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }
