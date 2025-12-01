@@ -105,7 +105,6 @@ class _SalePageState extends State<SalePage> {
   // Update the products displayed on current page
   void _updateDisplayedProducts() {
     final startIndex = (_currentPage - 1) * _productsPerPage;
-    final endIndex = startIndex + _productsPerPage;
 
     _displayedProducts =
         _filteredProducts.skip(startIndex).take(_productsPerPage).toList();
@@ -219,7 +218,19 @@ class _SalePageState extends State<SalePage> {
 
         // Subheading
         Text(
-          'Don\'t miss out on our amazing deals! Limited time offers on selected items.',
+          'Don’t miss out! Get yours before they’re all gone!',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 18,
+            color: Colors.grey[700],
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        // Subheading
+        Text(
+          'All prices shown are inclusive of the discount 🛒',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 18,
@@ -553,7 +564,7 @@ class _SaleProductCardState extends State<SaleProductCard> {
               borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(_isHovered ? 0.15 : 0.08),
+                  color: Color.fromRGBO(0, 0, 0, _isHovered ? 0.15 : 0.08),
                   blurRadius: _isHovered ? 12 : 8,
                   offset: const Offset(0, 4),
                 ),
