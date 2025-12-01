@@ -22,12 +22,21 @@ class _SalePageState extends State<SalePage> {
 
   static const int _productsPerPage = 9;
 
+  // ScrollController to handle scroll-to-top on page change
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     // Initialize with mock data
     _allProducts = List.from(mockSaleProducts);
     _applyFilters(); // Apply initial filter (All Categories)
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   // Apply category filter to products
@@ -105,6 +114,23 @@ class _SalePageState extends State<SalePage> {
     if (_totalPages == 0) _totalPages = 1;
   }
 
+  // Change to a specific page
+  void _changePage(int newPage) {
+    if (newPage < 1 || newPage > _totalPages) return;
+
+    setState(() {
+      _currentPage = newPage;
+      _updateDisplayedProducts();
+    });
+
+    // Scroll to top of page
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Get screen width for responsive design
@@ -135,6 +161,7 @@ class _SalePageState extends State<SalePage> {
           // Scrollable content
           Expanded(
             child: SingleChildScrollView(
+              controller: _scrollController,
               child: Container(
                 color: Colors.white,
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -156,7 +183,11 @@ class _SalePageState extends State<SalePage> {
                     // Product Grid
                     _buildProductGrid(gridColumns),
 
-                    // TODO: Pagination Controls (Phase 6)
+                    // Pagination Controls
+                    if (_totalPages > 1) ...[
+                      const SizedBox(height: 48),
+                      _buildPaginationControls(),
+                    ],
 
                     // Bottom spacing
                     const SizedBox(height: 64),
@@ -426,6 +457,63 @@ class _SalePageState extends State<SalePage> {
           ],
         ),
       ),
+    );
+  }
+
+  // Build pagination controls
+  Widget _buildPaginationControls() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Previous button
+        IconButton(
+          onPressed:
+              _currentPage > 1 ? () => _changePage(_currentPage - 1) : null,
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Previous Page',
+          iconSize: 24,
+          padding: const EdgeInsets.all(12),
+          constraints: const BoxConstraints(
+            minWidth: 48,
+            minHeight: 48,
+          ),
+          color: _currentPage > 1 ? const Color(0xFF4d2963) : Colors.grey[400],
+          disabledColor: Colors.grey[300],
+        ),
+
+        const SizedBox(width: 16),
+
+        // Page indicator
+        Text(
+          'Page $_currentPage of $_totalPages',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[700],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+
+        const SizedBox(width: 16),
+
+        // Next button
+        IconButton(
+          onPressed: _currentPage < _totalPages
+              ? () => _changePage(_currentPage + 1)
+              : null,
+          icon: const Icon(Icons.arrow_forward),
+          tooltip: 'Next Page',
+          iconSize: 24,
+          padding: const EdgeInsets.all(12),
+          constraints: const BoxConstraints(
+            minWidth: 48,
+            minHeight: 48,
+          ),
+          color: _currentPage < _totalPages
+              ? const Color(0xFF4d2963)
+              : Colors.grey[400],
+          disabledColor: Colors.grey[300],
+        ),
+      ],
     );
   }
 }
