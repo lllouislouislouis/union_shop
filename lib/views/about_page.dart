@@ -50,9 +50,7 @@ class AboutPage extends StatelessWidget {
 
                       // Body text - Paragraph 1
                       Text(
-                        'Welcome to the Union Shop, your go-to destination for quality products and merchandise. '
-                        'We are committed to providing our community with exceptional goods and services that meet '
-                        'your everyday needs.',
+                        'Welcome to the Union Shop!',
                         style: TextStyle(
                           fontSize: 16,
                           height: 1.6,
@@ -65,9 +63,7 @@ class AboutPage extends StatelessWidget {
 
                       // Body text - Paragraph 2
                       Text(
-                        'Our mission is to serve the student community by offering a wide range of products, '
-                        'from essential supplies to unique merchandise. We pride ourselves on competitive pricing, '
-                        'quality products, and excellent customer service.',
+                        'We’re dedicated to giving you the very best University branded products, with a range of clothing and merchandise available to shop all year round! We even offer an exclusive personalisation service!',
                         style: TextStyle(
                           fontSize: 16,
                           height: 1.6,
@@ -80,9 +76,7 @@ class AboutPage extends StatelessWidget {
 
                       // Body text - Paragraph 3
                       Text(
-                        'Whether you\'re looking for course materials, university branded items, or everyday essentials, '
-                        'the Union Shop is here to support you throughout your academic journey. Visit us online or '
-                        'in-store to discover our full range of offerings.',
+                        'All online purchases are available for delivery or instore collection!',
                         style: TextStyle(
                           fontSize: 16,
                           height: 1.6,
@@ -95,8 +89,33 @@ class AboutPage extends StatelessWidget {
 
                       // Body text - Paragraph 4
                       Text(
-                        'Thank you for choosing the Union Shop. We look forward to serving you and being part of '
-                        'your university experience.',
+                        'We hope you enjoy our products as much as we enjoy offering them to you. If you have any questions or comments, please don’t hesitate to contact us at hello@upsu.net.',
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 1.6,
+                          color: Colors.grey[800],
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Body text - Paragraph 4
+                      Text(
+                        'Happy shopping!',
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 1.6,
+                          color: Colors.grey[800],
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Body text - Paragraph 4
+                      Text(
+                        'The Union Shop & Reception Team',
                         style: TextStyle(
                           fontSize: 16,
                           height: 1.6,
