@@ -16,7 +16,7 @@ class _SalePageState extends State<SalePage> {
   List<SaleProduct> _displayedProducts = [];
 
   String _selectedCategory = 'All Categories';
-  final String _selectedSort = 'Featured';
+  String _selectedSort = 'Featured';
   int _currentPage = 1;
   int _totalPages = 1;
 
@@ -44,6 +44,49 @@ class _SalePageState extends State<SalePage> {
 
       // Reset to page 1 when filter changes
       _currentPage = 1;
+
+      // Apply sorting to filtered products
+      _applySorting();
+    });
+  }
+
+  // Apply sorting to filtered products
+  void _applySorting() {
+    setState(() {
+      switch (_selectedSort) {
+        case 'Featured':
+          // Keep original order (no sorting needed)
+          break;
+        case 'Best Selling':
+          // For now, same as Featured (could add a salesCount field later)
+          break;
+        case 'Alphabetically, A-Z':
+          _filteredProducts.sort((a, b) => a.title.compareTo(b.title));
+          break;
+        case 'Alphabetically, Z-A':
+          _filteredProducts.sort((a, b) => b.title.compareTo(a.title));
+          break;
+        case 'Price: Low to High':
+          _filteredProducts.sort((a, b) => a.salePrice.compareTo(b.salePrice));
+          break;
+        case 'Price: High to Low':
+          _filteredProducts.sort((a, b) => b.salePrice.compareTo(a.salePrice));
+          break;
+        case 'Date, old to new':
+          _filteredProducts
+              .sort((a, b) => a.saleEndDate.compareTo(b.saleEndDate));
+          break;
+        case 'Date, new to old':
+          _filteredProducts
+              .sort((a, b) => b.saleEndDate.compareTo(a.saleEndDate));
+          break;
+      }
+
+      // Validate current page is still valid after sorting
+      final maxPage = (_filteredProducts.length / _productsPerPage).ceil();
+      if (_currentPage > maxPage && maxPage > 0) {
+        _currentPage = maxPage;
+      }
 
       // Update displayed products and pagination
       _updateDisplayedProducts();
@@ -192,7 +235,7 @@ class _SalePageState extends State<SalePage> {
         children: [
           _buildCategoryFilter(fullWidth: true),
           const SizedBox(height: 16),
-          // TODO: Sort dropdown (Phase 5)
+          _buildSortDropdown(fullWidth: true),
         ],
       );
     } else {
@@ -201,7 +244,7 @@ class _SalePageState extends State<SalePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildCategoryFilter(fullWidth: false),
-          // TODO: Sort dropdown (Phase 5)
+          _buildSortDropdown(fullWidth: false),
         ],
       );
     }
@@ -250,6 +293,73 @@ class _SalePageState extends State<SalePage> {
               setState(() {
                 _selectedCategory = newValue;
                 _applyFilters();
+              });
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  // Build sort dropdown
+  Widget _buildSortDropdown({required bool fullWidth}) {
+    return Container(
+      width: fullWidth ? double.infinity : 220,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _selectedSort,
+          isExpanded: true,
+          icon: const Icon(Icons.arrow_drop_down),
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[900],
+            fontWeight: FontWeight.w500,
+          ),
+          dropdownColor: Colors.white,
+          items: const [
+            DropdownMenuItem(
+              value: 'Featured',
+              child: Text('Featured'),
+            ),
+            DropdownMenuItem(
+              value: 'Best Selling',
+              child: Text('Best Selling'),
+            ),
+            DropdownMenuItem(
+              value: 'Alphabetically, A-Z',
+              child: Text('Alphabetically, A-Z'),
+            ),
+            DropdownMenuItem(
+              value: 'Alphabetically, Z-A',
+              child: Text('Alphabetically, Z-A'),
+            ),
+            DropdownMenuItem(
+              value: 'Price: Low to High',
+              child: Text('Price: Low to High'),
+            ),
+            DropdownMenuItem(
+              value: 'Price: High to Low',
+              child: Text('Price: High to Low'),
+            ),
+            DropdownMenuItem(
+              value: 'Date, old to new',
+              child: Text('Date, old to new'),
+            ),
+            DropdownMenuItem(
+              value: 'Date, new to old',
+              child: Text('Date, new to old'),
+            ),
+          ],
+          onChanged: (String? newValue) {
+            if (newValue != null && newValue != _selectedSort) {
+              setState(() {
+                _selectedSort = newValue;
+                _applySorting();
               });
             }
           },
