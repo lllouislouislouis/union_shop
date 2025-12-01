@@ -15,9 +15,9 @@ class _SalePageState extends State<SalePage> {
   List<SaleProduct> _filteredProducts = [];
   List<SaleProduct> _displayedProducts = [];
 
-  final String _selectedCategory = 'All Categories';
+  String _selectedCategory = 'All Categories';
   final String _selectedSort = 'Featured';
-  final int _currentPage = 1;
+  int _currentPage = 1;
   int _totalPages = 1;
 
   static const int _productsPerPage = 9;
@@ -27,8 +27,27 @@ class _SalePageState extends State<SalePage> {
     super.initState();
     // Initialize with mock data
     _allProducts = List.from(mockSaleProducts);
-    _filteredProducts = List.from(_allProducts);
-    _updateDisplayedProducts();
+    _applyFilters(); // Apply initial filter (All Categories)
+  }
+
+  // Apply category filter to products
+  void _applyFilters() {
+    setState(() {
+      // Filter products based on selected category
+      if (_selectedCategory == 'All Categories') {
+        _filteredProducts = List.from(_allProducts);
+      } else {
+        _filteredProducts = _allProducts
+            .where((product) => product.category == _selectedCategory)
+            .toList();
+      }
+
+      // Reset to page 1 when filter changes
+      _currentPage = 1;
+
+      // Update displayed products and pagination
+      _updateDisplayedProducts();
+    });
   }
 
   // Update the products displayed on current page
@@ -51,6 +70,7 @@ class _SalePageState extends State<SalePage> {
     // Determine padding and grid columns based on screen size
     double horizontalPadding;
     int gridColumns;
+    bool isMobile = screenWidth <= 600;
 
     if (screenWidth > 800) {
       horizontalPadding = 40.0; // Desktop
@@ -85,7 +105,9 @@ class _SalePageState extends State<SalePage> {
 
                     const SizedBox(height: 32),
 
-                    // TODO: Filter & Sort Controls (Phase 4 & 5)
+                    // Filter & Sort Controls
+                    _buildFilterSortControls(isMobile),
+
                     const SizedBox(height: 24),
 
                     // Product Grid
@@ -161,6 +183,81 @@ class _SalePageState extends State<SalePage> {
     );
   }
 
+  // Build filter and sort controls
+  Widget _buildFilterSortControls(bool isMobile) {
+    if (isMobile) {
+      // Stack vertically on mobile
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildCategoryFilter(fullWidth: true),
+          const SizedBox(height: 16),
+          // TODO: Sort dropdown (Phase 5)
+        ],
+      );
+    } else {
+      // Horizontal row on desktop/tablet
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildCategoryFilter(fullWidth: false),
+          // TODO: Sort dropdown (Phase 5)
+        ],
+      );
+    }
+  }
+
+  // Build category filter dropdown
+  Widget _buildCategoryFilter({required bool fullWidth}) {
+    return Container(
+      width: fullWidth ? double.infinity : 200,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _selectedCategory,
+          isExpanded: true,
+          icon: const Icon(Icons.arrow_drop_down),
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[900],
+            fontWeight: FontWeight.w500,
+          ),
+          dropdownColor: Colors.white,
+          items: const [
+            DropdownMenuItem(
+              value: 'All Categories',
+              child: Text('All Categories'),
+            ),
+            DropdownMenuItem(
+              value: 'Clothing',
+              child: Text('Clothing'),
+            ),
+            DropdownMenuItem(
+              value: 'Merchandise',
+              child: Text('Merchandise'),
+            ),
+            DropdownMenuItem(
+              value: 'PSUT',
+              child: Text('PSUT'),
+            ),
+          ],
+          onChanged: (String? newValue) {
+            if (newValue != null && newValue != _selectedCategory) {
+              setState(() {
+                _selectedCategory = newValue;
+                _applyFilters();
+              });
+            }
+          },
+        ),
+      ),
+    );
+  }
+
   // Build empty state when no products
   Widget _buildEmptyState() {
     return Center(
@@ -175,7 +272,9 @@ class _SalePageState extends State<SalePage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No products found',
+              _selectedCategory == 'All Categories'
+                  ? 'No products found'
+                  : 'No products found in this category',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -184,12 +283,36 @@ class _SalePageState extends State<SalePage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Check back soon for amazing deals!',
+              _selectedCategory == 'All Categories'
+                  ? 'Check back soon for amazing deals!'
+                  : 'Try selecting a different category',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[600],
               ),
             ),
+            if (_selectedCategory != 'All Categories') ...[
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _selectedCategory = 'All Categories';
+                    _applyFilters();
+                  });
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF4d2963),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
+                child: const Text(
+                  'View All Products',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
           ],
         ),
       ),
