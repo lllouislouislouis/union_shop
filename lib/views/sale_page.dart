@@ -15,9 +15,9 @@ class _SalePageState extends State<SalePage> {
   List<SaleProduct> _filteredProducts = [];
   List<SaleProduct> _displayedProducts = [];
 
-  String _selectedCategory = 'All Categories';
-  String _selectedSort = 'Featured';
-  int _currentPage = 1;
+  final String _selectedCategory = 'All Categories';
+  final String _selectedSort = 'Featured';
+  final int _currentPage = 1;
   int _totalPages = 1;
 
   static const int _productsPerPage = 9;
