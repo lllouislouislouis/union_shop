@@ -134,11 +134,11 @@ class _AppHeaderState extends State<AppHeader> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Header with fixed height
+        // Header - now with intrinsic sizing instead of fixed height
         Container(
-          height: 100,
           color: Colors.white,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Top banner
               Container(
@@ -151,95 +151,119 @@ class _AppHeaderState extends State<AppHeader> {
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
-              // Main header
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    children: [
-                      // Logo
-                      GestureDetector(
-                        onTap: () {
-                          _closeMobileMenu();
-                          navigateToHome(context);
-                        },
-                        child: SizedBox(
-                          height: 40,
-                          child: Image.asset(
-                            'assets/images/upsu.png',
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                height: 40,
-                                padding: const EdgeInsets.all(8),
-                                child: const Icon(
-                                  Icons.store,
-                                  color: Color(0xFF4d2963),
-                                ),
-                              );
-                            },
-                          ),
+              // Main header - with proper padding for all elements
+              Container(
+                height: 64, // Sufficient height for logo and icons
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                child: Row(
+                  children: [
+                    // Logo - smaller on mobile to fit all buttons
+                    GestureDetector(
+                      onTap: () {
+                        _closeMobileMenu();
+                        navigateToHome(context);
+                      },
+                      child: SizedBox(
+                        height: isDesktop
+                            ? 48
+                            : 32, // 32px on mobile, 48px on desktop
+                        child: Image.asset(
+                          'assets/images/upsu.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              height: isDesktop ? 48 : 32,
+                              padding: const EdgeInsets.all(8),
+                              child: const Icon(
+                                Icons.store,
+                                color: Color(0xFF4d2963),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                      const Spacer(),
+                    ),
+                    const Spacer(),
 
-                      // Desktop Navigation Buttons (only show on wide screens)
-                      if (isDesktop) ...[
-                        _buildNavButton(
-                          'Home',
-                          () => navigateToHome(context),
-                          widget.currentRoute == '/',
-                        ),
-                        _buildNavButton(
-                          'Shop',
-                          placeholderCallbackForButtons,
-                          false,
-                        ),
-                        _buildNavButton(
-                          'The Print Shack',
-                          placeholderCallbackForButtons,
-                          false,
-                        ),
-                        _buildNavButton(
-                          'SALE!',
-                          placeholderCallbackForButtons,
-                          false,
-                        ),
-                        _buildNavButton(
-                          'About',
-                          () => navigateToAbout(context),
-                          widget.currentRoute == '/about',
-                        ),
-                        const SizedBox(width: 16),
-                      ],
-
-                      // Utility Icons (search, profile, cart)
-                      IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: placeholderCallbackForButtons,
-                        tooltip: 'Search',
+                    // Desktop Navigation Buttons (only show on wide screens)
+                    if (isDesktop) ...[
+                      _buildNavButton(
+                        'Home',
+                        () => navigateToHome(context),
+                        widget.currentRoute == '/',
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.person_outline),
-                        onPressed: placeholderCallbackForButtons,
-                        tooltip: 'Account',
+                      _buildNavButton(
+                        'Shop',
+                        placeholderCallbackForButtons,
+                        false,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.shopping_cart_outlined),
-                        onPressed: placeholderCallbackForButtons,
-                        tooltip: 'Cart',
+                      _buildNavButton(
+                        'The Print Shack',
+                        placeholderCallbackForButtons,
+                        false,
                       ),
-
-                      // Mobile Hamburger Menu
-                      if (!isDesktop)
-                        IconButton(
-                          icon: Icon(
-                              _isMobileMenuOpen ? Icons.close : Icons.menu),
-                          onPressed: _toggleMobileMenu,
-                          tooltip: 'Menu',
-                        ),
+                      _buildNavButton(
+                        'SALE!',
+                        placeholderCallbackForButtons,
+                        false,
+                      ),
+                      _buildNavButton(
+                        'About',
+                        () => navigateToAbout(context),
+                        widget.currentRoute == '/about',
+                      ),
+                      const SizedBox(width: 16),
                     ],
-                  ),
+
+                    // Utility Icons (search, profile, cart)
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: placeholderCallbackForButtons,
+                      tooltip: 'Search',
+                      iconSize: 24,
+                      padding: isDesktop
+                          ? null
+                          : const EdgeInsets.all(
+                              8), // Tighter padding on mobile
+                      constraints: isDesktop
+                          ? null
+                          : const BoxConstraints(minWidth: 40, minHeight: 40),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.person_outline),
+                      onPressed: placeholderCallbackForButtons,
+                      tooltip: 'Account',
+                      iconSize: 24,
+                      padding: isDesktop ? null : const EdgeInsets.all(8),
+                      constraints: isDesktop
+                          ? null
+                          : const BoxConstraints(minWidth: 40, minHeight: 40),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.shopping_cart_outlined),
+                      onPressed: placeholderCallbackForButtons,
+                      tooltip: 'Cart',
+                      iconSize: 24,
+                      padding: isDesktop ? null : const EdgeInsets.all(8),
+                      constraints: isDesktop
+                          ? null
+                          : const BoxConstraints(minWidth: 40, minHeight: 40),
+                    ),
+
+                    // Mobile Hamburger Menu
+                    if (!isDesktop)
+                      IconButton(
+                        icon:
+                            Icon(_isMobileMenuOpen ? Icons.close : Icons.menu),
+                        onPressed: _toggleMobileMenu,
+                        tooltip: 'Menu',
+                        iconSize: 24,
+                        padding: const EdgeInsets.all(8),
+                        constraints:
+                            const BoxConstraints(minWidth: 40, minHeight: 40),
+                      ),
+                  ],
                 ),
               ),
             ],
