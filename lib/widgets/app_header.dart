@@ -39,6 +39,11 @@ class _AppHeaderState extends State<AppHeader> {
     Navigator.pushNamed(context, '/product');
   }
 
+  void navigateToSale(BuildContext context) {
+    _closeMobileMenu();
+    Navigator.pushNamed(context, '/sale');
+  }
+
   void placeholderCallbackForButtons() {
     // This is the event handler for buttons that don't work yet
     _closeMobileMenu();
@@ -208,8 +213,8 @@ class _AppHeaderState extends State<AppHeader> {
                       ),
                       _buildNavButton(
                         'SALE!',
-                        placeholderCallbackForButtons,
-                        false,
+                        () => navigateToSale(context),
+                        widget.currentRoute == '/sale',
                       ),
                       _buildNavButton(
                         'About',
@@ -305,8 +310,8 @@ class _AppHeaderState extends State<AppHeader> {
                   ),
                   _buildMobileMenuItem(
                     'SALE!',
-                    placeholderCallbackForButtons,
-                    false,
+                    () => navigateToSale(context),
+                    widget.currentRoute == '/sale',
                   ),
                   _buildMobileMenuItem(
                     'About',
