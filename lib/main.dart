@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:union_shop/product_page.dart';
+import 'package:union_shop/views/about_page.dart';
+import 'package:union_shop/views/product_page.dart';
 import 'package:union_shop/widgets/app_header.dart';
 
 void main() {
@@ -20,9 +21,11 @@ class UnionShopApp extends StatelessWidget {
       home: const HomeScreen(),
       // By default, the app starts at the '/' route, which is the HomeScreen
       initialRoute: '/',
-      // When navigating to '/product', build and return the ProductPage
-      // In your browser, try this link: http://localhost:49856/#/product
-      routes: {'/product': (context) => const ProductPage()},
+      // Define all application routes
+      routes: {
+        '/product': (context) => const ProductPage(),
+        '/about': (context) => const AboutPage(),
+      },
     );
   }
 }
@@ -49,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               children: [
                 // Header - Now using reusable AppHeader component
-                AppHeader(currentRoute: '/'),
+                const AppHeader(currentRoute: '/'),
 
                 // Hero Section
                 SizedBox(
