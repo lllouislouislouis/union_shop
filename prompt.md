@@ -1,69 +1,136 @@
-# Navigation Bar Implementation Request
+# About Page Implementation Request
 
-I'm working on a Flutter online shop app and need to implement a responsive navigation bar with specific layout requirements for desktop and mobile views.
+I'm working on a Flutter online shop app and need to implement an "About" page with a reusable header component and simple content layout.
 
 ## Current Code Context
 
 - **File**: `lib/main.dart`
-- **Location**: Inside the `HomeScreen` widget, there's a header `Container` (height: 100) with a purple banner at the top
-- **Current Structure**: Below the purple banner with "PLACEHOLDER HEADER TEXT", there's a Row containing a logo and some action icons (search, person, shopping bag, menu)
-- **Navigation Setup**: The app uses named routes with `Navigator.pushNamed()` and has existing routes for '/' (home) and '/product'
+- **Existing Pages**: HomeScreen (at route '/') and ProductPage (at route '/product')
+- **Navigation**: The app uses named routes with `Navigator.pushNamed()` for navigation
+- **Header Structure**: Currently implemented in HomeScreen with:
+  - Purple banner at top (height varies, contains sale announcement text)
+  - Main header bar (height 100) with logo, navigation buttons, and action icons
+  - Responsive navigation (desktop buttons vs mobile hamburger menu)
+  - Logo click navigates to home
+  - Navigation includes: Home, Shop, The Print Shack, SALE!, About
 
 ## Requirements
 
-### 1. Desktop/Wide Screen Layout (width > 800px)
+### 1. Create About Page
 
-Add navigation buttons **between the logo and the action icons** in the existing Row:
+**New File**: Create `lib/about_page.dart` with an AboutPage widget that includes:
 
-- **Buttons needed**: "Home", "Shop", "The Print Shack", "SALE!", "About"
-- "Home" represents the current page (HomeScreen)
-- Buttons should be horizontally aligned and properly spaced
-- Style should match the existing design (simple, clean, grey text)
-- Each button should have hover effects (optional but nice to have)
+- **Same header structure** as HomeScreen (purple banner + navigation bar)
+- **Page content**:
+  - Plain white background
+  - "About Us" as a large heading (consider using fontSize: 32-36, bold, with proper spacing)
+  - Placeholder body text below the heading (3-4 paragraphs of lorem ipsum or descriptive placeholder text)
+  - Proper padding around content (e.g., 40px on desktop, 24px on mobile)
+  - Centered
 
-### 2. Mobile/Narrow Screen Layout (width ≤ 800px)
+### 2. Header Reusability
 
-- **Hide** the navigation buttons
-- **Replace** with a hamburger menu icon (☰ three horizontal bars)
-- Position the hamburger icon in the same Row, between the logo and action icons
-- Clicking the hamburger icon should open a **Drawer** widget from the left side
-- The Drawer should contain:
-  - The same 5 navigation options in a vertical list
-  - Proper spacing and styling
-  - Close button or swipe-to-dismiss functionality
+Since the header will be shared between pages, consider one of these approaches:
 
-### 3. Responsive Behavior
+**Extract Reusable Widget**:
+- Create a separate `AppHeader` widget that can be used on both HomeScreen and AboutPage
+- Extract the entire header (purple banner + navigation bar) into this component
+- Make it accept parameters if needed (e.g., current route for highlighting active nav button)
 
-- Use `MediaQuery.of(context).size.width` or `LayoutBuilder` to detect screen width
-- Breakpoint: **800px** (show buttons if width > 800px, show hamburger if ≤ 800px)
-- Smooth conditional rendering between layouts
+### 3. Navigation Setup
 
-### 4. Navigation Logic
+**Route Registration**:
+- Add '/about' route in main.dart's MaterialApp routes
+- Route should build and return the AboutPage widget
 
-For now, use placeholder navigation:
-- "Home" button: calls `navigateToHome(context)` (already exists in the code)
-- Other buttons: call `placeholderCallbackForButtons()` (already exists in the code)
-- Later, I'll add proper routes for Shop, The Print Shack, SALE!, and About pages
+**Navigation Actions**:
+- When user clicks "About" button in navigation bar (desktop) → Navigate to '/about' route
+- When user clicks "About" in mobile menu → Close menu, then navigate to '/about' route
+- Update the `placeholderCallbackForButtons()` call for the About button to use proper navigation
+- AboutPage's "Home" button should navigate back to '/' route
+- AboutPage's "About" button should be highlighted or styled to indicate it's the current page
+
+### 4. Visual Design Requirements
+
+**Purple Banner**:
+- Same styling as HomeScreen
+- Background color: `Color(0xFF4d2963)`
+- White text, centered
+- Same sale announcement text (or make it configurable)
+
+**Main Header Bar**:
+- Height: 100
+- White background
+- Same logo (clickable, navigates to home)
+- Same navigation buttons with hover effects
+- Same action icons (search, profile, cart)
+- Same responsive behavior (buttons on desktop, hamburger menu on mobile)
+- Highlight "About" button to show current page (e.g., different color, underline, or bold text)
+
+**Content Area**:
+- White background
+- "About Us" heading:
+  - Large font size (32-36px)
+  - Bold weight
+  - Black or dark grey color
+  - Top padding: 64px
+  - Bottom padding: 24px
+- Body text:
+  - Normal font size (16px)
+  - Regular weight
+  - Dark grey color for readability
+  - Line height: 1.6-1.8 for better readability
+  - Max width: 800px (centered) for optimal reading experience on wide screens
+- Overall page padding: 40px on desktop, 24px on mobile
+
+### 5. Responsive Behavior
+
+- Use the same breakpoint as HomeScreen (800px)
+- Desktop (width > 800px): Show navigation buttons, wider content
+- Mobile (width ≤ 800px): Show hamburger menu, full-width content with padding
+- Ensure text is readable on all screen sizes
+
+### 6. State Management
+
+- AboutPage can be a StatelessWidget unless you need state for the mobile menu
+- If using a shared header component, handle mobile menu state appropriately
+- Reuse existing helper methods where possible (_buildNavButton, _buildMobileMenuItem, etc.)
 
 ## Technical Constraints
 
-- The HomeScreen is a `StatelessWidget`, so if state management is needed for the Drawer, suggest converting to `StatefulWidget` or another approach
-- Maintain the existing header structure and styling
-- Don't modify the existing logo, action icons, or their functionality
-- Use Flutter best practices for responsive design
+- Maintain consistent styling with HomeScreen (colors, fonts, spacing)
+- Use existing theme color: `Color(0xFF4d2963)`
+- Follow Flutter best practices (const constructors where possible)
+- Ensure smooth navigation transitions
 
 ## Deliverables
 
 Please provide:
 
-1. Complete modified code for the header Container section in `main.dart`
-2. Implementation of both desktop navigation buttons and mobile drawer
-3. Comments explaining key decisions and the responsive logic
-4. Any necessary imports or state management changes
+1. **New file**: `lib/about_page.dart` with complete AboutPage implementation
+2. **Modified file**: Updated `lib/main.dart` with:
+   - New route for '/about'
+   - Updated navigation handlers for About button (desktop and mobile)
+   - Extracted AppHeader component
+3. **Comments**: Explain key decisions, especially regarding header reusability
+4. **Any additional files**: If creating separate header widget or other components
 
 ## Code Style Preferences
 
-- Use `const` constructors where possible (as in existing code)
-- Match existing styling patterns (grey icons, purple theme color: `0xFF4d2963`)
-- Keep consistent padding and sizing with current design
-- Use existing helper methods where applicable
+- Match existing code style (consistent with HomeScreen)
+- Use `const` constructors where possible
+- Follow existing naming conventions
+- Keep consistent padding and sizing patterns
+- Add helpful comments for future maintainability
+
+## User Actions Summary
+
+| User Action | Expected Behavior |
+|-------------|-------------------|
+| Click "About" button (desktop) | Navigate to /about route, show AboutPage |
+| Click "About" in mobile menu | Close mobile menu, then navigate to /about route |
+| Click logo on AboutPage | Navigate back to home (/) |
+| Click "Home" button on AboutPage | Navigate back to home (/) |
+| Click back button (browser/device) | Return to previous page |
+| View on mobile (<800px) | See hamburger menu, responsive content layout |
+| View on desktop (>800px) | See full navigation buttons, "About" highlighted as current page |
