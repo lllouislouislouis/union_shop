@@ -154,33 +154,36 @@ class _AppHeaderState extends State<AppHeader> {
               // Main header - with proper padding for all elements
               Container(
                 height: 64, // Sufficient height for logo and icons
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: isDesktop ? 8 : 4,
+                  vertical: 8,
+                ),
                 child: Row(
                   children: [
                     // Logo - smaller on mobile to fit all buttons
-                    GestureDetector(
-                      onTap: () {
-                        _closeMobileMenu();
-                        navigateToHome(context);
-                      },
-                      child: SizedBox(
-                        height: isDesktop
-                            ? 48
-                            : 32, // 32px on mobile, 48px on desktop
-                        child: Image.asset(
-                          'assets/images/upsu.png',
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: isDesktop ? 48 : 32,
-                              padding: const EdgeInsets.all(8),
-                              child: const Icon(
-                                Icons.store,
-                                color: Color(0xFF4d2963),
-                              ),
-                            );
-                          },
+                    Flexible(
+                      flex: 0,
+                      child: GestureDetector(
+                        onTap: () {
+                          _closeMobileMenu();
+                          navigateToHome(context);
+                        },
+                        child: SizedBox(
+                          height: isDesktop ? 48 : 32,
+                          child: Image.asset(
+                            'assets/images/upsu.png',
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: isDesktop ? 48 : 32,
+                                padding: const EdgeInsets.all(8),
+                                child: const Icon(
+                                  Icons.store,
+                                  color: Color(0xFF4d2963),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -213,42 +216,48 @@ class _AppHeaderState extends State<AppHeader> {
                         () => navigateToAbout(context),
                         widget.currentRoute == '/about',
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 8),
                     ],
 
-                    // Utility Icons (search, profile, cart)
+                    // Utility Icons (search, profile, cart) - more compact on mobile
                     IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: placeholderCallbackForButtons,
                       tooltip: 'Search',
-                      iconSize: 24,
+                      iconSize: isDesktop ? 24 : 20,
                       padding: isDesktop
-                          ? null
-                          : const EdgeInsets.all(
-                              8), // Tighter padding on mobile
-                      constraints: isDesktop
-                          ? null
-                          : const BoxConstraints(minWidth: 40, minHeight: 40),
+                          ? const EdgeInsets.all(8)
+                          : const EdgeInsets.all(2),
+                      constraints: BoxConstraints(
+                        minWidth: isDesktop ? 48 : 32,
+                        minHeight: isDesktop ? 48 : 32,
+                      ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.person_outline),
                       onPressed: placeholderCallbackForButtons,
                       tooltip: 'Account',
-                      iconSize: 24,
-                      padding: isDesktop ? null : const EdgeInsets.all(8),
-                      constraints: isDesktop
-                          ? null
-                          : const BoxConstraints(minWidth: 40, minHeight: 40),
+                      iconSize: isDesktop ? 24 : 20,
+                      padding: isDesktop
+                          ? const EdgeInsets.all(8)
+                          : const EdgeInsets.all(2),
+                      constraints: BoxConstraints(
+                        minWidth: isDesktop ? 48 : 32,
+                        minHeight: isDesktop ? 48 : 32,
+                      ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.shopping_cart_outlined),
                       onPressed: placeholderCallbackForButtons,
                       tooltip: 'Cart',
-                      iconSize: 24,
-                      padding: isDesktop ? null : const EdgeInsets.all(8),
-                      constraints: isDesktop
-                          ? null
-                          : const BoxConstraints(minWidth: 40, minHeight: 40),
+                      iconSize: isDesktop ? 24 : 20,
+                      padding: isDesktop
+                          ? const EdgeInsets.all(8)
+                          : const EdgeInsets.all(2),
+                      constraints: BoxConstraints(
+                        minWidth: isDesktop ? 48 : 32,
+                        minHeight: isDesktop ? 48 : 32,
+                      ),
                     ),
 
                     // Mobile Hamburger Menu
@@ -259,9 +268,9 @@ class _AppHeaderState extends State<AppHeader> {
                         onPressed: _toggleMobileMenu,
                         tooltip: 'Menu',
                         iconSize: 24,
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(2),
                         constraints:
-                            const BoxConstraints(minWidth: 40, minHeight: 40),
+                            const BoxConstraints(minWidth: 32, minHeight: 32),
                       ),
                   ],
                 ),

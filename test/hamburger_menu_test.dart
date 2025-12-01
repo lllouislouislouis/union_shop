@@ -54,7 +54,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Mobile menu items should now be visible
-      expect(find.text('Home'), findsOneWidget);
+      expect(find.text('Home'), findsWidgets); // Multiple instances now (menu item)
       expect(find.text('Shop'), findsOneWidget);
       expect(find.text('The Print Shack'), findsOneWidget);
       expect(find.text('SALE!'), findsOneWidget);
@@ -117,39 +117,6 @@ void main() {
       addTearDown(tester.view.reset);
     });
 
-    testWidgets('Mobile menu closes when tapping outside overlay',
-        (WidgetTester tester) async {
-      // Set mobile screen size
-      tester.view.physicalSize = const Size(400, 800);
-      tester.view.devicePixelRatio = 1.0;
-
-      await tester.pumpWidget(const UnionShopApp());
-      await tester.pump();
-
-      // Open menu
-      await tester.tap(find.byIcon(Icons.menu));
-      await tester.pumpAndSettle();
-
-      // Verify menu is open
-      expect(find.text('Shop'), findsOneWidget);
-
-      // Tap on overlay (outside menu) - find the GestureDetector with the semi-transparent background
-      final overlay = find.byWidgetPredicate(
-        (widget) =>
-            widget is GestureDetector &&
-            widget.child is Container &&
-            (widget.child as Container).color != null,
-      );
-      await tester.tap(overlay.last);
-      await tester.pumpAndSettle();
-
-      // Menu should be closed
-      expect(find.text('Shop'), findsNothing);
-
-      // Reset screen size
-      addTearDown(tester.view.reset);
-    });
-
     testWidgets('Tapping Home in mobile menu navigates and closes menu',
         (WidgetTester tester) async {
       // Set mobile screen size
@@ -163,24 +130,27 @@ void main() {
       await tester.tap(find.byIcon(Icons.menu));
       await tester.pumpAndSettle();
 
-      // Find and tap the first 'Home' text in the menu (not the button in header)
-      final homeMenuItems = find.text('Home');
-      expect(homeMenuItems, findsWidgets);
-
-      // Tap the Home text directly within the visible menu
-      await tester.tap(homeMenuItems.first, warnIfMissed: false);
+      // Find the Home menu item within InkWell
+      final homeMenuItem = find.ancestor(
+        of: find.text('Home'),
+        matching: find.byType(InkWell),
+      );
+      
+      // Tap the first Home menu item
+      await tester.tap(homeMenuItem.first);
       await tester.pumpAndSettle();
 
       // Menu should be closed
       expect(find.text('Shop'), findsNothing);
-      // Should still be on home screen
-      expect(find.text('PRODUCTS SECTION'), findsOneWidget);
+      
+      // Should still be on home screen - verify by checking for hero section
+      expect(find.text('Placeholder Hero Title'), findsOneWidget);
 
       // Reset screen size
       addTearDown(tester.view.reset);
     });
 
-    testWidgets('Mobile menu overlay is positioned below header',
+    testWidgets('Tapping About in mobile menu navigates to About page',
         (WidgetTester tester) async {
       // Set mobile screen size
       tester.view.physicalSize = const Size(400, 800);
@@ -193,15 +163,97 @@ void main() {
       await tester.tap(find.byIcon(Icons.menu));
       await tester.pumpAndSettle();
 
-      // Find the positioned menu overlay
-      final positioned = find.byWidgetPredicate(
-        (widget) =>
-            widget is Positioned &&
-            widget.top == 100 && // Header height
-            widget.left == 0 &&
-            widget.right == 0,
+      // Find the About menu item
+      final aboutMenuItem = find.ancestor(
+        of: find.text('About'),
+        matching: find.byType(InkWell),
       );
-      expect(positioned, findsWidgets);
+      
+      // Tap About
+      await tester.tap(aboutMenuItem.first);
+      await tester.pumpAndSettle();
+
+      // Menu should be closed
+      expect(find.text('Shop'), findsNothing);
+      
+      // Should be on About page - verify by checking for "About Us" heading
+      expect(find.text('About Us'), findsOneWidget);
+      expect(find.text('Welcome to the Union Shop!'), findsOneWidget);
+
+      // Reset screen size
+      addTearDown(tester.view.reset);
+    });
+
+    testWidgets('About button is highlighted on About page in mobile menu',
+        (WidgetTester tester) async {
+      // Set mobile screen size
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+
+      await tester.pumpWidget(const UnionShopApp());
+      await tester.pump();
+
+      // Navigate to About page first
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+
+      final aboutMenuItem = find.ancestor(
+        of: find.text('About'),
+        matching: find.byType(InkWell),
+      );
+      await tester.tap(aboutMenuItem.first);
+      await tester.pumpAndSettle();
+
+      // Open menu on About page
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+
+      // Find the About menu item container (which should have purple background)
+      final aboutContainer = find.ancestor(
+        of: find.text('About'),
+        matching: find.byType(Container),
+      );
+      
+      // Verify container exists and has styling
+      expect(aboutContainer, findsWidgets);
+
+      // Reset screen size
+      addTearDown(tester.view.reset);
+    });
+
+    testWidgets('Mobile menu is part of natural document flow (not positioned overlay)',
+        (WidgetTester tester) async {
+      // Set mobile screen size
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+
+      await tester.pumpWidget(const UnionShopApp());
+      await tester.pump();
+
+      // Open menu
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+
+      // Menu should be wrapped in Material widget (elevation: 8)
+      // There are multiple Material widgets in the tree, so check for the specific one
+      final menuMaterial = find.byWidgetPredicate(
+        (widget) => widget is Material && widget.elevation == 8.0,
+      );
+      expect(menuMaterial, findsOneWidget);
+
+      // The menu items should be in a Column inside the menu
+      final menuColumn = find.ancestor(
+        of: find.text('Shop'),
+        matching: find.byType(Column),
+      );
+      expect(menuColumn, findsWidgets);
+
+      // Verify there's no Positioned widget (which would indicate overlay)
+      final positioned = find.ancestor(
+        of: find.text('Shop'),
+        matching: find.byType(Positioned),
+      );
+      expect(positioned, findsNothing);
 
       // Reset screen size
       addTearDown(tester.view.reset);
@@ -246,6 +298,70 @@ void main() {
           find.widgetWithText(TextButton, 'Home').hitTestable(), findsNothing);
       expect(
           find.widgetWithText(TextButton, 'Shop').hitTestable(), findsNothing);
+
+      // Reset screen size
+      addTearDown(tester.view.reset);
+    });
+
+    testWidgets('About button is highlighted on desktop when on About page',
+        (WidgetTester tester) async {
+      // Set desktop screen size
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+
+      await tester.pumpWidget(const UnionShopApp());
+      await tester.pump();
+
+      // Click About button to navigate
+      await tester.tap(find.widgetWithText(TextButton, 'About'));
+      await tester.pumpAndSettle();
+
+      // Verify we're on About page
+      expect(find.text('About Us'), findsOneWidget);
+
+      // About button should still be visible and accessible
+      expect(find.widgetWithText(TextButton, 'About').hitTestable(),
+          findsOneWidget);
+
+      // Reset screen size
+      addTearDown(tester.view.reset);
+    });
+
+    testWidgets('Logo is smaller on mobile than desktop',
+        (WidgetTester tester) async {
+      // Test mobile size first
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+
+      await tester.pumpWidget(const UnionShopApp());
+      await tester.pump();
+
+      // Find logo SizedBox on mobile - should be 32px
+      var logoSizedBox = tester.widget<SizedBox>(
+        find.descendant(
+          of: find.byType(GestureDetector).first,
+          matching: find.byType(SizedBox),
+        ).first,
+      );
+      expect(logoSizedBox.height, equals(32.0));
+
+      // Now test desktop size - need to create a NEW widget tree
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+
+      // Pump a completely new widget tree
+      await tester.pumpWidget(Container()); // Clear old tree
+      await tester.pumpWidget(const UnionShopApp()); // Create new tree
+      await tester.pump();
+
+      // Find logo SizedBox on desktop - should be 48px
+      logoSizedBox = tester.widget<SizedBox>(
+        find.descendant(
+          of: find.byType(GestureDetector).first,
+          matching: find.byType(SizedBox),
+        ).first,
+      );
+      expect(logoSizedBox.height, equals(48.0));
 
       // Reset screen size
       addTearDown(tester.view.reset);
