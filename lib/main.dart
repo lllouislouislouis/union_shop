@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:union_shop/product_page.dart';
+import 'package:union_shop/widgets/app_header.dart';
 
 void main() {
   runApp(const UnionShopApp());
@@ -34,108 +35,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Track whether the mobile menu is open
-  bool _isMobileMenuOpen = false;
-
-  // Navigation helper methods
-  void navigateToHome(BuildContext context) {
-    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-  }
-
-  void navigateToProduct(BuildContext context) {
-    Navigator.pushNamed(context, '/product');
-  }
-
   void placeholderCallbackForButtons() {
     // This is the event handler for buttons that don't work yet
   }
 
-  // Toggle mobile menu
-  void _toggleMobileMenu() {
-    setState(() {
-      _isMobileMenuOpen = !_isMobileMenuOpen;
-    });
-  }
-
-  // Close mobile menu
-  void _closeMobileMenu() {
-    if (_isMobileMenuOpen) {
-      setState(() {
-        _isMobileMenuOpen = false;
-      });
-    }
-  }
-
-  // Helper method to build navigation buttons
-  Widget _buildNavButton(String label, VoidCallback onPressed) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: TextButton(
-        onPressed: onPressed,
-        style: TextButton.styleFrom(
-          foregroundColor: Colors.grey[700],
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero,
-          ),
-        ).copyWith(
-          overlayColor: WidgetStateProperty.resolveWith<Color?>(
-            (Set<WidgetState> states) {
-              if (states.contains(WidgetState.hovered)) {
-                return const Color(0xFF4d2963).withValues(alpha: 0.1);
-              }
-              return null;
-            },
-          ),
-        ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.5,
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Helper method to build mobile menu items
-  Widget _buildMobileMenuItem(String label, VoidCallback onTap) {
-    return InkWell(
-      onTap: () {
-        _closeMobileMenu();
-        onTap();
-      },
-      splashColor: const Color(0xFF4d2963).withValues(alpha: 0.1),
-      highlightColor: const Color(0xFF4d2963).withValues(alpha: 0.05),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Colors.grey[300]!),
-          ),
-        ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.5,
-            color: Colors.black87,
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    // Get screen width for responsive behavior
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth > 800;
-
     return Scaffold(
       body: Stack(
         children: [
@@ -143,100 +48,8 @@ class _HomeScreenState extends State<HomeScreen> {
           SingleChildScrollView(
             child: Column(
               children: [
-                // Header
-                Container(
-                  height: 100,
-                  color: Colors.white,
-                  child: Column(
-                    children: [
-                      // Top banner
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        color: const Color(0xFF4d2963),
-                        child: const Text(
-                          'BIG SALE! OUR ESSENTIAL RANGE HAS DROPPED IN PRICE! OVER 20% OFF! COME GRAB YOURS WHILE STOCK LASTS!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ),
-                      // Main header
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Row(
-                            children: [
-                              // Logo
-                              GestureDetector(
-                                onTap: () {
-                                  navigateToHome(context);
-                                  _closeMobileMenu();
-                                },
-                                child: Image.asset(
-                                  'assets/images/upsu.png',
-                                  height: 18,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const SizedBox.shrink();
-                                  },
-                                ),
-                              ),
-                              const Spacer(),
-
-                              // Desktop Navigation Buttons (only show on wide screens)
-                              if (isDesktop) ...[
-                                _buildNavButton(
-                                    'Home', () => navigateToHome(context)),
-                                _buildNavButton(
-                                    'Shop', placeholderCallbackForButtons),
-                                _buildNavButton('The Print Shack',
-                                    placeholderCallbackForButtons),
-                                _buildNavButton(
-                                    'SALE!', placeholderCallbackForButtons),
-                                _buildNavButton(
-                                    'About', placeholderCallbackForButtons),
-                                const SizedBox(width: 16),
-                              ],
-
-                              // Utility Icons (search, profile, cart)
-                              IconButton(
-                                icon: const Icon(Icons.search,
-                                    color: Colors.grey),
-                                onPressed: placeholderCallbackForButtons,
-                                tooltip: 'Search',
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.person_outline,
-                                    color: Colors.grey),
-                                onPressed: placeholderCallbackForButtons,
-                                tooltip: 'Account',
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.shopping_bag_outlined,
-                                    color: Colors.grey),
-                                onPressed: placeholderCallbackForButtons,
-                                tooltip: 'Cart',
-                              ),
-
-                              // Mobile Hamburger Menu
-                              if (!isDesktop)
-                                IconButton(
-                                  icon: Icon(
-                                    _isMobileMenuOpen
-                                        ? Icons.close
-                                        : Icons.menu,
-                                    color: Colors.grey,
-                                  ),
-                                  onPressed: _toggleMobileMenu,
-                                  tooltip: 'Menu',
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Header - Now using reusable AppHeader component
+                AppHeader(currentRoute: '/'),
 
                 // Hero Section
                 SizedBox(
@@ -273,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             const Text(
                               'Placeholder Hero Title',
                               style: TextStyle(
-                                fontSize: 32,
+                                fontSize: 48,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                                 height: 1.2,
@@ -283,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             const Text(
                               "This is placeholder text for the hero section.",
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
                                 color: Colors.white,
                                 height: 1.5,
                               ),
@@ -295,14 +108,17 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF4d2963),
                                 foregroundColor: Colors.white,
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.zero,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                  vertical: 16,
                                 ),
                               ),
                               child: const Text(
-                                'BROWSE PRODUCTS',
-                                style:
-                                    TextStyle(fontSize: 14, letterSpacing: 1),
+                                'SHOP NOW',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
@@ -384,51 +200,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-
-          // Mobile dropdown menu overlay (appears below header)
-          if (!isDesktop && _isMobileMenuOpen)
-            Positioned(
-              top: 100, // Position below the header
-              left: 0,
-              right: 0,
-              child: Material(
-                elevation: 8,
-                child: AnimatedSize(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeInOut,
-                  child: Container(
-                    color: Colors.white,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildMobileMenuItem(
-                            'Home', () => navigateToHome(context)),
-                        _buildMobileMenuItem(
-                            'Shop', placeholderCallbackForButtons),
-                        _buildMobileMenuItem(
-                            'The Print Shack', placeholderCallbackForButtons),
-                        _buildMobileMenuItem(
-                            'SALE!', placeholderCallbackForButtons),
-                        _buildMobileMenuItem(
-                            'About', placeholderCallbackForButtons),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-          // Overlay to close menu when tapping outside
-          if (!isDesktop && _isMobileMenuOpen)
-            Positioned.fill(
-              top: 100, // Start below header
-              child: GestureDetector(
-                onTap: _closeMobileMenu,
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.3),
-                ),
-              ),
-            ),
         ],
       ),
     );
