@@ -3,6 +3,7 @@ import 'package:union_shop/views/about_page.dart';
 import 'package:union_shop/views/product_page.dart';
 import 'package:union_shop/views/sale_page.dart';
 import 'package:union_shop/widgets/app_header.dart';
+import 'package:union_shop/views/shop_category_page.dart';
 
 void main() {
   runApp(const UnionShopApp());
@@ -27,7 +28,7 @@ class UnionShopApp extends StatelessWidget {
         '/product': (context) => const ProductPage(),
         '/about': (context) => const AboutPage(),
         '/sale': (context) => const SalePage(),
- 
+
         // Shop category routes (FR-16)
         '/shop/clothing': (context) =>
             const ShopCategoryPage(category: 'clothing'),
