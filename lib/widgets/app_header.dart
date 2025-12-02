@@ -62,30 +62,40 @@ class _AppHeaderState extends State<AppHeader> {
   // Track whether the mobile menu is open
   bool _isMobileMenuOpen = false;
 
+  // Dropdown state management (FR-1.1)
+  bool _isShopDropdownOpen = false;
+  bool _isPrintShackDropdownOpen = false;
+  bool _isMobileSubmenuOpen = false;
+  String _currentSubmenu = ''; // Values: '', 'shop', 'printshack'
+
   // Navigation helper methods
   void navigateToHome(BuildContext context) {
     _closeMobileMenu();
+    _closeAllDropdowns();
     Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
   }
 
   void navigateToAbout(BuildContext context) {
     _closeMobileMenu();
+    _closeAllDropdowns();
     Navigator.pushNamed(context, '/about');
   }
 
   void navigateToProduct(BuildContext context) {
     _closeMobileMenu();
+    _closeAllDropdowns();
     Navigator.pushNamed(context, '/product');
   }
 
   void navigateToSale(BuildContext context) {
     _closeMobileMenu();
+    _closeAllDropdowns();
     Navigator.pushNamed(context, '/sale');
   }
 
   void placeholderCallbackForButtons() {
-    // This is the event handler for buttons that don't work yet
     _closeMobileMenu();
+    _closeAllDropdowns();
   }
 
   // Toggle mobile menu
@@ -95,78 +105,48 @@ class _AppHeaderState extends State<AppHeader> {
     });
   }
 
-  // Close mobile menu
-  void _closeMobileMenu() {
-    if (_isMobileMenuOpen) {
+  // Dropdown state management methods (FR-1.2)
+  /// Toggle Shop dropdown - closes Print Shack dropdown if open
+  void _toggleShopDropdown() {
+    setState(() {
+      _isShopDropdownOpen = !_isShopDropdownOpen;
+      // Close Print Shack dropdown if Shop is opening (FR-1.3)
+      if (_isShopDropdownOpen) {
+        _isPrintShackDropdownOpen = false;
+      }
+    });
+  }
+
+  /// Toggle Print Shack dropdown - closes Shop dropdown if open
+  void _togglePrintShackDropdown() {
+    setState(() {
+      _isPrintShackDropdownOpen = !_isPrintShackDropdownOpen;
+      // Close Shop dropdown if Print Shack is opening (FR-1.3)
+      if (_isPrintShackDropdownOpen) {
+        _isShopDropdownOpen = false;
+      }
+    });
+  }
+
+  /// Close all dropdowns (desktop)
+  void _closeAllDropdowns() {
+    if (_isShopDropdownOpen || _isPrintShackDropdownOpen) {
       setState(() {
-        _isMobileMenuOpen = false;
+        _isShopDropdownOpen = false;
+        _isPrintShackDropdownOpen = false;
       });
     }
   }
 
-  // Helper method to build navigation buttons
-  // isActive parameter highlights the current page
-  Widget _buildNavButton(String label, VoidCallback onPressed, bool isActive) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: TextButton(
-        onPressed: onPressed,
-        style: TextButton.styleFrom(
-          foregroundColor:
-              isActive ? const Color(0xFF4d2963) : Colors.grey[700],
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero,
-          ),
-        ).copyWith(
-          overlayColor: WidgetStateProperty.resolveWith<Color?>(
-            (Set<WidgetState> states) {
-              if (states.contains(WidgetState.hovered)) {
-                return const Color(0xFF4d2963).withValues(alpha: 0.1);
-              }
-              return null;
-            },
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-            letterSpacing: 0.5,
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Helper method to build mobile menu items
-  Widget _buildMobileMenuItem(String label, VoidCallback onTap, bool isActive) {
-    return InkWell(
-      onTap: onTap,
-      splashColor: const Color(0xFF4d2963).withValues(alpha: 0.1),
-      highlightColor: const Color(0xFF4d2963).withValues(alpha: 0.05),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Colors.grey[300]!),
-          ),
-          color:
-              isActive ? const Color(0xFF4d2963).withValues(alpha: 0.05) : null,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-            letterSpacing: 0.5,
-            color: isActive ? const Color(0xFF4d2963) : Colors.black87,
-          ),
-        ),
-      ),
-    );
+  // Update _closeMobileMenu to also close submenus (FR-1.5)
+  void _closeMobileMenu() {
+    if (_isMobileMenuOpen || _isMobileSubmenuOpen) {
+      setState(() {
+        _isMobileMenuOpen = false;
+        _isMobileSubmenuOpen = false;
+        _currentSubmenu = '';
+      });
+    }
   }
 
   @override
@@ -362,6 +342,71 @@ class _AppHeaderState extends State<AppHeader> {
             ),
           ),
       ],
+    );
+  }
+
+  // Helper method to build navigation buttons
+  // isActive parameter highlights the current page
+  Widget _buildNavButton(String label, VoidCallback onPressed, bool isActive) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          foregroundColor:
+              isActive ? const Color(0xFF4d2963) : Colors.grey[700],
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+        ).copyWith(
+          overlayColor: WidgetStateProperty.resolveWith<Color?>(
+            (Set<WidgetState> states) {
+              if (states.contains(WidgetState.hovered)) {
+                return const Color(0xFF4d2963).withValues(alpha: 0.1);
+              }
+              return null;
+            },
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper method to build mobile menu items
+  Widget _buildMobileMenuItem(String label, VoidCallback onTap, bool isActive) {
+    return InkWell(
+      onTap: onTap,
+      splashColor: const Color(0xFF4d2963).withValues(alpha: 0.1),
+      highlightColor: const Color(0xFF4d2963).withValues(alpha: 0.05),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: Colors.grey[300]!),
+          ),
+          color:
+              isActive ? const Color(0xFF4d2963).withValues(alpha: 0.05) : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+            letterSpacing: 0.5,
+            color: isActive ? const Color(0xFF4d2963) : Colors.black87,
+          ),
+        ),
+      ),
     );
   }
 }
