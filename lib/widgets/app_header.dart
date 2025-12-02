@@ -180,6 +180,29 @@ class _AppHeaderState extends State<AppHeader> {
   }
 
   // Dropdown state management methods (FR-1.2)
+  // If the button's RenderBox isn't ready yet, retry next frame; otherwise close to keep state consistent
+  void _openOverlayFor(
+    GlobalKey key,
+    void Function(Rect rect) showOverlay,
+    void Function() markClosed,
+  ) {
+    final rect = _getButtonRect(key);
+    if (rect != null) {
+      showOverlay(rect);
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final retryRect = _getButtonRect(key);
+      if (retryRect != null) {
+        showOverlay(retryRect);
+      } else {
+        setState(() {
+          markClosed();
+        });
+      }
+    });
+  }
+
   /// Toggle Shop dropdown - closes Print Shack dropdown if open
   void _toggleShopDropdown() {
     setState(() {
@@ -189,8 +212,11 @@ class _AppHeaderState extends State<AppHeader> {
     });
     _printOverlayEntry?.remove();
     if (_isShopDropdownOpen) {
-      final rect = _getButtonRect(_shopButtonKey);
-      if (rect != null) _showShopDropdownOverlay(rect);
+      _openOverlayFor(
+        _shopButtonKey,
+        (rect) => _showShopDropdownOverlay(rect),
+        () => _isShopDropdownOpen = false,
+      );
     } else {
       _shopOverlayEntry?.remove();
       _shopOverlayEntry = null;
@@ -206,8 +232,11 @@ class _AppHeaderState extends State<AppHeader> {
     });
     _shopOverlayEntry?.remove();
     if (_isPrintShackDropdownOpen) {
-      final rect = _getButtonRect(_printShackButtonKey);
-      if (rect != null) _showPrintDropdownOverlay(rect);
+      _openOverlayFor(
+        _printShackButtonKey,
+        (rect) => _showPrintDropdownOverlay(rect),
+        () => _isPrintShackDropdownOpen = false,
+      );
     } else {
       _printOverlayEntry?.remove();
       _printOverlayEntry = null;
