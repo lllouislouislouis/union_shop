@@ -406,45 +406,166 @@ class _AppHeaderState extends State<AppHeader> {
             ),
           ),
 
-          // Mobile dropdown menu
+          // Mobile menu with slide animation (FR-15)
           if (!isDesktop && _isMobileMenuOpen)
             Material(
               elevation: 8,
               child: Container(
                 color: Colors.white,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildMobileMenuItem(
-                      'Home',
-                      () => navigateToHome(context),
-                      widget.currentRoute == '/',
-                    ),
-                    _buildMobileMenuItem(
-                      'Shop',
-                      () => _openMobileSubmenu('shop'),
-                      widget.currentRoute.startsWith('/shop/'),
-                    ),
-                    _buildMobileMenuItem(
-                      'The Print Shack',
-                      () => _openMobileSubmenu('printshack'),
-                      widget.currentRoute.startsWith('/print-shack/'),
-                    ),
-                    _buildMobileMenuItem(
-                      'SALE!',
-                      () => navigateToSale(context),
-                      widget.currentRoute == '/sale',
-                    ),
-                    _buildMobileMenuItem(
-                      'About',
-                      () => navigateToAbout(context),
-                      widget.currentRoute == '/about',
-                    ),
-                  ],
+                child: ClipRect(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                      // Slide from right when opening submenu, slide from left when closing
+                      final inFromRight =
+                          child.key == const ValueKey('submenu');
+                      final offsetAnimation = Tween<Offset>(
+                        begin: Offset(inFromRight ? 1.0 : -1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeInOut,
+                      ));
+
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      );
+                    },
+                    child: _isMobileSubmenuOpen
+                        ? _buildMobileSubmenu()
+                        : _buildMainMobileMenu(),
+                  ),
                 ),
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  // Main mobile menu (FR-15.1)
+  Widget _buildMainMobileMenu() {
+    return Container(
+      key: const ValueKey('main'),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildMobileMenuItem(
+            'Home',
+            () => navigateToHome(context),
+            widget.currentRoute == '/',
+          ),
+          _buildMobileMenuItem(
+            'Shop',
+            () => _openMobileSubmenu('shop'),
+            widget.currentRoute.startsWith('/shop/'),
+          ),
+          _buildMobileMenuItem(
+            'The Print Shack',
+            () => _openMobileSubmenu('printshack'),
+            widget.currentRoute.startsWith('/print-shack/'),
+          ),
+          _buildMobileMenuItem(
+            'SALE!',
+            () => navigateToSale(context),
+            widget.currentRoute == '/sale',
+          ),
+          _buildMobileMenuItem(
+            'About',
+            () => navigateToAbout(context),
+            widget.currentRoute == '/about',
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Mobile submenu (FR-15.2)
+  Widget _buildMobileSubmenu() {
+    // Determine which submenu to show
+    final items = _currentSubmenu == 'shop'
+        ? AppHeader.shopMenuItems
+        : AppHeader.printShackMenuItems;
+
+    final title = _currentSubmenu == 'shop' ? 'Shop' : 'The Print Shack';
+
+    return Container(
+      key: const ValueKey('submenu'),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Back button header (FR-15.3)
+          InkWell(
+            onTap: _closeMobileSubmenu,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4d2963).withValues(alpha: 0.05),
+                border: Border(
+                  bottom: BorderSide(color: Colors.grey[300]!),
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.arrow_back,
+                    color: Color(0xFF4d2963),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF4d2963),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Submenu items (FR-15.4)
+          ...items.map((item) {
+            return _buildMobileSubmenuItem(
+              item: item,
+              isActive: item.isActive(widget.currentRoute),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  // Helper method to build mobile submenu items (FR-15.5)
+  Widget _buildMobileSubmenuItem({
+    required MenuItem item,
+    required bool isActive,
+  }) {
+    return InkWell(
+      onTap: () {
+        _closeMobileMenu();
+        Navigator.pushNamed(context, item.route);
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: Colors.grey[200]!),
+          ),
+        ),
+        child: Text(
+          item.label,
+          style: TextStyle(
+            fontSize: 16,
+            color: isActive ? const Color(0xFF4d2963) : Colors.black,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
       ),
     );
   }
