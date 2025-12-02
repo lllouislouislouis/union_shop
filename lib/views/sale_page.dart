@@ -275,9 +275,40 @@ class _SalePageState extends State<SalePage> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildCategoryFilter(fullWidth: true),
+          // Filter row with label
+          Row(
+            children: [
+              Text(
+                'Filter by',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(child: _buildCategoryFilter(fullWidth: true)),
+            ],
+          ),
           const SizedBox(height: 16),
-          _buildSortDropdown(fullWidth: true),
+          // Sort row with label
+          Row(
+            children: [
+              Text(
+                'Sort by',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(child: _buildSortDropdown(fullWidth: true)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Product count
+          _buildProductCount(),
         ],
       );
     } else {
@@ -285,8 +316,44 @@ class _SalePageState extends State<SalePage> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildCategoryFilter(fullWidth: false),
-          _buildSortDropdown(fullWidth: false),
+          // Left side: Filter and Sort with labels
+          Row(
+            children: [
+              // Filter with label
+              Row(
+                children: [
+                  Text(
+                    'Filter by',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  _buildCategoryFilter(fullWidth: false),
+                ],
+              ),
+              const SizedBox(width: 24),
+              // Sort with label
+              Row(
+                children: [
+                  Text(
+                    'Sort by',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  _buildSortDropdown(fullWidth: false),
+                ],
+              ),
+            ],
+          ),
+          // Right side: Product count
+          _buildProductCount(),
         ],
       );
     }
@@ -410,6 +477,19 @@ class _SalePageState extends State<SalePage> {
     );
   }
 
+  // Build product count display
+  Widget _buildProductCount() {
+    final productText = _filteredProducts.length == 1 ? 'product' : 'products';
+    return Text(
+      '${_filteredProducts.length} $productText',
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: Colors.grey[700],
+      ),
+    );
+  }
+
   // Build empty state when no products
   Widget _buildEmptyState() {
     return Center(
@@ -424,7 +504,7 @@ class _SalePageState extends State<SalePage> {
             ),
             const SizedBox(height: 16),
             Text(
-              _selectedCategory == 'All Categories'
+              _selectedCategory == 'All products'
                   ? 'No products found'
                   : 'No products found in this category',
               style: TextStyle(
