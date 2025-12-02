@@ -27,6 +27,26 @@ class UnionShopApp extends StatelessWidget {
         '/product': (context) => const ProductPage(),
         '/about': (context) => const AboutPage(),
         '/sale': (context) => const SalePage(),
+ 
+        // Shop category routes (FR-16)
+        '/shop/clothing': (context) =>
+            const ShopCategoryPage(category: 'clothing'),
+        '/shop/merchandise': (context) =>
+            const ShopCategoryPage(category: 'merchandise'),
+        '/shop/halloween': (context) =>
+            const ShopCategoryPage(category: 'halloween'),
+        '/shop/signature-essential': (context) =>
+            const ShopCategoryPage(category: 'signature-essential'),
+        '/shop/portsmouth': (context) =>
+            const ShopCategoryPage(category: 'portsmouth'),
+        '/shop/pride': (context) => const ShopCategoryPage(category: 'pride'),
+        '/shop/graduation': (context) =>
+            const ShopCategoryPage(category: 'graduation'),
+
+        // Print Shack routes (FR-17)
+        '/print-shack/about': (context) => const PrintShackAboutPage(),
+        '/print-shack/personalisation': (context) =>
+            const PersonalisationPage(),
       },
     );
   }
