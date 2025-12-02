@@ -1,498 +1,510 @@
-# Sale Page Feature Requirements
+# Shop and Print Shack Dropdown Menu Feature Requirements
 
 ## 1. Feature Overview
 
 ### Description
-Implement a comprehensive "Sale" page for the Union Shop Flutter application that displays discounted products in a filterable, sortable, and paginated grid layout. The page will allow users to browse sale items efficiently, filter by category, sort by various criteria (price, name, discount, etc.), and navigate through multiple pages of products.
+Implement hierarchical dropdown navigation menus for the "Shop" and "The Print Shack" buttons in the AppHeader component. These menus will provide quick access to product categories and services, with distinct behavior patterns for desktop (hover-activated dropdowns) and mobile (slide-over submenu panels) viewports.
 
 ### Purpose
-- **Showcase Discounts**: Highlight products currently on sale to drive conversions
-- **Improve Discoverability**: Help users find sale items that match their interests through filtering
-- **Enhance User Experience**: Provide intuitive sorting and pagination for browsing large product catalogs
-- **Drive Sales**: Make it easy for users to find and purchase discounted items
-- **Professional Appearance**: Demonstrate a complete, feature-rich e-commerce experience
+- **Improve Navigation**: Provide direct access to specific product categories without extra page loads
+- **Enhance Discoverability**: Make all shopping categories and print services immediately visible
+- **Professional UX**: Implement industry-standard dropdown navigation patterns
+- **Mobile Optimization**: Provide touch-friendly navigation hierarchy for mobile users
+- **Reduce Clicks**: Allow users to navigate directly to category pages from any location
 
 ### Technical Context
-- **Current State**: "SALE!" button exists in navigation but uses placeholder callback
-- **New Components**: SalePage widget, SaleProduct model, enhanced ProductCard
-- **Framework**: Flutter web application with named route navigation
-- **Route**: '/sale' will be added to application routes
-- **Shared Elements**: AppHeader component will be reused from other pages
-- **Data Management**: Mock product data with filtering, sorting, and pagination logic
+- **Current State**: Shop and Print Shack buttons use placeholder callbacks
+- **Modified Component**: `lib/widgets/app_header.dart` will be significantly enhanced
+- **New Components**: Desktop dropdown overlays, mobile submenu panels, new page templates
+- **New Routes**: 9 new routes total (7 shop categories + 2 print shack pages)
+- **Framework**: Flutter web with named route navigation
+- **Theme**: Consistent purple (`Color(0xFF4d2963)`) across all interactive elements
+- **Responsive Breakpoint**: 800px separates desktop and mobile behavior
 
 ---
 
 ## 2. User Stories
 
-### US-1: Navigating to Sale Page (Desktop)
+### US-1: Desktop User Accesses Shop Categories
+**As a** desktop user (screen > 800px)  
+**I want to** click the "Shop" button to see a dropdown menu of categories  
+**So that** I can quickly navigate to the specific products I'm interested in
+
+**Acceptance Criteria:**
+- Clicking "Shop" button opens dropdown menu below the button
+- Dropdown displays all 7 categories vertically
+- Dropdown appears with smooth fade-in animation (150ms)
+- Dropdown has white background with subtle shadow (elevation: 4)
+- Each menu item shows hover effect (light purple background, purple text)
+- Clicking a category navigates to the correct route and closes dropdown
+- Clicking "Shop" again closes the dropdown (toggle behavior)
+- Clicking outside dropdown area closes it without triggering navigation
+- Pressing Escape key closes the dropdown
+- Only one dropdown (Shop or Print Shack) can be open at a time
+
+---
+
+### US-2: Desktop User Accesses Print Shack Services
 **As a** desktop user  
-**I want to** click the "SALE!" button in the navigation bar  
-**So that** I can browse discounted products
+**I want to** click "The Print Shack" button to see available services  
+**So that** I can quickly access personalization or information pages
 
 **Acceptance Criteria:**
-- SALE! button in desktop navigation is clickable
-- Clicking SALE! button navigates to '/sale' route
-- Page loads without errors showing initial 9 products
-- Navigation transition is smooth
-- SALE! button appears highlighted/active on the Sale page
-- All other navigation buttons remain functional
-- Default state: "All Categories" filter, "Featured" sort, page 1
+- Clicking "The Print Shack" button opens dropdown menu below the button
+- Dropdown displays 2 menu items: "About" and "Personalisation"
+- Same visual styling as Shop dropdown (white, shadow, purple accents)
+- Hover effects work on both menu items
+- Clicking an item navigates to correct route and closes dropdown
+- If Shop dropdown is open, it closes when Print Shack dropdown opens
+- All interaction patterns match Shop dropdown behavior
 
 ---
 
-### US-2: Navigating to Sale Page (Mobile)
+### US-3: Mobile User Accesses Shop Categories
+**As a** mobile user (screen ≤ 800px)  
+**I want to** tap "Shop" in the mobile menu to see a submenu of categories  
+**So that** I can browse categories on my touch device
+
+**Acceptance Criteria:**
+- Tapping hamburger menu opens main mobile menu
+- "Shop" appears as a tappable item in main menu
+- Tapping "Shop" slides main menu out to left and submenu in from right
+- Submenu displays purple header with "← Back" arrow and "Shop" title
+- Submenu lists all 7 categories as full-width tappable items
+- Tapping back arrow returns to main menu (slides right, main slides left)
+- Tapping any category navigates to route and closes all menus
+- Slide animations are smooth (250ms duration)
+- Touch targets are minimum 48x48px
+- Ripple effect shows on tap
+
+---
+
+### US-4: Mobile User Accesses Print Shack Services
 **As a** mobile user  
-**I want to** select "SALE!" from the mobile menu  
-**So that** I can view discounted items on my device
+**I want to** tap "The Print Shack" to see a submenu of services  
+**So that** I can access print services from my mobile device
 
 **Acceptance Criteria:**
-- SALE! option appears in mobile hamburger menu
-- Tapping SALE! closes the menu automatically
-- Navigation to '/sale' route occurs after menu closes
-- Page loads correctly on mobile viewport
-- Mobile header functions correctly on Sale page
-- Products display in single column on mobile
-- Filter and sort controls stack vertically
+- "The Print Shack" appears in main mobile menu
+- Tapping it opens submenu with purple header showing "← Back" and "The Print Shack"
+- Submenu displays 2 items: "About" and "Personalisation"
+- Navigation animations match Shop submenu (250ms slide transitions)
+- Tapping back arrow returns to main menu
+- Tapping menu item navigates and closes all menus
+- Touch targets are adequate (minimum 48x48px)
+- Visual styling matches Shop submenu
 
 ---
 
-### US-3: Viewing Sale Products
-**As a** user on the Sale page  
-**I want to** see a grid of discounted products with clear pricing  
-**So that** I can quickly identify good deals
+### US-5: User Sees Active State Highlighting
+**As a** user on a shop category page  
+**I want to** see the "Shop" button highlighted in the header  
+**So that** I know which section of the site I'm currently viewing
 
 **Acceptance Criteria:**
-- "SALE!" heading is prominent and visible at top (48px, purple)
-- Subheading explains the sale purpose
-- Products display in responsive grid (3 cols desktop, 2 tablet, 1 mobile)
-- Each product shows: image, title, original price (struck through), sale price (bold purple)
-- Original price is clearly crossed out in grey
-- Sale price is prominently displayed in purple
-- Optional discount badge shows percentage off
-- Grid spacing is consistent (24px horizontal, 32px vertical)
-- 9 products visible per page initially
+- When current route starts with `/shop/`, "Shop" button is highlighted
+- When current route starts with `/print-shack/`, "The Print Shack" button is highlighted
+- Highlighted state: purple text (`Color(0xFF4d2963)`), bold font
+- In dropdown, the current category item is highlighted with purple text
+- Active highlighting persists when dropdown is open
+- Active highlighting works on both desktop and mobile views
+- Example: On `/shop/clothing` page, "Shop" button is purple and "Clothing" in dropdown has purple text
 
 ---
 
-### US-4: Filtering Products by Category
-**As a** user browsing sale items  
-**I want to** filter products by category  
-**So that** I can focus on items I'm interested in
+### US-6: Desktop User Clicks Outside Dropdown
+**As a** desktop user with a dropdown open  
+**I want to** click anywhere outside the dropdown to close it  
+**So that** I can dismiss the menu without selecting an option
 
 **Acceptance Criteria:**
-- Category dropdown appears on left side of controls (desktop) or top (mobile)
-- Dropdown label reads "Category"
-- Options include: "All Categories", "Clothing", "Merchandise", "PSUT"
-- "All Categories" is selected by default
-- Clicking dropdown opens menu showing all options
-- Selecting a category immediately filters the grid
-- Page resets to 1 when filter changes
-- Total page count updates based on filtered results
-- Optional: Display count of filtered items (e.g., "Showing 12 items")
-- Current sort order is maintained when filtering
+- Clicking page background closes open dropdown
+- Clicking header area (but not other buttons) closes dropdown
+- Clicking other navigation buttons closes current dropdown and performs their action
+- Clicking inside dropdown keeps it open
+- Click outside detection doesn't interfere with other navigation
+- No navigation occurs when clicking outside dropdown area
 
 ---
 
-### US-5: Sorting Products
-**As a** user viewing sale items  
-**I want to** sort products by different criteria  
-**So that** I can find items that best match my preferences
+### US-7: Desktop User Switches Between Dropdowns
+**As a** desktop user  
+**I want to** click between Shop and Print Shack buttons to see different menus  
+**So that** I can explore both navigation options easily
 
 **Acceptance Criteria:**
-- Sort dropdown appears on right side of controls (desktop) or below filter (mobile)
-- Dropdown label reads "Sort by"
-- Options include:
-  - "Featured" (default)
-  - "Best Selling"
-  - "Alphabetically, A-Z"
-  - "Alphabetically, Z-A"
-  - "Price: Low to High"
-  - "Price: High to Low"
-  - "Date, old to new"
-  - "Date, new to old"
-- "Featured" is selected by default
-- Clicking dropdown opens menu showing all options
-- Selecting a sort option immediately reorders products
-- Current category filter is maintained when sorting
-- Current page is maintained if still valid after sorting
-- Page resets to 1 if current page exceeds new total after sort
+- Clicking "The Print Shack" when Shop dropdown is open switches to Print Shack dropdown
+- Clicking "Shop" when Print Shack dropdown is open switches to Shop dropdown
+- Transition is smooth with no flicker
+- Previous dropdown fully closes before new one opens
+- Only one dropdown is ever visible at a time
+- State management prevents conflicting open states
 
 ---
 
-### US-6: Navigating Through Pages
-**As a** user browsing multiple pages of sale items  
-**I want to** navigate between pages using arrow buttons  
-**So that** I can view all available products
+### US-8: Mobile User Navigates Submenu Hierarchy
+**As a** mobile user  
+**I want to** navigate back and forth between main menu and submenus  
+**So that** I can explore options before committing to navigation
 
 **Acceptance Criteria:**
-- Pagination controls appear centered below product grid
-- Controls include: Previous button (←), Page indicator, Next button (→)
-- Page indicator shows "Page X of Y" format
-- Previous button is disabled on page 1
-- Next button is disabled on last page
-- Clicking Next advances to next page and scrolls to top
-- Clicking Previous goes to previous page and scrolls to top
-- Page indicator updates correctly
-- Total pages recalculate when filters change
-- Current page stays valid or resets to 1 if out of range
+- Main menu → Shop submenu → Back → Main menu flow works correctly
+- Main menu → Print Shack submenu → Back → Main menu flow works correctly
+- Back arrow always returns to previous menu level
+- Main menu slides in/out from correct directions
+- Submenu slides in/out from correct directions
+- No menu state conflicts or visual glitches
+- Animation timing is consistent (250ms)
 
 ---
 
-### US-7: Viewing Product Details
-**As a** user interested in a specific product  
-**I want to** click on a product card  
-**So that** I can view more details and purchase
+### US-9: User Navigates to Category Pages
+**As a** user selecting a category from dropdown/submenu  
+**I want to** be taken to a page showing products in that category  
+**So that** I can browse and shop for specific types of items
 
 **Acceptance Criteria:**
-- Clicking any product card navigates to '/product' route
-- Product details are passed to product page (if applicable)
-- Navigation transition is smooth
-- Hover effect shows on desktop (scale/shadow increase)
-- Tap feedback shows on mobile (ripple effect)
-- Back button returns to Sale page
+- Clicking/tapping "Clothing" navigates to `/shop/clothing`
+- Clicking/tapping "Merchandise" navigates to `/shop/merchandise`
+- (Repeat for all 7 shop categories)
+- Page displays category name as heading
+- Placeholder page structure matches existing pages (header, content area)
+- Category pages can be extended later with product grids
+- Browser back button returns to previous page
+- All dropdown/submenu menus close after navigation
+
+---
+
+### US-10: User Navigates to Print Shack Pages
+**As a** user selecting a Print Shack service  
+**I want to** be taken to the relevant information or service page  
+**So that** I can learn about or use print services
+
+**Acceptance Criteria:**
+- Clicking/tapping "About" navigates to `/print-shack/about`
+- Clicking/tapping "Personalisation" navigates to `/print-shack/personalisation`
+- Pages display appropriate headings
+- Placeholder page structure matches existing pages
+- Pages can be filled with content later
 - Browser back button works correctly
-
----
-
-### US-8: Responsive Sale Page Layout
-**As a** user viewing the Sale page on different devices  
-**I want** the layout to adapt to my screen size  
-**So that** I can browse comfortably regardless of device
-
-**Acceptance Criteria:**
-- Desktop (>800px): 3-column grid, horizontal filter/sort row, 40px padding
-- Tablet (600-800px): 2-column grid, horizontal filter/sort row, 32px padding
-- Mobile (<600px): 1-column grid, vertical filter/sort stack, 24px padding
-- Header switches between desktop/mobile layouts at 800px
-- Products per page adjust based on grid columns (9 for 3-col, 6 for 2-col, 9 for 1-col)
-- Page doesn't overflow or break at any width
-- Scrolling is smooth on all devices
-- Touch targets are minimum 44x44 logical pixels
-
----
-
-### US-9: Handling Empty States
-**As a** user applying filters that return no results  
-**I want to** see a helpful message  
-**So that** I know the filter worked but found nothing
-
-**Acceptance Criteria:**
-- Message displays when filtered category has no products
-- Message reads: "No products found in this category"
-- Option to clear filter or return to "All Categories" is provided
-- Message is centered and clearly visible
-- Pagination controls hide when no products
-- Filter and sort controls remain accessible
-- User can easily change category or sort to see products again
-
----
-
-### US-10: Consistent Experience Across Pages
-**As a** user navigating between pages  
-**I want** the header to look and function identically on all pages  
-**So that** I have a consistent, predictable experience
-
-**Acceptance Criteria:**
-- Header appearance is identical on Home, About, and Sale pages
-- Purple banner displays on all pages
-- Logo, navigation, and utility icons positioned consistently
-- Responsive behavior works the same across pages
-- Mobile menu operates identically on all pages
-- Color scheme and styling are consistent
-- SALE! button is highlighted when on Sale page
+- All menus close after navigation
 
 ---
 
 ## 3. Functional Requirements
 
-### FR-1: Sale Page Creation
-- **FR-1.1**: Create new file `lib/views/sale_page.dart`
-- **FR-1.2**: Implement SalePage widget as StatefulWidget for managing filters, sort, and pagination state
-- **FR-1.3**: Include AppHeader component at top with currentRoute: '/sale'
-- **FR-1.4**: Include white content area with heading, subheading, filters, grid, and pagination
-- **FR-1.5**: Implement responsive layout with 800px and 600px breakpoints
-- **FR-1.6**: Handle state changes for category, sort, and page navigation
-- **FR-1.7**: Implement SingleChildScrollView for vertical scrolling
+### FR-1: State Management Enhancement
+- **FR-1.1**: Add state variables to `_AppHeaderState`:
+  - `bool _isShopDropdownOpen = false`
+  - `bool _isPrintShackDropdownOpen = false`
+  - `bool _isMobileSubmenuOpen = false`
+  - `String _currentSubmenu = ''` (values: '', 'shop', 'printshack')
+- **FR-1.2**: Implement state update methods:
+  - `void _toggleShopDropdown()`
+  - `void _togglePrintShackDropdown()`
+  - `void _closeAllDropdowns()`
+  - `void _openMobileSubmenu(String submenu)`
+  - `void _closeMobileSubmenu()`
+- **FR-1.3**: Ensure only one dropdown open at a time on desktop
+- **FR-1.4**: Track submenu navigation stack on mobile
+- **FR-1.5**: Reset all dropdown states when navigating to a new page
+- **FR-1.6**: Close dropdowns when window resizes across 800px breakpoint
 
-### FR-2: Product Data Model
-- **FR-2.1**: Create `lib/models/sale_product.dart` file (optional, can be in same file)
-- **FR-2.2**: Define SaleProduct class with fields:
-  - `String id` - Unique product identifier
-  - `String title` - Product name
-  - `double originalPrice` - Price before discount
-  - `double salePrice` - Discounted price
-  - `String imageUrl` - Path to product image
-  - `String category` - One of: "Clothing", "Merchandise", "PSUT"
-  - `DateTime saleEndDate` - When sale expires (for future features)
-- **FR-2.3**: Add computed property `discountPercentage` that calculates percentage off
-- **FR-2.4**: Create mock data list with 10-20 sample products
-- **FR-2.5**: Ensure realistic product names and prices (£5-£50 range)
-- **FR-2.6**: Mix categories evenly across mock products
+### FR-2: Desktop Dropdown - Visual Design
+- **FR-2.1**: Dropdown container with white background
+- **FR-2.2**: Box shadow with elevation: 4
+- **FR-2.3**: Border radius on bottom corners: 8px
+- **FR-2.4**: Minimum width: 250px (or match button width if larger)
+- **FR-2.5**: Position dropdown below button, aligned to left edge
+- **FR-2.6**: Use Stack and Positioned widgets for overlay
+- **FR-2.7**: Z-index: above page content, below modal overlays
+- **FR-2.8**: Border: 1px solid grey[200] (optional, for definition)
 
-### FR-3: Heading Section
-- **FR-3.1**: "SALE!" heading with fontSize 48, bold, purple color `Color(0xFF4d2963)`
-- **FR-3.2**: Subheading text: "Don't miss out on our amazing deals! Limited time offers on selected items."
-- **FR-3.3**: Subheading fontSize 18, grey[700], centered alignment
-- **FR-3.4**: Top padding: 64px from AppHeader
-- **FR-3.5**: Bottom padding: 32px before filter controls
-- **FR-3.6**: Heading centered horizontally on page
+### FR-3: Desktop Dropdown - Menu Items
+- **FR-3.1**: Each item is a clickable InkWell or TextButton
+- **FR-3.2**: Padding: 16px horizontal, 12px vertical
+- **FR-3.3**: Font size: 14px
+- **FR-3.4**: Default text color: grey[800]
+- **FR-3.5**: Hover text color: purple `Color(0xFF4d2963)`
+- **FR-3.6**: Hover background: light purple `Color(0xFF4d2963).withValues(alpha: 0.1)`
+- **FR-3.7**: Border between items: 1px solid grey[200]
+- **FR-3.8**: Active item (current page): purple text, slightly darker background
+- **FR-3.9**: OnTap callback: navigate to route, close dropdown, update state
+- **FR-3.10**: Cursor changes to pointer on hover
 
-### FR-4: Filter & Sort Controls
-- **FR-4.1**: Container for controls with horizontal Row layout on desktop (>600px)
-- **FR-4.2**: Container switches to vertical Column layout on mobile (≤600px)
-- **FR-4.3**: Category filter dropdown on left (desktop) or top (mobile)
-- **FR-4.4**: Sort dropdown on right (desktop) or below filter (mobile)
-- **FR-4.5**: Spacing between controls: 16px
-- **FR-4.6**: Controls centered on page with max-width constraint
-- **FR-4.7**: Both dropdowns have consistent styling (border, padding, colors)
+### FR-4: Desktop Dropdown - Animation
+- **FR-4.1**: Create AnimationController for dropdown (duration: 150ms)
+- **FR-4.2**: Implement fade-in animation using FadeTransition
+- **FR-4.3**: Optional: Add slight slide-down (10-20px) combined with fade
+- **FR-4.4**: Animation curve: Curves.easeOut
+- **FR-4.5**: Dispose animation controller in dispose() method
+- **FR-4.6**: Reverse animation when closing dropdown
 
-### FR-5: Category Filter Implementation
-- **FR-5.1**: DropdownButton with label "Category"
-- **FR-5.2**: Options: "All Categories", "Clothing", "Merchandise", "PSUT"
-- **FR-5.3**: Default selection: "All Categories"
-- **FR-5.4**: Border: 1px solid grey[300]
-- **FR-5.5**: Padding: 12px horizontal, 8px vertical
-- **FR-5.6**: Min width: 180px
-- **FR-5.7**: Dropdown icon: standard Material dropdown arrow
-- **FR-5.8**: OnChanged callback updates `_selectedCategory` state
-- **FR-5.9**: Triggers `_applyFilters()` method to update displayed products
-- **FR-5.10**: Resets `_currentPage` to 1 when filter changes
+### FR-5: Desktop Dropdown - Click Outside Detection
+- **FR-5.1**: Wrap entire screen content in GestureDetector
+- **FR-5.2**: Set behavior: HitTestBehavior.opaque on detector
+- **FR-5.3**: OnTap callback checks if click is outside dropdown bounds
+- **FR-5.4**: Close dropdown if click is outside
+- **FR-5.5**: Don't trigger other navigation when clicking outside
+- **FR-5.6**: Ensure dropdown itself absorbs pointer events (doesn't close on self-click)
 
-### FR-6: Sort Implementation
-- **FR-6.1**: DropdownButton with label "Sort by"
-- **FR-6.2**: Options:
-  - "Featured" (default, original order)
-  - "Best Selling"
-  - "Alphabetically, A-Z"
-  - "Alphabetically, Z-A"
-  - "Price: Low to High"
-  - "Price: High to Low"
-  - "Date, old to new"
-  - "Date, new to old"
-- **FR-6.3**: Default selection: "Featured"
-- **FR-6.4**: Same styling as category filter (border, padding, min-width: 200px)
-- **FR-6.5**: OnChanged callback updates `_selectedSort` state
-- **FR-6.6**: Triggers `_applySorting()` method to reorder displayed products
-- **FR-6.7**: Maintains current category filter when sorting
-- **FR-6.8**: Attempts to maintain current page if still valid
+### FR-7: Mobile Submenu - Visual Design
+- **FR-7.1**: Full-height panel (100% viewport height)
+- **FR-7.2**: Full-width or 100% viewport width
+- **FR-7.3**: White background
+- **FR-7.4**: Header section: 64px height, purple background `Color(0xFF4d2963)`
+- **FR-7.5**: Header content: back arrow (left), submenu title (center)
+- **FR-7.6**: Back arrow: white color, 24px icon size
+- **FR-7.7**: Title: white text, bold, 18px font size
+- **FR-7.8**: Menu items section: white background, full width items
+- **FR-7.9**: Shadow or elevation: 8 (for depth perception)
 
-### FR-7: Product Grid Layout
-- **FR-7.1**: Use GridView.builder or GridView.count for grid
-- **FR-7.2**: Desktop (>800px): 3 columns (crossAxisCount: 3)
-- **FR-7.3**: Tablet (600-800px): 2 columns (crossAxisCount: 2)
-- **FR-7.4**: Mobile (<600px): 1 column (crossAxisCount: 1)
-- **FR-7.5**: Cross-axis spacing: 24px
-- **FR-7.6**: Main-axis spacing: 32px
-- **FR-7.7**: Grid padding: 40px desktop, 32px tablet, 24px mobile
-- **FR-7.8**: Display paginated subset of filtered/sorted products
-- **FR-7.9**: Each cell uses ProductCard or enhanced variant
+### FR-8: Mobile Submenu - Menu Items
+- **FR-8.1**: Each item full width of panel
+- **FR-8.2**: Padding: 20px horizontal, 16px vertical
+- **FR-8.3**: Font size: 16px
+- **FR-8.4**: Text color: black/grey[900]
+- **FR-8.5**: Border between items: 1px solid grey[200]
+- **FR-8.6**: Tap ripple effect (InkWell)
+- **FR-8.7**: OnTap callback: navigate to route, close all menus, update state
+- **FR-8.8**: Touch target: minimum 48x48px (verify with padding)
+- **FR-8.9**: Active item (current page): purple text, light purple background
 
-### FR-8: Product Card Design
-- **FR-8.1**: Reuse or enhance existing ProductCard widget
-- **FR-8.2**: Product image with 1:1 or 4:3 aspect ratio
-- **FR-8.3**: Product title below image (max 2 lines, ellipsis overflow)
-- **FR-8.4**: Original price with strikethrough and grey[600] color
-- **FR-8.5**: Sale price bold, purple `Color(0xFF4d2963)`, larger font
-- **FR-8.6**: Optional discount badge at top-right corner
-- **FR-8.7**: Hover effect on desktop: scale 1.02 or shadow increase
-- **FR-8.8**: Tap ripple effect on mobile
-- **FR-8.9**: OnTap navigates to '/product' route
-- **FR-8.10**: Image error handling with placeholder icon
+### FR-9: Mobile Submenu - Animation
+- **FR-9.1**: Create AnimationController for submenu (duration: 250ms)
+- **FR-9.2**: Implement SlideTransition for main menu (slides left to -100% width)
+- **FR-9.3**: Implement SlideTransition for submenu (slides in from right, 100% → 0%)
+- **FR-9.4**: Animation curve: Curves.easeInOut
+- **FR-9.5**: Reverse animations when navigating back to main menu
+- **FR-9.6**: Dispose animation controller in dispose() method
+- **FR-9.7**: Coordinate animations so main menu slides out as submenu slides in
 
-### FR-9: Pagination Controls
-- **FR-9.1**: Row container centered horizontally below grid
-- **FR-9.2**: Top margin: 48px from grid
-- **FR-9.3**: Previous button (IconButton with left arrow icon)
-- **FR-9.4**: Page indicator text in center
-- **FR-9.5**: Next button (IconButton with right arrow icon)
-- **FR-9.6**: Spacing between elements: 16px
-- **FR-9.7**: Button size: 48x48px
-- **FR-9.8**: Page indicator format: "Page X of Y"
-- **FR-9.9**: Page indicator fontSize: 16, color: grey[700]
-- **FR-9.10**: Buttons disabled when at first/last page
+### FR-10: Mobile Submenu - Navigation Stack
+- **FR-10.1**: Track current menu level (main or submenu)
+- **FR-10.2**: _isMobileMenuOpen tracks main menu state
+- **FR-10.3**: _isMobileSubmenuOpen tracks submenu state
+- **FR-10.4**: _currentSubmenu stores which submenu is open ('shop' or 'printshack')
+- **FR-10.5**: Implement _openMobileSubmenu(String) to transition main → submenu
+- **FR-10.6**: Implement _closeMobileSubmenu() to transition submenu → main
+- **FR-10.7**: Navigating to a page closes both main menu and submenu
+- **FR-10.8**: State validation prevents impossible states (both menus open, etc.)
 
-### FR-10: Pagination Logic
-- **FR-10.1**: Products per page: 9 (constant)
-- **FR-10.2**: Calculate `_totalPages`: `ceil(_filteredProducts.length / 9)`
-- **FR-10.3**: Calculate displayed products: `_filteredProducts.skip((_currentPage - 1) * 9).take(9)`
-- **FR-10.4**: Previous button OnPressed: decrement `_currentPage`, setState, scroll to top
-- **FR-10.5**: Next button OnPressed: increment `_currentPage`, setState, scroll to top
-- **FR-10.6**: Disable Previous when `_currentPage == 1`
-- **FR-10.7**: Disable Next when `_currentPage == _totalPages`
-- **FR-10.8**: Reset to page 1 when filters change
-- **FR-10.9**: Validate current page doesn't exceed total pages after filter/sort
-- **FR-10.10**: Auto-scroll to top of grid on page change
+### FR-11: Shop Button Update
+- **FR-11.1**: Replace placeholder callback with _toggleShopDropdown() on desktop
+- **FR-11.2**: Replace placeholder callback with _openMobileSubmenu('shop') on mobile
+- **FR-11.3**: Update isActive logic: active if currentRoute starts with '/shop/'
+- **FR-11.4**: Pass current dropdown state to button for visual feedback
+- **FR-11.5**: Maintain existing hover/tap effects
+- **FR-11.6**: Ensure button styling consistent with other nav buttons
 
-### FR-11: State Management
-- **FR-11.1**: Declare state variables:
-  - `List<SaleProduct> _allProducts` - Full product catalog
-  - `List<SaleProduct> _filteredProducts` - After category filter
-  - `List<SaleProduct> _displayedProducts` - Paginated subset
-  - `String _selectedCategory` - Current category ("All Categories" default)
-  - `String _selectedSort` - Current sort ("Featured" default)
-  - `int _currentPage` - Current page number (starts at 1)
-  - `int _totalPages` - Calculated from filtered products
-- **FR-11.2**: Initialize `_allProducts` in initState with mock data
-- **FR-11.3**: Implement `_applyFilters()` method:
-  - Filter `_allProducts` by `_selectedCategory`
-  - Update `_filteredProducts`
-  - Recalculate `_totalPages`
-  - Reset `_currentPage` to 1
-  - Call `_applySorting()`
-- **FR-11.4**: Implement `_applySorting()` method:
-  - Sort `_filteredProducts` based on `_selectedSort`
-  - Update `_displayedProducts` with paginated subset
-  - Validate `_currentPage` doesn't exceed `_totalPages`
-  - Call setState to rebuild
-- **FR-11.5**: Implement `_changePage(int newPage)` method:
-  - Validate newPage is between 1 and `_totalPages`
-  - Update `_currentPage`
-  - Update `_displayedProducts` with new paginated subset
-  - Scroll to top of grid
-  - Call setState to rebuild
+### FR-12: Print Shack Button Update
+- **FR-12.1**: Replace placeholder callback with _togglePrintShackDropdown() on desktop
+- **FR-12.2**: Replace placeholder callback with _openMobileSubmenu('printshack') on mobile
+- **FR-12.3**: Update isActive logic: active if currentRoute starts with '/print-shack/'
+- **FR-12.4**: Pass current dropdown state to button for visual feedback
+- **FR-12.5**: Maintain existing hover/tap effects
+- **FR-12.6**: Ensure button styling consistent with other nav buttons
 
-### FR-12: Navigation Integration
-- **FR-12.1**: Add '/sale' route to MaterialApp routes in main.dart
-- **FR-12.2**: Route should return `const SalePage()`
-- **FR-12.3**: Update AppHeader SALE! button callback to navigate to '/sale'
-- **FR-12.4**: Update AppHeader mobile menu SALE! item to close menu and navigate to '/sale'
-- **FR-12.5**: Pass `currentRoute: '/sale'` to AppHeader in SalePage
-- **FR-12.6**: Highlight SALE! button when on '/sale' route
-- **FR-12.7**: Logo and Home button navigate to '/' route from Sale page
-- **FR-12.8**: Product card OnTap navigates to '/product' route
-- **FR-12.9**: Browser back button returns to previous page
+### FR-13: Dropdown Data Structure
+- **FR-13.1**: Create helper class/model for menu items:
+  ```dart
+  class DropdownMenuItem {
+    final String label;
+    final String route;
+    bool get isActive => currentRoute == route;
+  }
+  ```
+- **FR-13.2**: Define Shop dropdown items list (7 items):
+  - Clothing → /shop/clothing
+  - Merchandise → /shop/merchandise
+  - Halloween → /shop/halloween
+  - Signature & Essential Range → /shop/signature-essential
+  - Portsmouth City Collection → /shop/portsmouth
+  - Pride Collection → /shop/pride
+  - Graduation → /shop/graduation
+- **FR-13.3**: Define Print Shack dropdown items list (2 items):
+  - About → /print-shack/about
+  - Personalisation → /print-shack/personalisation
+- **FR-13.4**: Make lists accessible to both desktop dropdown and mobile submenu builders
 
-### FR-13: Responsive Behavior
-- **FR-13.1**: Use MediaQuery to get screen width
-- **FR-13.2**: Define breakpoints: desktop >800px, tablet 600-800px, mobile <600px
-- **FR-13.3**: Adjust grid columns based on breakpoint
-- **FR-13.4**: Adjust padding based on breakpoint (40/32/24px)
-- **FR-13.5**: Stack filter/sort vertically on mobile (<600px)
-- **FR-13.6**: Make dropdowns full-width on mobile
-- **FR-13.7**: Recalculate products per page if grid columns change (optional)
-- **FR-13.8**: Ensure touch targets are minimum 44x44 on mobile
+### FR-14: Helper Method - Desktop Dropdown Builder
+- **FR-14.1**: Create method: `Widget _buildDesktopDropdown(List<DropdownMenuItem> items, bool isOpen)`
+- **FR-14.2**: Return null/empty if not isOpen
+- **FR-14.3**: Build Column of menu items with borders
+- **FR-14.4**: Apply container styling (background, shadow, border radius)
+- **FR-14.5**: Wrap in AnimatedOpacity or FadeTransition
+- **FR-14.6**: Position below corresponding button using Stack/Positioned
+- **FR-14.7**: Reusable for both Shop and Print Shack dropdowns
 
-### FR-14: Visual Design Consistency
-- **FR-14.1**: Primary color: `Color(0xFF4d2963)` throughout
-- **FR-14.2**: White background: `Colors.white`
-- **FR-14.3**: Text colors: black/grey[900] headings, grey[700] body, grey[600] original prices
-- **FR-14.4**: Borders: grey[300] on controls
-- **FR-14.5**: Sale prices: bold, purple
-- **FR-14.6**: Original prices: strikethrough, grey
-- **FR-14.7**: Typography consistent with HomeScreen and AboutPage
-- **FR-14.8**: Spacing follows 8px grid system (8, 16, 24, 32, 40, 48, 64)
+### FR-15: Helper Method - Mobile Submenu Builder
+- **FR-15.1**: Create method: `Widget _buildMobileSubmenu(String title, List<DropdownMenuItem> items)`
+- **FR-15.2**: Build Column with purple header section (back arrow + title)
+- **FR-15.3**: Build list of menu items below header
+- **FR-15.4**: Wrap in Container with full height
+- **FR-15.5**: Apply white background and shadow
+- **FR-15.6**: Wrap in SlideTransition for animation
+- **FR-15.7**: Reusable for both Shop and Print Shack submenus
+- **FR-15.8**: Header back arrow triggers _closeMobileSubmenu()
 
-### FR-15: Error Handling & Edge Cases
-- **FR-15.1**: Handle empty `_allProducts` list: show "No sale items available" message
-- **FR-15.2**: Handle filtered category with no products: show "No products found in this category"
-- **FR-15.3**: Provide "Clear filters" or "View all" button in empty state
-- **FR-15.4**: Handle last page with fewer than 9 products: display remaining products
-- **FR-15.5**: Hide pagination when only 1 page of results
-- **FR-15.6**: Show disabled pagination arrows when at boundaries
-- **FR-15.7**: Handle image loading errors with placeholder
-- **FR-15.8**: Truncate long product names with ellipsis
-- **FR-15.9**: Validate page number is always within valid range
+### FR-16: Route Registration - Shop Categories
+- **FR-16.1**: Add '/shop/clothing' route to MaterialApp routes in main.dart
+- **FR-16.2**: Add '/shop/merchandise' route
+- **FR-16.3**: Add '/shop/halloween' route
+- **FR-16.4**: Add '/shop/signature-essential' route
+- **FR-16.5**: Add '/shop/portsmouth' route
+- **FR-16.6**: Add '/shop/pride' route
+- **FR-16.7**: Add '/shop/graduation' route
+- **FR-16.8**: Each route returns ShopCategoryPage widget with category parameter
+
+### FR-17: Route Registration - Print Shack Pages
+- **FR-17.1**: Add '/print-shack/about' route to MaterialApp routes
+- **FR-17.2**: Add '/print-shack/personalisation' route
+- **FR-17.3**: Each route returns respective page widget
+- **FR-17.4**: Ensure routes follow existing navigation patterns
+
+### FR-18: Shop Category Page Template
+- **FR-18.1**: Create file: `lib/views/shop_category_page.dart`
+- **FR-18.2**: Define ShopCategoryPage as StatelessWidget
+- **FR-18.3**: Accept category parameter: `final String category`
+- **FR-18.4**: Include AppHeader with currentRoute: '/shop/$category'
+- **FR-18.5**: Display category name as heading (48px, purple, bold)
+- **FR-18.6**: Include placeholder text: "Products for [Category] will appear here"
+- **FR-18.7**: Apply white background and consistent padding
+- **FR-18.8**: Structure matches HomeScreen and AboutPage layouts
+- **FR-18.9**: Scrollable content area for future product grid
+
+### FR-19: Print Shack About Page
+- **FR-19.1**: Create file: `lib/views/print_shack_about_page.dart`
+- **FR-19.2**: Define PrintShackAboutPage as StatelessWidget
+- **FR-19.3**: Include AppHeader with currentRoute: '/print-shack/about'
+- **FR-19.4**: Display "About The Print Shack" heading (48px, purple, bold)
+- **FR-19.5**: Include placeholder text about print services
+- **FR-19.6**: Apply consistent styling with other pages
+- **FR-19.7**: Scrollable content area for future detailed content
+
+### FR-20: Personalisation Page
+- **FR-20.1**: Create file: `lib/views/personalisation_page.dart`
+- **FR-20.2**: Define PersonalisationPage as StatelessWidget
+- **FR-20.3**: Include AppHeader with currentRoute: '/print-shack/personalisation'
+- **FR-20.4**: Display "Personalisation Services" heading (48px, purple, bold)
+- **FR-20.5**: Include placeholder text about personalisation options
+- **FR-20.6**: Apply consistent styling with other pages
+- **FR-20.7**: Scrollable content area for future form or service details
+
+### FR-21: Responsive Behavior Coordination
+- **FR-21.1**: Use MediaQuery to determine isDesktop (width > 800px)
+- **FR-21.2**: On desktop: show dropdown buttons, hide mobile menu
+- **FR-21.3**: On mobile: show hamburger menu, hide dropdown buttons
+- **FR-21.4**: Close all dropdowns when resizing crosses 800px threshold
+- **FR-21.5**: Reset submenu state when switching to desktop view
+- **FR-21.6**: Ensure no visual glitches during window resize
+- **FR-21.7**: Test smooth transition between mobile and desktop layouts
+
+### FR-22: Navigation Integration
+- **FR-22.1**: Clicking dropdown item closes dropdown before navigating
+- **FR-22.2**: Update _closeMobileMenu() to also close submenus
+- **FR-22.3**: Ensure AppHeader currentRoute prop updates on navigation
+- **FR-22.4**: Pass correct currentRoute to AppHeader in all new pages
+- **FR-22.5**: Verify active state highlighting works on all new pages
+- **FR-22.6**: Test browser back button returns to previous page correctly
+- **FR-22.7**: Ensure Logo and Home button navigate from all new pages
 
 ---
 
 ## 4. Non-Functional Requirements
 
 ### NFR-1: Performance
-- Sale page loads within 1 second on average connection
-- Filtering operation completes within 100ms
-- Sorting operation completes within 100ms
-- Page navigation is instant (no visible delay)
-- No flickering or layout shifts during state changes
-- Smooth 60 FPS animations on hover effects
-- Grid scrolling is smooth and responsive
-- No frame drops when resizing window
+- Desktop dropdown opens within 50ms of click
+- Mobile submenu slide animation is smooth 60 FPS
+- No lag or stuttering during animations
+- Click outside detection responds immediately
+- State updates don't cause entire header to rebuild unnecessarily
+- Animation controllers disposed properly to prevent memory leaks
+- No performance degradation with multiple dropdown open/close cycles
 
-### NFR-2: Maintainability
-- Code is well-commented explaining complex logic (especially filtering/sorting/pagination)
-- Helper methods are extracted and clearly named
-- State management is straightforward and easy to understand
-- Product data model is easily extensible for future features
-- Filtering and sorting logic can be easily modified or extended
-- Pagination logic is reusable for other pages if needed
+### NFR-2: Animation Quality
+- Desktop dropdown fade-in is smooth and professional (150ms)
+- Mobile submenu slide is fluid and synchronized (250ms)
+- No flickering or visual artifacts during transitions
+- Animations use appropriate curves (easeOut, easeInOut)
+- Reverse animations are equally smooth
+- Multiple rapid clicks don't break animation state
 
-### NFR-3: Accessibility
-- Touch targets are minimum 44x44 logical pixels
-- Text contrast meets WCAG AA standards
-- Focus states are visible on interactive elements
-- Dropdown menus are keyboard navigable
-- Product cards are keyboard accessible
-- Pagination buttons support keyboard navigation
-- Screen reader support for price information (sale vs original)
+### NFR-3: Responsive Design
+- Dropdowns position correctly at all desktop widths (800px - 1920px)
+- Mobile submenus work on all mobile widths (320px - 800px)
+- Transition between desktop/mobile layouts is seamless
+- No layout breaking at 800px breakpoint
+- Touch targets adequate on mobile (48x48px minimum)
+- Dropdowns don't overflow screen boundaries
 
-### NFR-4: Code Quality
-- Follows existing code style and conventions
-- Uses const constructors where applicable
-- No Dart analyzer warnings or errors
-- Proper null safety handling throughout
-- Consistent naming conventions (`_privateVariables`, `publicMethods`)
-- Efficient list operations (avoid unnecessary copying)
-- State updates are batched appropriately
+### NFR-4: Accessibility
+- Focus states visible on all interactive elements
+- Screen reader support for menu structure
+- ARIA labels for dropdown buttons and items
+- Escape key closes dropdowns consistently
+- Tab order is logical and intuitive
+- Focus management prevents traps
 
-### NFR-5: Responsive Design
-- Content readable on screens from 320px to 1920px width
-- Grid adapts smoothly at breakpoints (600px, 800px)
-- Filter/sort controls don't overflow at any width
-- Product cards maintain aspect ratio at all sizes
-- Images scale appropriately without distortion
-- Layout doesn't break at any screen width
-- Mobile menu works on touch devices
-- Pagination controls remain accessible on mobile
+### NFR-5: Code Maintainability
+- State management is clear and well-documented
+- Helper methods reduce code duplication
+- Animation logic is commented and explained
+- Menu items defined in reusable data structures
+- Easy to add new categories or menu items
+- Separation of concerns (desktop vs mobile logic)
+- Consistent naming conventions throughout
 
-### NFR-6: User Experience
-- Filtering provides immediate visual feedback
-- Sorting shows clear indication of current order
-- Pagination clearly shows current position
-- Empty states are helpful and actionable
+### NFR-6: Visual Consistency
+- All dropdowns use consistent purple theme (`Color(0xFF4d2963)`)
+- Typography matches existing pages
+- Spacing follows 8px grid system (8, 16, 24, 32, 40, 48, 64)
+- Hover effects consistent with existing buttons
+- Mobile submenu header matches mobile menu styling
+- Border colors and shadows consistent across components
+
+### NFR-7: User Experience
+- Dropdown behavior matches user expectations (industry standards)
 - Hover effects provide clear affordance
-- Touch feedback is immediate and visible
-- Loading states are smooth (if added)
-- Transitions are smooth and not jarring
+- Active state highlighting is obvious
+- Click outside to close is intuitive
+- Mobile back arrow clearly indicates return to previous menu
+- No confusing states or navigation dead-ends
+- Smooth, non-jarring transitions
 
 ---
 
 ## 5. Technical Constraints
 
-### TC-1: Component Architecture
-- SalePage must be StatefulWidget to manage filter/sort/page state
-- Reuse AppHeader component from `lib/widgets/app_header.dart`
-- Reuse or enhance existing ProductCard widget
-- Product data can be mock list in-file or separate data service
-- No additional package dependencies required
+### TC-1: Flutter Widgets
+- Use standard Material widgets (InkWell, TextButton, etc.)
+- Use AnimationController for animations
+- Use FadeTransition and SlideTransition for effects
+- Use Stack and Positioned for dropdown overlay
+- Use GestureDetector for click-outside detection
+- Use FocusScope for keyboard navigation
+- No third-party packages required
 
-### TC-2: Styling Requirements
+### TC-2: State Management
+- Local StatefulWidget state in AppHeader
+- No external state management libraries required
+- State variables track dropdown and submenu states
+- Methods handle state transitions
+- setState() calls optimized to prevent unnecessary rebuilds
+
+### TC-3: File Organization
+- All dropdown logic in `lib/widgets/app_header.dart`
+- New page files in `lib/views/` directory
+- Optional: Extract menu item data to separate file if list grows
+- Update `lib/main.dart` for route registration
+- No changes to existing page files beyond route updates
+
+### TC-4: Theme Requirements
 - Primary color: `Color(0xFF4d2963)` (purple)
 - White: `Colors.white`
-- Grey shades: `Colors.grey[300]`, `Colors.grey[600]`, `Colors.grey[700]`, `Colors.grey[900]`
-- Font sizes: 48px (heading), 18px (subheading), 16px (prices, indicators), 14px (product titles)
-- Consistent spacing: 8px, 16px, 24px, 32px, 40px, 48px, 64px
-- Borders: 1px solid grey[300]
-
-### TC-3: Flutter Specifics
-- Use standard Material widgets (DropdownButton, GridView, IconButton, etc.)
-- Use MediaQuery for responsive breakpoints
-- Use Navigator.pushNamed for route navigation
-- Compatible with hot reload during development
-- Works with existing theme configuration
-- Supports browser back button navigation
-
-### TC-4: Data Requirements
-- Minimum 10-20 mock products for testing pagination
-- Mix of categories: approximately equal distribution
-- Price range: £5-£50 original, 10-70% discounts
-- Realistic product names (university-themed)
-- Placeholder images can reuse existing assets or use AssetImage
-
-### TC-5: File Organization
-- `lib/views/sale_page.dart` for SalePage widget
-- Optional: `lib/models/sale_product.dart` for product model
-- Optional: `lib/widgets/sale_product_card.dart` for enhanced card
-- Update `lib/main.dart` for route registration
-- Update `lib/widgets/app_header.dart` for SALE! navigation
+- Grey shades: `Colors.grey[200]`, `Colors.grey[300]`, `Colors.grey[600]`, `Colors.grey[700]`, `Colors.grey[800]`, `Colors.grey[900]`
+- Font sizes: 14px (dropdown items), 16px (mobile items), 18px (mobile submenu title)
+- Consistent with existing theme configuration
 
 ---
 
@@ -500,329 +512,111 @@ Implement a comprehensive "Sale" page for the Union Shop Flutter application tha
 
 The feature is considered **complete** when:
 
-### Sale Page Implementation
-- [ ] `lib/views/sale_page.dart` file created with SalePage StatefulWidget
-- [ ] AppHeader component integrated at top with currentRoute: '/sale'
-- [ ] "SALE!" heading and subheading displayed with correct styling
-- [ ] White background applied to entire page
-- [ ] Responsive padding implemented (40px desktop, 32px tablet, 24px mobile)
-- [ ] Page is scrollable vertically
+### Desktop Dropdown - Shop
+- [ ] Clicking "Shop" button opens dropdown menu
+- [ ] Dropdown displays all 7 categories
+- [ ] Dropdown positioned below button with correct styling
+- [ ] Fade-in animation smooth (150ms)
+- [ ] Hover effects work on all menu items
+- [ ] Clicking menu item navigates to correct route
+- [ ] Clicking menu item closes dropdown
+- [ ] Clicking "Shop" again toggles dropdown closed
+- [ ] Clicking outside dropdown closes it
+- [ ] Pressing Escape closes dropdown
+- [ ] Active category highlighted in dropdown
+- [ ] "Shop" button highlighted when on shop category page
 
-### Product Data & Model
-- [ ] SaleProduct class created with all required fields
-- [ ] discountPercentage computed property implemented
-- [ ] Mock product list created with 10-20 items
-- [ ] Products evenly distributed across categories
-- [ ] Realistic product names and prices
-- [ ] Placeholder images assigned to each product
+### Desktop Dropdown - Print Shack
+- [ ] Clicking "The Print Shack" button opens dropdown
+- [ ] Dropdown displays "About" and "Personalisation"
+- [ ] Same styling and behavior as Shop dropdown
+- [ ] Opening Print Shack dropdown closes Shop dropdown if open
+- [ ] All interaction patterns work identically
+- [ ] Active item highlighted correctly
+- [ ] "The Print Shack" button highlighted on print-shack pages
 
-### Filter Functionality
-- [ ] Category dropdown displays with correct label and styling
-- [ ] All category options present: "All Categories", "Clothing", "Merchandise", "PSUT"
-- [ ] "All Categories" selected by default
-- [ ] Selecting category filters products correctly
-- [ ] Page resets to 1 when filter changes
-- [ ] Total pages recalculate based on filtered results
-- [ ] Current sort order maintained when filtering
-- [ ] Filter dropdown full-width on mobile
+### Mobile Submenu - Shop
+- [ ] Tapping hamburger opens main mobile menu
+- [ ] "Shop" appears in main menu
+- [ ] Tapping "Shop" opens submenu with slide animation
+- [ ] Main menu slides left as submenu slides in from right
+- [ ] Submenu shows purple header with "← Back" and "Shop"
+- [ ] Submenu lists all 7 categories
+- [ ] Tapping back arrow returns to main menu
+- [ ] Tapping category navigates and closes all menus
+- [ ] Animations smooth (250ms)
+- [ ] Touch targets adequate (48x48px minimum)
+- [ ] Ripple effects on tap
 
-### Sort Functionality
-- [ ] Sort dropdown displays with correct label and styling
-- [ ] All sort options present (Featured, Best Selling, Alphabetically A-Z/Z-A, Price Low-High/High-Low, Date old-new/new-old)
-- [ ] "Featured" selected by default
-- [ ] Selecting sort reorders products correctly
-- [ ] Current category filter maintained when sorting
-- [ ] Current page maintained if still valid after sorting
-- [ ] Sort dropdown full-width on mobile
+### Mobile Submenu - Print Shack
+- [ ] "The Print Shack" appears in main mobile menu
+- [ ] Tapping opens submenu with slide animation
+- [ ] Submenu shows purple header with "← Back" and "The Print Shack"
+- [ ] Submenu lists "About" and "Personalisation"
+- [ ] All interactions match Shop submenu behavior
+- [ ] Navigation and animation work correctly
 
-### Product Grid
-- [ ] Grid displays with correct column count per breakpoint (3/2/1)
-- [ ] Grid spacing correct (24px horizontal, 32px vertical)
-- [ ] 9 products displayed per page (paginated subset)
-- [ ] Product cards show image, title, original price, sale price
-- [ ] Original price has strikethrough and grey color
-- [ ] Sale price is bold and purple
-- [ ] Hover effect works on desktop
-- [ ] Tap ripple effect works on mobile
-- [ ] Clicking product navigates to '/product' route
-- [ ] Image error handling displays placeholder
+### Routes & Pages
+- [ ] All 7 shop category routes registered in main.dart
+- [ ] All 2 print-shack routes registered in main.dart
+- [ ] ShopCategoryPage displays correct category name
+- [ ] PrintShackAboutPage displays correctly
+- [ ] PersonalisationPage displays correctly
+- [ ] All pages include AppHeader with correct currentRoute
+- [ ] All pages match existing page structure
+- [ ] Browser back button works from all new pages
 
-### Pagination
-- [ ] Pagination controls appear centered below grid
-- [ ] Previous button (←), page indicator, Next button (→) present
-- [ ] Page indicator shows "Page X of Y" format
-- [ ] Previous disabled on page 1
-- [ ] Next disabled on last page
-- [ ] Clicking Next advances to next page and scrolls to top
-- [ ] Clicking Previous goes to previous page and scrolls to top
-- [ ] Page indicator updates correctly
-- [ ] Total pages recalculate when filters change
-- [ ] Current page validates and resets if out of range
-
-### Navigation Integration
-- [ ] '/sale' route registered in main.dart MaterialApp routes
-- [ ] Desktop SALE! button navigates to '/sale' route
-- [ ] Mobile menu SALE! item navigates to '/sale' route
-- [ ] Mobile menu closes before navigating
-- [ ] SALE! button highlighted when on '/sale' route
-- [ ] Logo navigation returns to home from Sale page
-- [ ] Home button returns to home from Sale page
-- [ ] Browser back button works correctly
-
-### Responsive Behavior
-- [ ] Desktop layout (>800px): 3 columns, horizontal filters, 40px padding
-- [ ] Tablet layout (600-800px): 2 columns, horizontal filters, 32px padding
-- [ ] Mobile layout (<600px): 1 column, vertical filters, 24px padding
-- [ ] Filter/sort controls stack vertically on mobile
-- [ ] Dropdowns full-width on mobile
-- [ ] Header switches between desktop/mobile at 800px
-- [ ] No layout breaking at any width
-- [ ] Touch targets minimum 44x44 on mobile
+### State Management
+- [ ] Only one desktop dropdown open at a time
+- [ ] Mobile main menu and submenu states managed correctly
+- [ ] Dropdowns close when navigating to new page
+- [ ] Dropdowns close when window resizes across breakpoint
+- [ ] No state conflicts or impossible states
+- [ ] State resets correctly after navigation
 
 ### Visual Consistency
-- [ ] Purple theme color used throughout (`Color(0xFF4d2963)`)
+- [ ] Purple theme (`Color(0xFF4d2963)`) used throughout
 - [ ] Typography matches existing pages
 - [ ] Spacing follows 8px grid system
-- [ ] Border styling consistent (grey[300])
-- [ ] Sale prices bold purple
-- [ ] Original prices strikethrough grey
-- [ ] Overall design matches HomeScreen and AboutPage
+- [ ] Hover/active states use consistent colors
+- [ ] Mobile submenu styling matches mobile menu
+- [ ] All borders and shadows consistent
 
-### Error Handling
-- [ ] Empty product list shows "No sale items available"
-- [ ] Filtered category with no products shows appropriate message
-- [ ] "Clear filters" or "View all" option in empty state
-- [ ] Last page displays remaining products (even if < 9)
-- [ ] Single page hides or disables pagination appropriately
-- [ ] Image loading errors show placeholder
-- [ ] Long product names truncate with ellipsis
+### Responsive Behavior
+- [ ] Desktop layout shows dropdown buttons (>800px)
+- [ ] Mobile layout shows hamburger menu (≤800px)
+- [ ] Transition between layouts is smooth
+- [ ] No layout breaking during window resize
+- [ ] Dropdowns position correctly at all widths
+- [ ] Mobile submenus work at all mobile widths
+
+### Interaction Quality
+- [ ] Hover effects smooth on desktop
+- [ ] Click outside closes dropdown
+- [ ] Escape key closes dropdown
+- [ ] Keyboard navigation works (Tab, Arrow keys, Enter)
+- [ ] Touch targets adequate on mobile
+- [ ] Tap ripple effects on mobile
+- [ ] No animation glitches or flickering
 
 ### Code Quality
 - [ ] Code follows existing conventions
-- [ ] Helpful comments explain complex logic
-- [ ] Const constructors used where possible
+- [ ] State management is clear and documented
+- [ ] Helper methods reduce duplication
+- [ ] Animation controllers disposed properly
 - [ ] No Dart analyzer warnings
 - [ ] No console errors
-- [ ] Proper null safety handling
-- [ ] Efficient list operations
-- [ ] State management is clear and maintainable
+- [ ] Const constructors used where possible
+- [ ] Meaningful comments on complex logic
 
 ### Testing
-- [ ] Manual testing on desktop (>800px)
-- [ ] Manual testing on tablet (600-800px)
-- [ ] Manual testing on mobile (<600px)
+- [ ] Manual testing on desktop (various widths)
+- [ ] Manual testing on mobile (various widths)
 - [ ] Window resize testing completed
-- [ ] All filtering scenarios tested
-- [ ] All sorting scenarios tested
-- [ ] Pagination navigation tested
-- [ ] Product navigation verified
-- [ ] Mobile menu interaction tested
-- [ ] Empty states tested
-- [ ] Edge cases verified (last page, single page, etc.)
+- [ ] All dropdown interactions tested
+- [ ] All submenu interactions tested
+- [ ] Navigation from all menu items verified
+- [ ] Active state highlighting verified on all pages
+- [ ] Keyboard navigation tested
+- [ ] Click outside detection tested
 - [ ] No regression in existing features
-
----
-
-## 7. Out of Scope
-
-The following are explicitly **not** included in this feature:
-
-- Real product data from backend API
-- Database integration or data persistence
-- User authentication or personalized sale items
-- Shopping cart integration from Sale page
-- Product quick view modal
-- Wishlist/favorites functionality
-- Product comparison feature
-- Search bar for filtering by keyword
-- Price range filter slider
-- Multiple category selection (checkboxes)
-- Advanced filtering (size, color, brand, etc.)
-- Sale countdown timer ("Ending in X hours")
-- Stock level indicators
-- Product ratings or reviews on cards
-- "Recently Viewed" section
-- "Recommended for You" section
-- Email signup for sale notifications
-- Social sharing buttons
-- Print-friendly sale page
-- Export sale items to PDF
-- SEO optimization or meta tags
-- Analytics tracking for filter/sort usage
-- A/B testing different layouts
-- Accessibility audit beyond basic requirements
-- Unit tests or widget tests
-- Integration tests
-- Performance profiling
-
----
-
-## 8. Implementation Guidance
-
-### Recommended Approach
-
-#### **Phase 1 - Data Model & Mock Data**
-1. Create SaleProduct class with all required fields
-2. Add discountPercentage computed property
-3. Create mock product list with 10-20 items
-4. Distribute products across categories
-5. Assign realistic names, prices, and images
-6. Test data structure is correct
-
-#### **Phase 2 - Basic Page Structure**
-1. Create sale_page.dart file with SalePage StatefulWidget
-2. Add AppHeader component with currentRoute: '/sale'
-3. Add heading section (title and subheading)
-4. Set up white background and responsive padding
-5. Register '/sale' route in main.dart
-6. Update AppHeader to navigate to '/sale' and highlight button
-7. Test navigation works from desktop and mobile
-
-#### **Phase 3 - Product Grid**
-1. Initialize state variables (_allProducts, _filteredProducts, _displayedProducts)
-2. Implement responsive grid with correct column counts
-3. Reuse or enhance ProductCard for sale products
-4. Display initial 9 products (page 1, all categories, featured sort)
-5. Test grid displays correctly on all screen sizes
-6. Test product card click navigates to product page
-
-#### **Phase 4 - Filtering**
-1. Add category dropdown with correct options
-2. Implement _applyFilters() method
-3. Update _filteredProducts based on _selectedCategory
-4. Reset _currentPage to 1 on filter change
-5. Recalculate _totalPages
-6. Test filtering updates grid correctly
-7. Test "All Categories" shows all products
-
-#### **Phase 5 - Sorting**
-1. Add sort dropdown with all options
-2. Implement _applySorting() method
-3. Sort _filteredProducts based on _selectedSort
-4. Update _displayedProducts with paginated subset
-5. Maintain current page if valid, reset to 1 if not
-6. Test all sort options work correctly
-7. Test sorting maintains category filter
-
-#### **Phase 6 - Pagination**
-1. Implement pagination controls (Previous, Indicator, Next)
-2. Implement _changePage() method
-3. Calculate _totalPages from _filteredProducts
-4. Update _displayedProducts with correct subset based on _currentPage
-5. Disable buttons at boundaries
-6. Add scroll-to-top on page change
-7. Test pagination navigates correctly
-8. Test pagination updates when filters/sort change
-
-#### **Phase 7 - Empty States & Error Handling**
-1. Add empty state message for no products
-2. Add empty state for filtered category with no results
-3. Add "Clear filters" or "View all" button
-4. Handle last page with fewer products
-5. Handle single page (hide/disable pagination)
-6. Test all edge cases
-
-#### **Phase 8 - Responsive Refinements**
-1. Test all breakpoints (320px, 600px, 800px, 1200px, 1920px)
-2. Ensure filter/sort stack on mobile
-3. Verify touch targets are adequate
-4. Test mobile menu integration
-5. Fix any layout issues
-
-#### **Phase 9 - Visual Polish**
-1. Verify colors match theme (`Color(0xFF4d2963)`)
-2. Check spacing follows 8px grid
-3. Test hover effects on desktop
-4. Test tap feedback on mobile
-5. Ensure typography is consistent
-6. Add any final visual refinements
-
-#### **Phase 10 - Testing & Documentation**
-1. Manual testing on multiple devices/browsers
-2. Test all user stories and acceptance criteria
-3. Verify no regressions in existing features
-4. Add code comments explaining complex logic
-5. Document any assumptions or decisions
-6. Prepare for code review
-
-### Key Design Decisions to Document
-
-1. **State Management Approach**: Document why you chose local state vs provider/bloc
-2. **Pagination Calculation**: Explain how products per page is determined and calculated
-3. **Filter/Sort Interaction**: Document how filters and sorts interact (order of operations)
-4. **Product Data Structure**: Explain product model fields and computed properties
-5. **Responsive Breakpoints**: Document why 600px and 800px were chosen
-6. **Empty State Handling**: Explain different empty state scenarios and messages
-7. **Performance Optimizations**: Note any caching or efficiency improvements
-8. **Future Extensibility**: Comment on how to easily add new categories or sort options
-
-### Testing Strategy
-
-**Manual Testing Checklist:**
-- [ ] Desktop navigation to Sale page
-- [ ] Mobile navigation to Sale page
-- [ ] Filter by each category individually
-- [ ] Return to "All Categories" filter
-- [ ] Sort by each option individually
-- [ ] Combine filtering and sorting
-- [ ] Navigate through all pages
-- [ ] Test pagination at boundaries (page 1, last page)
-- [ ] Filter to reduce products and verify pagination updates
-- [ ] Resize window across all breakpoints
-- [ ] Click product cards to verify navigation
-- [ ] Test back button returns correctly
-- [ ] Verify SALE! button highlighted on Sale page
-- [ ] Test empty states (no products, filtered no results)
-- [ ] Verify image error handling
-- [ ] Test touch targets on mobile
-- [ ] Check text truncation on long product names
-
-**Edge Cases to Test:**
-- [ ] Single page of results (≤9 products)
-- [ ] Exactly 9 products (one full page)
-- [ ] 10 products (two pages, last page has 1 item)
-- [ ] Empty product list (no mock data)
-- [ ] Category with 0 products
-- [ ] Very long product names
-- [ ] Missing product images
-- [ ] Window resize during filtering/sorting
-- [ ] Rapid filter/sort changes
-- [ ] Navigation while on page 5+ of results
-
----
-
-## 9. Future Enhancements
-
-Potential improvements for future iterations:
-
-### Phase 2 Enhancements
-1. **Search Functionality**: Add search bar to filter by product name/description
-2. **Price Range Filter**: Slider to filter by minimum/maximum price
-3. **Multiple Category Selection**: Checkboxes to select multiple categories at once
-4. **Discount Badge**: Visual badge on cards showing percentage off
-5. **Sort by Discount**: Add "Discount: High to Low" sort option
-6. **Product Count Indicator**: Show "Showing X of Y products" above grid
-
-### Phase 3 Enhancements
-1. **Sale Countdown**: Show "Sale ends in X hours" on products
-2. **Stock Indicators**: Show "Low stock" or "Only X left" warnings
-3. **Quick View**: Modal popup with product details on hover/click
-4. **Wishlist Integration**: Heart icon to save favorite sale items
-5. **Comparison Feature**: Select products to compare side-by-side
-6. **Recently Viewed**: Show recently viewed sale products
-
-### Phase 4 Enhancements
-1. **Backend Integration**: Connect to real product API
-2. **Persistent State**: Save filter/sort/page in URL parameters
-3. **Loading States**: Skeleton screens while loading products
-4. **Animations**: Fade-in products when page changes
-5. **Infinite Scroll**: Load more products as user scrolls (alternative to pagination)
-6. **Product Recommendations**: "You might also like" section
-
-### Phase 5 Enhancements
-1. **Email Notifications**: Sign up for sale alerts
-2. **Social Sharing**: Share favorite sale products
-3. **Advanced Analytics**: Track filter/sort usage, popular products
-4. **A/B Testing**: Test different layouts and features
-5. **Accessibility Improvements**: Full WCAG AAA compliance
-6. **Performance Optimization**: Lazy loading, image optimization
