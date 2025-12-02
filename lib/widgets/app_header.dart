@@ -71,8 +71,6 @@ class _AppHeaderState extends State<AppHeader> {
   // GlobalKeys to track button positions
   final GlobalKey _shopButtonKey = GlobalKey();
   final GlobalKey _printShackButtonKey = GlobalKey();
-
-  // Overlay entries for desktop dropdowns
   OverlayEntry? _shopOverlayEntry;
   OverlayEntry? _printOverlayEntry;
 
@@ -92,43 +90,56 @@ class _AppHeaderState extends State<AppHeader> {
   void _showShopDropdownOverlay(Rect buttonRect) {
     _shopOverlayEntry?.remove();
     _shopOverlayEntry = OverlayEntry(
-      builder: (context) {
-        return Positioned(
-          top: buttonRect.bottom,
-          left: buttonRect.left,
-          child: Material(
-            elevation: 8,
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(8),
-              bottomRight: Radius.circular(8),
+      builder: (context) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: _closeAllDropdowns,
             ),
-            child: _buildDesktopDropdown(AppHeader.shopMenuItems, true)!,
           ),
-        );
-      },
+          Positioned(
+            top: buttonRect.bottom,
+            left: buttonRect.left,
+            child: Material(
+              elevation: 8,
+              child: _buildDesktopDropdown(AppHeader.shopMenuItems, true)!,
+            ),
+          ),
+        ],
+      ),
     );
-    Overlay.of(context).insert(_shopOverlayEntry!);
+    final overlay =
+        Navigator.of(context).overlay ?? Overlay.of(context, rootOverlay: true);
+    overlay.insert(_shopOverlayEntry!);
   }
 
   void _showPrintDropdownOverlay(Rect buttonRect) {
     _printOverlayEntry?.remove();
     _printOverlayEntry = OverlayEntry(
-      builder: (context) {
-        return Positioned(
-          top: buttonRect.bottom,
-          left: buttonRect.left,
-          child: Material(
-            elevation: 8,
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(8),
-              bottomRight: Radius.circular(8),
+      builder: (context) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: _closeAllDropdowns,
             ),
-            child: _buildDesktopDropdown(AppHeader.printShackMenuItems, true)!,
           ),
-        );
-      },
+          Positioned(
+            top: buttonRect.bottom,
+            left: buttonRect.left,
+            child: Material(
+              elevation: 8,
+              child:
+                  _buildDesktopDropdown(AppHeader.printShackMenuItems, true)!,
+            ),
+          ),
+        ],
+      ),
     );
-    Overlay.of(context).insert(_printOverlayEntry!);
+    final overlay =
+        Navigator.of(context).overlay ?? Overlay.of(context, rootOverlay: true);
+    overlay.insert(_printOverlayEntry!);
   }
 
   // Navigation helper methods
@@ -172,33 +183,35 @@ class _AppHeaderState extends State<AppHeader> {
   /// Toggle Shop dropdown - closes Print Shack dropdown if open
   void _toggleShopDropdown() {
     setState(() {
-      _isShopDropdownOpen = !_isShopDropdownOpen;
-      if (_isShopDropdownOpen) {
-        _isPrintShackDropdownOpen = false;
-        _printOverlayEntry?.remove();
-        final rect = _getButtonRect(_shopButtonKey);
-        if (rect != null) _showShopDropdownOverlay(rect);
-      } else {
-        _shopOverlayEntry?.remove();
-        _shopOverlayEntry = null;
-      }
+      final willOpen = !_isShopDropdownOpen;
+      _isShopDropdownOpen = willOpen;
+      _isPrintShackDropdownOpen = false;
     });
+    _printOverlayEntry?.remove();
+    if (_isShopDropdownOpen) {
+      final rect = _getButtonRect(_shopButtonKey);
+      if (rect != null) _showShopDropdownOverlay(rect);
+    } else {
+      _shopOverlayEntry?.remove();
+      _shopOverlayEntry = null;
+    }
   }
 
   /// Toggle Print Shack dropdown - closes Shop dropdown if open
   void _togglePrintShackDropdown() {
     setState(() {
-      _isPrintShackDropdownOpen = !_isPrintShackDropdownOpen;
-      if (_isPrintShackDropdownOpen) {
-        _isShopDropdownOpen = false;
-        _shopOverlayEntry?.remove();
-        final rect = _getButtonRect(_printShackButtonKey);
-        if (rect != null) _showPrintDropdownOverlay(rect);
-      } else {
-        _printOverlayEntry?.remove();
-        _printOverlayEntry = null;
-      }
+      final willOpen = !_isPrintShackDropdownOpen;
+      _isPrintShackDropdownOpen = willOpen;
+      _isShopDropdownOpen = false;
     });
+    _shopOverlayEntry?.remove();
+    if (_isPrintShackDropdownOpen) {
+      final rect = _getButtonRect(_printShackButtonKey);
+      if (rect != null) _showPrintDropdownOverlay(rect);
+    } else {
+      _printOverlayEntry?.remove();
+      _printOverlayEntry = null;
+    }
   }
 
   /// Close all dropdowns (desktop)
@@ -244,13 +257,11 @@ class _AppHeaderState extends State<AppHeader> {
 
   // Get button position and size
   Rect? _getButtonRect(GlobalKey key) {
-    final RenderBox? renderBox =
-        key.currentContext?.findRenderObject() as RenderBox?;
+    final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return null;
-
-    final position = renderBox.localToGlobal(Offset.zero);
+    final pos = renderBox.localToGlobal(Offset.zero);
     final size = renderBox.size;
-    return Rect.fromLTWH(position.dx, position.dy, size.width, size.height);
+    return Rect.fromLTWH(pos.dx, pos.dy, size.width, size.height);
   }
 
   @override
@@ -258,192 +269,181 @@ class _AppHeaderState extends State<AppHeader> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
 
-    // We still compute rects for alignment
-    final shopButtonRect = _getButtonRect(_shopButtonKey);
-    final printShackButtonRect = _getButtonRect(_printShackButtonKey);
-
     return SizedBox(
       width: double.infinity,
-      child: Stack(
-        clipBehavior: Clip.none,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              Container(
-                color: Colors.white,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Top banner
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      color: const Color(0xFF4d2963),
-                      child: const Text(
-                        'BIG SALE! OUR ESSENTIAL RANGE HAS DROPPED IN PRICE! OVER 20% OFF! COME GRAB YOURS WHILE STOCK LASTS!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ),
-                    // Main header
-                    Container(
-                      height: 64,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 16),
-                          // Logo section
-                          InkWell(
-                            onTap: () => navigateToHome(context),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF4d2963),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: const Center(
-                                    child: Text(
-                                      'US',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'Union Shop',
+          // Header
+          Container(
+            color: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top banner
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  color: const Color(0xFF4d2963),
+                  child: const Text(
+                    'BIG SALE! OUR ESSENTIAL RANGE HAS DROPPED IN PRICE! OVER 20% OFF! COME GRAB YOURS WHILE STOCK LASTS!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
+                // Main header
+                Container(
+                  height: 64,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 16),
+                      // Logo section
+                      InkWell(
+                        onTap: () => navigateToHome(context),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF4d2963),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'US',
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF4d2963),
+                                    fontSize: 18,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-
-                          const Spacer(),
-
-                          // Desktop Navigation
-                          if (isDesktop) ...[
-                            _buildNavButton(
-                              'Home',
-                              () => navigateToHome(context),
-                              widget.currentRoute == '/',
-                            ),
-                            // Shop button with key
-                            KeyedSubtree(
-                              key: _shopButtonKey,
-                              child: _buildNavButton(
-                                'Shop',
-                                _toggleShopDropdown,
-                                widget.currentRoute.startsWith('/shop/'),
                               ),
                             ),
-                            // Print Shack button with key
-                            KeyedSubtree(
-                              key: _printShackButtonKey,
-                              child: _buildNavButton(
-                                'The Print Shack',
-                                _togglePrintShackDropdown,
-                                widget.currentRoute.startsWith('/print-shack/'),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'Union Shop',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4d2963),
                               ),
-                            ),
-                            _buildNavButton(
-                              'SALE!',
-                              () => navigateToSale(context),
-                              widget.currentRoute == '/sale',
-                            ),
-                            _buildNavButton(
-                              'About',
-                              () => navigateToAbout(context),
-                              widget.currentRoute == '/about',
                             ),
                           ],
-
-                          const Spacer(),
-
-                          // Right side icons
-                          IconButton(
-                            icon: const Icon(Icons.search),
-                            onPressed: placeholderCallbackForButtons,
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.person_outline),
-                            onPressed: placeholderCallbackForButtons,
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.shopping_bag_outlined),
-                            onPressed: placeholderCallbackForButtons,
-                          ),
-
-                          // Mobile menu button
-                          if (!isDesktop)
-                            IconButton(
-                              icon: Icon(
-                                _isMobileMenuOpen ? Icons.close : Icons.menu,
-                              ),
-                              onPressed: _toggleMobileMenu,
-                            ),
-
-                          const SizedBox(width: 8),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
 
-              // Mobile dropdown menu
-              if (!isDesktop && _isMobileMenuOpen)
-                Material(
-                  elevation: 8,
-                  child: Container(
-                    color: Colors.white,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildMobileMenuItem(
+                      const Spacer(),
+
+                      // Desktop Navigation
+                      if (isDesktop) ...[
+                        _buildNavButton(
                           'Home',
                           () => navigateToHome(context),
                           widget.currentRoute == '/',
                         ),
-                        _buildMobileMenuItem(
-                          'Shop',
-                          () => _openMobileSubmenu('shop'),
-                          widget.currentRoute.startsWith('/shop/'),
+                        // Shop button with key
+                        Container(
+                          key: _shopButtonKey,
+                          child: _buildNavButton(
+                            'Shop',
+                            _toggleShopDropdown,
+                            widget.currentRoute.startsWith('/shop/'),
+                          ),
                         ),
-                        _buildMobileMenuItem(
-                          'The Print Shack',
-                          () => _openMobileSubmenu('printshack'),
-                          widget.currentRoute.startsWith('/print-shack/'),
+                        // Print Shack button with key
+                        Container(
+                          key: _printShackButtonKey,
+                          child: _buildNavButton(
+                            'The Print Shack',
+                            _togglePrintShackDropdown,
+                            widget.currentRoute.startsWith('/print-shack/'),
+                          ),
                         ),
-                        _buildMobileMenuItem(
+                        _buildNavButton(
                           'SALE!',
                           () => navigateToSale(context),
                           widget.currentRoute == '/sale',
                         ),
-                        _buildMobileMenuItem(
+                        _buildNavButton(
                           'About',
                           () => navigateToAbout(context),
                           widget.currentRoute == '/about',
                         ),
                       ],
-                    ),
+
+                      const Spacer(),
+
+                      // Right side icons
+                      IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: placeholderCallbackForButtons,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.person_outline),
+                        onPressed: placeholderCallbackForButtons,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.shopping_bag_outlined),
+                        onPressed: placeholderCallbackForButtons,
+                      ),
+
+                      // Mobile menu button
+                      if (!isDesktop)
+                        IconButton(
+                          icon: Icon(
+                            _isMobileMenuOpen ? Icons.close : Icons.menu,
+                          ),
+                          onPressed: _toggleMobileMenu,
+                        ),
+
+                      const SizedBox(width: 8),
+                    ],
                   ),
                 ),
-            ],
+              ],
+            ),
           ),
 
-          // Remove inline desktop dropdowns; Overlay now handles them
+          // Mobile dropdown menu
+          if (!isDesktop && _isMobileMenuOpen)
+            Material(
+              elevation: 8,
+              child: Container(
+                color: Colors.white,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildMobileMenuItem(
+                      'Home',
+                      () => navigateToHome(context),
+                      widget.currentRoute == '/',
+                    ),
+                    _buildMobileMenuItem(
+                      'Shop',
+                      () => _openMobileSubmenu('shop'),
+                      widget.currentRoute.startsWith('/shop/'),
+                    ),
+                    _buildMobileMenuItem(
+                      'The Print Shack',
+                      () => _openMobileSubmenu('printshack'),
+                      widget.currentRoute.startsWith('/print-shack/'),
+                    ),
+                    _buildMobileMenuItem(
+                      'SALE!',
+                      () => navigateToSale(context),
+                      widget.currentRoute == '/sale',
+                    ),
+                    _buildMobileMenuItem(
+                      'About',
+                      () => navigateToAbout(context),
+                      widget.currentRoute == '/about',
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
