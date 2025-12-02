@@ -72,6 +72,65 @@ class _AppHeaderState extends State<AppHeader> {
   final GlobalKey _shopButtonKey = GlobalKey();
   final GlobalKey _printShackButtonKey = GlobalKey();
 
+  // Overlay entries for desktop dropdowns
+  OverlayEntry? _shopOverlayEntry;
+  OverlayEntry? _printOverlayEntry;
+
+  @override
+  void dispose() {
+    _removeDropdownOverlays();
+    super.dispose();
+  }
+
+  void _removeDropdownOverlays() {
+    _shopOverlayEntry?.remove();
+    _shopOverlayEntry = null;
+    _printOverlayEntry?.remove();
+    _printOverlayEntry = null;
+  }
+
+  void _showShopDropdownOverlay(Rect buttonRect) {
+    _shopOverlayEntry?.remove();
+    _shopOverlayEntry = OverlayEntry(
+      builder: (context) {
+        return Positioned(
+          top: buttonRect.bottom,
+          left: buttonRect.left,
+          child: Material(
+            elevation: 8,
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(8),
+            ),
+            child: _buildDesktopDropdown(AppHeader.shopMenuItems, true)!,
+          ),
+        );
+      },
+    );
+    Overlay.of(context).insert(_shopOverlayEntry!);
+  }
+
+  void _showPrintDropdownOverlay(Rect buttonRect) {
+    _printOverlayEntry?.remove();
+    _printOverlayEntry = OverlayEntry(
+      builder: (context) {
+        return Positioned(
+          top: buttonRect.bottom,
+          left: buttonRect.left,
+          child: Material(
+            elevation: 8,
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(8),
+            ),
+            child: _buildDesktopDropdown(AppHeader.printShackMenuItems, true)!,
+          ),
+        );
+      },
+    );
+    Overlay.of(context).insert(_printOverlayEntry!);
+  }
+
   // Navigation helper methods
   void navigateToHome(BuildContext context) {
     _closeMobileMenu();
@@ -114,9 +173,14 @@ class _AppHeaderState extends State<AppHeader> {
   void _toggleShopDropdown() {
     setState(() {
       _isShopDropdownOpen = !_isShopDropdownOpen;
-      // Close Print Shack dropdown if Shop is opening (FR-1.3)
       if (_isShopDropdownOpen) {
         _isPrintShackDropdownOpen = false;
+        _printOverlayEntry?.remove();
+        final rect = _getButtonRect(_shopButtonKey);
+        if (rect != null) _showShopDropdownOverlay(rect);
+      } else {
+        _shopOverlayEntry?.remove();
+        _shopOverlayEntry = null;
       }
     });
   }
@@ -125,9 +189,14 @@ class _AppHeaderState extends State<AppHeader> {
   void _togglePrintShackDropdown() {
     setState(() {
       _isPrintShackDropdownOpen = !_isPrintShackDropdownOpen;
-      // Close Shop dropdown if Print Shack is opening (FR-1.3)
       if (_isPrintShackDropdownOpen) {
         _isShopDropdownOpen = false;
+        _shopOverlayEntry?.remove();
+        final rect = _getButtonRect(_printShackButtonKey);
+        if (rect != null) _showPrintDropdownOverlay(rect);
+      } else {
+        _printOverlayEntry?.remove();
+        _printOverlayEntry = null;
       }
     });
   }
@@ -139,6 +208,7 @@ class _AppHeaderState extends State<AppHeader> {
         _isShopDropdownOpen = false;
         _isPrintShackDropdownOpen = false;
       });
+      _removeDropdownOverlays();
     }
   }
 
@@ -188,7 +258,7 @@ class _AppHeaderState extends State<AppHeader> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
 
-    // Get button positions for dropdown placement
+    // We still compute rects for alignment
     final shopButtonRect = _getButtonRect(_shopButtonKey);
     final printShackButtonRect = _getButtonRect(_printShackButtonKey);
 
@@ -373,44 +443,7 @@ class _AppHeaderState extends State<AppHeader> {
             ],
           ),
 
-          // Desktop dropdowns positioned below buttons
-          if (isDesktop) ...[
-            // Shop dropdown
-            if (_isShopDropdownOpen && shopButtonRect != null)
-              Positioned(
-                top: shopButtonRect.bottom,
-                left: shopButtonRect.left,
-                child: Material(
-                  elevation: 4,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(8),
-                    bottomRight: Radius.circular(8),
-                  ),
-                  child: _buildDesktopDropdown(
-                    AppHeader.shopMenuItems,
-                    _isShopDropdownOpen,
-                  )!,
-                ),
-              ),
-
-            // Print Shack dropdown
-            if (_isPrintShackDropdownOpen && printShackButtonRect != null)
-              Positioned(
-                top: printShackButtonRect.bottom,
-                left: printShackButtonRect.left,
-                child: Material(
-                  elevation: 4,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(8),
-                    bottomRight: Radius.circular(8),
-                  ),
-                  child: _buildDesktopDropdown(
-                    AppHeader.printShackMenuItems,
-                    _isPrintShackDropdownOpen,
-                  )!,
-                ),
-              ),
-          ],
+          // Remove inline desktop dropdowns; Overlay now handles them
         ],
       ),
     );
