@@ -68,6 +68,10 @@ class _AppHeaderState extends State<AppHeader> {
   bool _isMobileSubmenuOpen = false;
   String _currentSubmenu = ''; // Values: '', 'shop', 'printshack'
 
+  // GlobalKeys to track button positions
+  final GlobalKey _shopButtonKey = GlobalKey();
+  final GlobalKey _printShackButtonKey = GlobalKey();
+
   // Navigation helper methods
   void navigateToHome(BuildContext context) {
     _closeMobileMenu();
@@ -168,15 +172,30 @@ class _AppHeaderState extends State<AppHeader> {
     }
   }
 
+  // Get button position and size
+  Rect? _getButtonRect(GlobalKey key) {
+    final RenderBox? renderBox =
+        key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) return null;
+
+    final position = renderBox.localToGlobal(Offset.zero);
+    final size = renderBox.size;
+    return Rect.fromLTWH(position.dx, position.dy, size.width, size.height);
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
 
+    // Get button positions for dropdown placement
+    final shopButtonRect = _getButtonRect(_shopButtonKey);
+    final printShackButtonRect = _getButtonRect(_printShackButtonKey);
+
     return SizedBox(
       width: double.infinity,
       child: Stack(
-        clipBehavior: Clip.none, // Allow dropdowns to overflow
+        clipBehavior: Clip.none,
         children: [
           Column(
             mainAxisSize: MainAxisSize.min,
@@ -250,15 +269,23 @@ class _AppHeaderState extends State<AppHeader> {
                               () => navigateToHome(context),
                               widget.currentRoute == '/',
                             ),
-                            _buildNavButton(
-                              'Shop',
-                              _toggleShopDropdown,
-                              widget.currentRoute.startsWith('/shop/'),
+                            // Shop button with key
+                            KeyedSubtree(
+                              key: _shopButtonKey,
+                              child: _buildNavButton(
+                                'Shop',
+                                _toggleShopDropdown,
+                                widget.currentRoute.startsWith('/shop/'),
+                              ),
                             ),
-                            _buildNavButton(
-                              'The Print Shack',
-                              _togglePrintShackDropdown,
-                              widget.currentRoute.startsWith('/print-shack/'),
+                            // Print Shack button with key
+                            KeyedSubtree(
+                              key: _printShackButtonKey,
+                              child: _buildNavButton(
+                                'The Print Shack',
+                                _togglePrintShackDropdown,
+                                widget.currentRoute.startsWith('/print-shack/'),
+                              ),
                             ),
                             _buildNavButton(
                               'SALE!',
@@ -349,10 +376,10 @@ class _AppHeaderState extends State<AppHeader> {
           // Desktop dropdowns positioned below buttons
           if (isDesktop) ...[
             // Shop dropdown
-            if (_isShopDropdownOpen)
+            if (_isShopDropdownOpen && shopButtonRect != null)
               Positioned(
-                top: 72, // Below header (banner + nav bar height)
-                left: 300, // Adjust based on actual button position
+                top: shopButtonRect.bottom,
+                left: shopButtonRect.left,
                 child: Material(
                   elevation: 4,
                   borderRadius: const BorderRadius.only(
@@ -367,10 +394,10 @@ class _AppHeaderState extends State<AppHeader> {
               ),
 
             // Print Shack dropdown
-            if (_isPrintShackDropdownOpen)
+            if (_isPrintShackDropdownOpen && printShackButtonRect != null)
               Positioned(
-                top: 72,
-                left: 430, // Adjust based on actual button position
+                top: printShackButtonRect.bottom,
+                left: printShackButtonRect.left,
                 child: Material(
                   elevation: 4,
                   borderRadius: const BorderRadius.only(
