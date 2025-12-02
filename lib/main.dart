@@ -4,6 +4,8 @@ import 'package:union_shop/views/product_page.dart';
 import 'package:union_shop/views/sale_page.dart';
 import 'package:union_shop/widgets/app_header.dart';
 import 'package:union_shop/views/shop_category_page.dart';
+import 'package:union_shop/views/print_shack_about_page.dart';
+import 'package:union_shop/views/personalisation_page.dart';
 
 void main() {
   runApp(const UnionShopApp());
