@@ -138,6 +138,25 @@ class _AppHeaderState extends State<AppHeader> {
     }
   }
 
+  /// Open mobile submenu - closes main menu and opens submenu (FR-1.4)
+  void _openMobileSubmenu(String submenu) {
+    setState(() {
+      _currentSubmenu = submenu;
+      _isMobileSubmenuOpen = true;
+      // Keep mobile menu open, submenu will slide over it
+    });
+  }
+
+  /// Close mobile submenu - returns to main mobile menu (FR-1.4)
+  void _closeMobileSubmenu() {
+    if (_isMobileSubmenuOpen) {
+      setState(() {
+        _isMobileSubmenuOpen = false;
+        _currentSubmenu = '';
+      });
+    }
+  }
+
   // Update _closeMobileMenu to also close submenus (FR-1.5)
   void _closeMobileMenu() {
     if (_isMobileMenuOpen || _isMobileSubmenuOpen) {
@@ -151,230 +170,240 @@ class _AppHeaderState extends State<AppHeader> {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen width for responsive behavior
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Header - now with intrinsic sizing instead of fixed height
-        Container(
-          color: Colors.white,
-          child: Column(
+    return SizedBox(
+      width: double.infinity,
+      child: Stack(
+        clipBehavior: Clip.none, // Allow dropdowns to overflow
+        children: [
+          Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Top banner
+              // Header
               Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                color: const Color(0xFF4d2963),
-                child: const Text(
-                  'BIG SALE! OUR ESSENTIAL RANGE HAS DROPPED IN PRICE! OVER 20% OFF! COME GRAB YOURS WHILE STOCK LASTS!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ),
-              // Main header - with proper padding for all elements
-              Container(
-                height: 64, // Sufficient height for logo and icons
-                padding: EdgeInsets.symmetric(
-                  horizontal: isDesktop ? 8 : 4,
-                  vertical: 8,
-                ),
-                child: Row(
+                color: Colors.white,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Logo - smaller on mobile to fit all buttons
-                    Flexible(
-                      flex: 0,
-                      child: GestureDetector(
-                        onTap: () {
-                          _closeMobileMenu();
-                          navigateToHome(context);
-                        },
-                        child: SizedBox(
-                          height: isDesktop ? 48 : 32,
-                          child: Image.asset(
-                            'assets/images/upsu.png',
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                height: isDesktop ? 48 : 32,
-                                padding: const EdgeInsets.all(8),
-                                child: const Icon(
-                                  Icons.store,
-                                  color: Color(0xFF4d2963),
+                    // Top banner
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      color: const Color(0xFF4d2963),
+                      child: const Text(
+                        'BIG SALE! OUR ESSENTIAL RANGE HAS DROPPED IN PRICE! OVER 20% OFF! COME GRAB YOURS WHILE STOCK LASTS!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ),
+                    // Main header
+                    Container(
+                      height: 64,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 16),
+                          // Logo section
+                          InkWell(
+                            onTap: () => navigateToHome(context),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF4d2963),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      'US',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              );
-                            },
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Union Shop',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF4d2963),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
 
-                    // Desktop Navigation Buttons (only show on wide screens)
-                    if (isDesktop) ...[
-                      _buildNavButton(
-                        'Home',
-                        () => navigateToHome(context),
-                        widget.currentRoute == '/',
-                      ),
-                      _buildNavButton(
-                        'Shop',
-                        placeholderCallbackForButtons,
-                        false,
-                      ),
-                      _buildNavButton(
-                        'The Print Shack',
-                        placeholderCallbackForButtons,
-                        false,
-                      ),
-                      _buildNavButton(
-                        'SALE!',
-                        () => navigateToSale(context),
-                        widget.currentRoute == '/sale',
-                      ),
-                      _buildNavButton(
-                        'About',
-                        () => navigateToAbout(context),
-                        widget.currentRoute == '/about',
-                      ),
-                      const SizedBox(width: 8),
-                    ],
+                          const Spacer(),
 
-                    // Utility Icons (search, profile, cart) - more compact on mobile
-                    IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: placeholderCallbackForButtons,
-                      tooltip: 'Search',
-                      iconSize: isDesktop ? 24 : 20,
-                      padding: isDesktop
-                          ? const EdgeInsets.all(8)
-                          : const EdgeInsets.all(2),
-                      constraints: BoxConstraints(
-                        minWidth: isDesktop ? 48 : 32,
-                        minHeight: isDesktop ? 48 : 32,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.person_outline),
-                      onPressed: placeholderCallbackForButtons,
-                      tooltip: 'Account',
-                      iconSize: isDesktop ? 24 : 20,
-                      padding: isDesktop
-                          ? const EdgeInsets.all(8)
-                          : const EdgeInsets.all(2),
-                      constraints: BoxConstraints(
-                        minWidth: isDesktop ? 48 : 32,
-                        minHeight: isDesktop ? 48 : 32,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.shopping_cart_outlined),
-                      onPressed: placeholderCallbackForButtons,
-                      tooltip: 'Cart',
-                      iconSize: isDesktop ? 24 : 20,
-                      padding: isDesktop
-                          ? const EdgeInsets.all(8)
-                          : const EdgeInsets.all(2),
-                      constraints: BoxConstraints(
-                        minWidth: isDesktop ? 48 : 32,
-                        minHeight: isDesktop ? 48 : 32,
-                      ),
-                    ),
+                          // Desktop Navigation
+                          if (isDesktop) ...[
+                            _buildNavButton(
+                              'Home',
+                              () => navigateToHome(context),
+                              widget.currentRoute == '/',
+                            ),
+                            _buildNavButton(
+                              'Shop',
+                              _toggleShopDropdown,
+                              widget.currentRoute.startsWith('/shop/'),
+                            ),
+                            _buildNavButton(
+                              'The Print Shack',
+                              _togglePrintShackDropdown,
+                              widget.currentRoute.startsWith('/print-shack/'),
+                            ),
+                            _buildNavButton(
+                              'SALE!',
+                              () => navigateToSale(context),
+                              widget.currentRoute == '/sale',
+                            ),
+                            _buildNavButton(
+                              'About',
+                              () => navigateToAbout(context),
+                              widget.currentRoute == '/about',
+                            ),
+                          ],
 
-                    // Mobile Hamburger Menu
-                    if (!isDesktop)
-                      IconButton(
-                        icon:
-                            Icon(_isMobileMenuOpen ? Icons.close : Icons.menu),
-                        onPressed: _toggleMobileMenu,
-                        tooltip: 'Menu',
-                        iconSize: 24,
-                        padding: const EdgeInsets.all(2),
-                        constraints:
-                            const BoxConstraints(minWidth: 32, minHeight: 32),
+                          const Spacer(),
+
+                          // Right side icons
+                          IconButton(
+                            icon: const Icon(Icons.search),
+                            onPressed: placeholderCallbackForButtons,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.person_outline),
+                            onPressed: placeholderCallbackForButtons,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.shopping_bag_outlined),
+                            onPressed: placeholderCallbackForButtons,
+                          ),
+
+                          // Mobile menu button
+                          if (!isDesktop)
+                            IconButton(
+                              icon: Icon(
+                                _isMobileMenuOpen ? Icons.close : Icons.menu,
+                              ),
+                              onPressed: _toggleMobileMenu,
+                            ),
+
+                          const SizedBox(width: 8),
+                        ],
                       ),
+                    ),
                   ],
                 ),
               ),
+
+              // Mobile dropdown menu
+              if (!isDesktop && _isMobileMenuOpen)
+                Material(
+                  elevation: 8,
+                  child: Container(
+                    color: Colors.white,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildMobileMenuItem(
+                          'Home',
+                          () => navigateToHome(context),
+                          widget.currentRoute == '/',
+                        ),
+                        _buildMobileMenuItem(
+                          'Shop',
+                          () => _openMobileSubmenu('shop'),
+                          widget.currentRoute.startsWith('/shop/'),
+                        ),
+                        _buildMobileMenuItem(
+                          'The Print Shack',
+                          () => _openMobileSubmenu('printshack'),
+                          widget.currentRoute.startsWith('/print-shack/'),
+                        ),
+                        _buildMobileMenuItem(
+                          'SALE!',
+                          () => navigateToSale(context),
+                          widget.currentRoute == '/sale',
+                        ),
+                        _buildMobileMenuItem(
+                          'About',
+                          () => navigateToAbout(context),
+                          widget.currentRoute == '/about',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
-        ),
 
-        // Mobile dropdown menu (below header, not in Stack)
-        if (!isDesktop && _isMobileMenuOpen)
-          Material(
-            elevation: 8,
-            child: Container(
-              color: Colors.white,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildMobileMenuItem(
-                    'Home',
-                    () => navigateToHome(context),
-                    widget.currentRoute == '/',
+          // Desktop dropdowns positioned below buttons
+          if (isDesktop) ...[
+            // Shop dropdown
+            if (_isShopDropdownOpen)
+              Positioned(
+                top: 72, // Below header (banner + nav bar height)
+                left: 300, // Adjust based on actual button position
+                child: Material(
+                  elevation: 4,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(8),
+                    bottomRight: Radius.circular(8),
                   ),
-                  _buildMobileMenuItem(
-                    'Shop',
-                    placeholderCallbackForButtons,
-                    false,
-                  ),
-                  _buildMobileMenuItem(
-                    'The Print Shack',
-                    placeholderCallbackForButtons,
-                    false,
-                  ),
-                  _buildMobileMenuItem(
-                    'SALE!',
-                    () => navigateToSale(context),
-                    widget.currentRoute == '/sale',
-                  ),
-                  _buildMobileMenuItem(
-                    'About',
-                    () => navigateToAbout(context),
-                    widget.currentRoute == '/about',
-                  ),
-                ],
+                  child: _buildDesktopDropdown(
+                    AppHeader.shopMenuItems,
+                    _isShopDropdownOpen,
+                  )!,
+                ),
               ),
-            ),
-          ),
-      ],
+
+            // Print Shack dropdown
+            if (_isPrintShackDropdownOpen)
+              Positioned(
+                top: 72,
+                left: 430, // Adjust based on actual button position
+                child: Material(
+                  elevation: 4,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(8),
+                    bottomRight: Radius.circular(8),
+                  ),
+                  child: _buildDesktopDropdown(
+                    AppHeader.printShackMenuItems,
+                    _isPrintShackDropdownOpen,
+                  )!,
+                ),
+              ),
+          ],
+        ],
+      ),
     );
   }
 
   // Helper method to build navigation buttons
-  // isActive parameter highlights the current page
   Widget _buildNavButton(String label, VoidCallback onPressed, bool isActive) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: TextButton(
         onPressed: onPressed,
         style: TextButton.styleFrom(
-          foregroundColor:
-              isActive ? const Color(0xFF4d2963) : Colors.grey[700],
+          foregroundColor: isActive ? const Color(0xFF4d2963) : Colors.black,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero,
-          ),
-        ).copyWith(
-          overlayColor: WidgetStateProperty.resolveWith<Color?>(
-            (Set<WidgetState> states) {
-              if (states.contains(WidgetState.hovered)) {
-                return const Color(0xFF4d2963).withValues(alpha: 0.1);
-              }
-              return null;
-            },
-          ),
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 14,
-            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-            letterSpacing: 0.5,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
           ),
         ),
       ),
@@ -385,25 +414,94 @@ class _AppHeaderState extends State<AppHeader> {
   Widget _buildMobileMenuItem(String label, VoidCallback onTap, bool isActive) {
     return InkWell(
       onTap: onTap,
-      splashColor: const Color(0xFF4d2963).withValues(alpha: 0.1),
-      highlightColor: const Color(0xFF4d2963).withValues(alpha: 0.05),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(color: Colors.grey[300]!),
+            bottom: BorderSide(color: Colors.grey[200]!),
           ),
-          color:
-              isActive ? const Color(0xFF4d2963).withValues(alpha: 0.05) : null,
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 16,
-            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-            letterSpacing: 0.5,
-            color: isActive ? const Color(0xFF4d2963) : Colors.black87,
+            color: isActive ? const Color(0xFF4d2963) : Colors.black,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper method to build desktop dropdown menu
+  Widget? _buildDesktopDropdown(List<MenuItem> items, bool isOpen) {
+    if (!isOpen) return null;
+
+    return Container(
+      width: 250,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: items.asMap().entries.map((entry) {
+          final index = entry.key;
+          final item = entry.value;
+          final isLast = index == items.length - 1;
+
+          return _buildDropdownMenuItem(
+            item: item,
+            isActive: item.isActive(widget.currentRoute),
+            isLast: isLast,
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  // Helper method to build individual dropdown menu items
+  Widget _buildDropdownMenuItem({
+    required MenuItem item,
+    required bool isActive,
+    required bool isLast,
+  }) {
+    return InkWell(
+      onTap: () {
+        _closeAllDropdowns();
+        _closeMobileMenu();
+        Navigator.pushNamed(context, item.route);
+      },
+      hoverColor: const Color(0xFF4d2963).withValues(alpha: 0.1),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color:
+              isActive ? const Color(0xFF4d2963).withValues(alpha: 0.05) : null,
+          border: isLast
+              ? null
+              : Border(
+                  bottom: BorderSide(color: Colors.grey[200]!),
+                ),
+        ),
+        child: Text(
+          item.label,
+          style: TextStyle(
+            fontSize: 14,
+            color: isActive ? const Color(0xFF4d2963) : Colors.grey[800],
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
           ),
         ),
       ),
