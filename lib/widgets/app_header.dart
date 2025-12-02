@@ -347,7 +347,7 @@ class _AppHeaderState extends State<AppHeader> {
                         Container(
                           key: _shopButtonKey,
                           child: _buildNavButton(
-                            'Shop',
+                            'Shop ⏷',
                             _toggleShopDropdown,
                             widget.currentRoute.startsWith('/shop/'),
                           ),
@@ -356,7 +356,7 @@ class _AppHeaderState extends State<AppHeader> {
                         Container(
                           key: _printShackButtonKey,
                           child: _buildNavButton(
-                            'The Print Shack',
+                            'The Print Shack ⏷',
                             _togglePrintShackDropdown,
                             widget.currentRoute.startsWith('/print-shack/'),
                           ),
