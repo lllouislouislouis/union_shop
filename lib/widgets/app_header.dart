@@ -1,5 +1,21 @@
 import 'package:flutter/material.dart';
 
+// Menu item model for dropdown/submenu items
+class MenuItem {
+  final String label;
+  final String route;
+
+  const MenuItem({
+    required this.label,
+    required this.route,
+  });
+
+  // Check if this item is active based on current route
+  bool isActive(String currentRoute) {
+    return currentRoute == route;
+  }
+}
+
 /// Reusable header component that includes:
 /// - Purple banner with sale announcement
 /// - Navigation bar with logo, buttons, and utility icons
@@ -14,6 +30,29 @@ class AppHeader extends StatefulWidget {
     super.key,
     required this.currentRoute,
   });
+
+  // Shop category menu items
+  static const List<MenuItem> shopMenuItems = [
+    MenuItem(label: 'Clothing', route: '/shop/clothing'),
+    MenuItem(label: 'Merchandise', route: '/shop/merchandise'),
+    MenuItem(label: 'Halloween', route: '/shop/halloween'),
+    MenuItem(
+      label: 'Signature & Essential Range',
+      route: '/shop/signature-essential',
+    ),
+    MenuItem(
+      label: 'Portsmouth City Collection',
+      route: '/shop/portsmouth',
+    ),
+    MenuItem(label: 'Pride Collection', route: '/shop/pride'),
+    MenuItem(label: 'Graduation', route: '/shop/graduation'),
+  ];
+
+  // Print Shack menu items
+  static const List<MenuItem> printShackMenuItems = [
+    MenuItem(label: 'About', route: '/print-shack/about'),
+    MenuItem(label: 'Personalisation', route: '/print-shack/personalisation'),
+  ];
 
   @override
   State<AppHeader> createState() => _AppHeaderState();
