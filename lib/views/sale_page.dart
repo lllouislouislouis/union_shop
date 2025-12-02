@@ -575,59 +575,30 @@ class _SaleProductCardState extends State<SaleProductCard> {
               children: [
                 // Product Image
                 Expanded(
-                  child: Stack(
-                    children: [
-                      // Image
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(8),
-                        ),
-                        child: Container(
-                          width: double.infinity,
-                          color: Colors.grey[100],
-                          child: Image.asset(
-                            widget.product.imageUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.grey[200],
-                                child: Center(
-                                  child: Icon(
-                                    Icons.image_not_supported,
-                                    color: Colors.grey[400],
-                                    size: 48,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-
-                      // Discount badge (top-right corner)
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF4d2963),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            '-${widget.product.discountPercentage}%',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(8),
+                    ),
+                    child: Container(
+                      width: double.infinity,
+                      color: Colors.grey[100],
+                      child: Image.asset(
+                        widget.product.imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[200],
+                            child: Center(
+                              child: Icon(
+                                Icons.image_not_supported,
+                                color: Colors.grey[400],
+                                size: 48,
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
-                    ],
+                    ),
                   ),
                 ),
 
