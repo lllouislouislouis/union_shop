@@ -458,12 +458,12 @@ class _AppHeaderState extends State<AppHeader> {
             widget.currentRoute == '/',
           ),
           _buildMobileMenuItem(
-            'Shop',
+            'Shop ▶',
             () => _openMobileSubmenu('shop'),
             widget.currentRoute.startsWith('/shop/'),
           ),
           _buildMobileMenuItem(
-            'The Print Shack',
+            'The Print Shack ▶',
             () => _openMobileSubmenu('printshack'),
             widget.currentRoute.startsWith('/print-shack/'),
           ),
