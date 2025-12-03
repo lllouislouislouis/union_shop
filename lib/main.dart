@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:union_shop/models/carousel_slide.dart';
 import 'package:union_shop/views/about_page.dart';
 import 'package:union_shop/views/product_page.dart';
 import 'package:union_shop/views/sale_page.dart';
@@ -63,6 +64,46 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // NEW: Carousel state - define 4 slides with content (FR-1.2, FR-1.3)
+  late final List<CarouselSlide> _carouselSlides;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize carousel slides (FR-1.4: immutable after initialization)
+    _carouselSlides = const [
+      // Slide 1: Collections
+      CarouselSlide(
+        imagePath: 'assets/images/carousel_collections.jpg',
+        heading: 'Browse Our Collections',
+        buttonLabel: 'EXPLORE',
+        buttonRoute: '/collections',
+      ),
+      // Slide 2: Print Shack
+      CarouselSlide(
+        imagePath: 'assets/images/carousel_printshack.jpg',
+        heading: 'The Print Shack',
+        buttonLabel: 'GET PERSONALISED',
+        buttonRoute: '/print-shack/about',
+      ),
+      // Slide 3: Sale
+      CarouselSlide(
+        imagePath: 'assets/images/carousel_sale.jpg',
+        heading: 'Big Sale On Now!',
+        buttonLabel: 'SHOP SALE',
+        buttonRoute: '/sale',
+      ),
+      // Slide 4: About
+      CarouselSlide(
+        imagePath: 'assets/images/carousel_about.jpg',
+        heading: 'About Union Shop',
+        buttonLabel: 'LEARN MORE',
+        buttonRoute: '/about',
+      ),
+    ];
+  }
+
   void placeholderCallbackForButtons() {
     // This is the event handler for buttons that don't work yet
   }
@@ -150,6 +191,126 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // NEW: Carousel Section (FR-1.1)
+                Container(
+                  margin: const EdgeInsets.only(top: 24),
+                  child: Column(
+                    children: [
+                      // Carousel header
+                      Container(
+                        width: double.infinity,
+                        color: const Color(0xFF4d2963),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 24,
+                        ),
+                        child: const Text(
+                          'Welcome to Union Shop',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
+                      // Carousel slider (FR-1.5)
+                      SizedBox(
+                        height: 300,
+                        child: PageView.builder(
+                          itemCount: _carouselSlides.length,
+                          itemBuilder: (context, index) {
+                            final slide = _carouselSlides[index];
+                            return GestureDetector(
+                              onTap: () {
+                                // Navigate to the route defined in the slide
+                                Navigator.pushNamed(context, slide.buttonRoute);
+                              },
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  // Slide image
+                                  Image.asset(
+                                    slide.imagePath,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: Colors.grey[300],
+                                        child: const Center(
+                                          child: Icon(Icons.image_not_supported,
+                                              color: Colors.grey),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  // Gradient overlay
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.black.withOpacity(0.7),
+                                          Colors.black.withOpacity(0.3),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                    ),
+                                  ),
+                                  // Slide content
+                                  Positioned(
+                                    left: 24,
+                                    right: 24,
+                                    top: 40,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          slide.heading,
+                                          style: const TextStyle(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                            height: 1.2,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            // Navigate to the route defined in the slide
+                                            Navigator.pushNamed(
+                                                context, slide.buttonRoute);
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.white,
+                                            foregroundColor:
+                                                const Color(0xFF4d2963),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 32,
+                                              vertical: 16,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            slide.buttonLabel,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
