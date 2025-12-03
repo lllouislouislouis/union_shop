@@ -313,6 +313,9 @@ class _HomeScreenState extends State<HomeScreen>
             },
             child: _buildSlideContent(currentSlide, isDesktop),
           ),
+
+          // FR-6, FR-7, FR-8, FR-9: Navigation controls
+          _buildCarouselControls(isDesktop),
         ],
       ),
     );
@@ -424,6 +427,114 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  // FR-6, FR-7, FR-8, FR-9: Build navigation controls
+  Widget _buildCarouselControls(bool isDesktop) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: isDesktop ? 16 : 12, // FR-3.8, FR-4.4: Responsive bottom spacing
+      child: Center(
+        child: Container(
+          // FR-9.1: Semi-transparent dark background
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(24), // FR-9.3: Fully rounded
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12, // FR-9.2
+            vertical: 8,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // FR-6.1, FR-6.2: Previous arrow button
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                onPressed: _previousSlide, // FR-6.4: Navigate to previous
+                tooltip: 'Previous slide',
+              ),
+
+              const SizedBox(width: 12), // FR-9.5: Spacing
+
+              // FR-7: Dot indicators
+              _buildDotIndicators(),
+
+              const SizedBox(width: 12), // FR-9.5: Spacing
+
+              // FR-6.3, FR-6.4: Next arrow button
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                onPressed: _nextSlide, // FR-6.4: Navigate to next
+                tooltip: 'Next slide',
+              ),
+
+              const SizedBox(
+                  width: 16), // FR-8.4: Extra spacing before pause button
+
+              // FR-8: Pause/Play button with animated icon
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200), // FR-8.6
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+                child: IconButton(
+                  key: ValueKey(
+                      _isAutoPlayEnabled), // Trigger animation on state change
+                  icon: Icon(
+                    _isAutoPlayEnabled
+                        ? Icons.pause // FR-8.1
+                        : Icons.play_arrow, // FR-8.2
+                    color: Colors.white, // FR-8.3
+                    size: 24,
+                  ),
+                  onPressed: _toggleAutoPlay, // FR-8.5: Toggle auto-play
+                  tooltip: _isAutoPlayEnabled ? 'Pause' : 'Play',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // FR-7: Build dot indicators for slide navigation
+  Widget _buildDotIndicators() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(
+        _carouselSlides.length,
+        (index) {
+          final isActive = index == _currentSlide;
+          return GestureDetector(
+            onTap: () => _goToSlide(index), // FR-7.5: Jump to clicked slide
+            child: Container(
+              margin: const EdgeInsets.symmetric(
+                  horizontal: 4), // FR-7.1: 8px total spacing
+              width:
+                  isActive ? 12 : 8, // FR-7.2, FR-7.3: Active vs inactive size
+              height: isActive ? 12 : 8,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(
+                  alpha: isActive ? 1.0 : 0.5, // FR-7.2, FR-7.3: Opacity
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
