@@ -23,3 +23,12 @@ flutter:
   # Add assets
   assets:
     - assets/images/
+    - assets/images/collections/clothing.jpg
+    - assets/images/collections/merchandise.jpg
+    - assets/images/collections/graduation.jpg
+    - assets/images/collections/personalisation.jpg
+    - assets/images/collections/print_shack.jpg
+    - assets/images/collections/portsmouth.jpg
+    - assets/images/collections/pride.jpg
+    - assets/images/collections/stationery.jpg
+    - assets/images/collections/sports.jpg
