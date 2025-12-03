@@ -84,27 +84,32 @@ class CollectionsPage extends StatelessWidget {
 
     return AppScaffold(
       currentRoute: '/collections',
-      child: GridView.builder(
-        key: const Key('collections_grid'),
+      child: Padding(
         padding: const EdgeInsets.all(_padding),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: columns,
-          crossAxisSpacing: _spacing,
-          mainAxisSpacing: _spacing,
-          childAspectRatio: _childAspectRatio,
+        child: GridView.builder(
+          key: const Key('collections_grid'),
+          // FR: Disable GridView's own scrolling since AppScaffold handles it
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columns,
+            crossAxisSpacing: _spacing,
+            mainAxisSpacing: _spacing,
+            childAspectRatio: _childAspectRatio,
+          ),
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return CollectionTile(
+              key: Key('collection_tile_${item.slug}'),
+              item: item,
+              onTap: () {
+                // Navigation will be wired in next subtask
+                debugPrint('Tapped: ${item.slug}');
+              },
+            );
+          },
         ),
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          return CollectionTile(
-            key: Key('collection_tile_${item.slug}'),
-            item: item,
-            onTap: () {
-              // Navigation will be wired in next subtask
-              debugPrint('Tapped: ${item.slug}');
-            },
-          );
-        },
       ),
     );
   }
@@ -149,124 +154,125 @@ class _CollectionTileState extends State<CollectionTile> {
         child: Builder(
           builder: (context) {
             return MouseRegion(
-                onEnter: (_) => setState(() => _isHovering = true),
-                onExit: (_) => setState(() => _isHovering = false),
-                child: AnimatedContainer(
-                  // AC-9: Hover effect (slight elevation change)
-                  duration: const Duration(milliseconds: 200),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: _isHovering || _isFocused
-                        ? [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ]
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                  ),
-                  child: ConstrainedBox(
-                    // AC-11: Minimum touch target 44x44
-                    constraints: const BoxConstraints(
-                      minWidth: 44,
-                      minHeight: 44,
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: _handleActivation,
-                          // AC-8: Keyboard support via autofocus and InkWell
-                          focusNode: FocusNode(skipTraversal: false),
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              // FR-2, AC-4, AC-6: Background image with fallback
-                              Image.asset(
-                                widget.item.imagePath,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  // Fallback placeholder
-                                  return Container(
-                                    color: Colors.grey.shade300,
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.image_not_supported,
-                                        size: 48,
-                                        color: Colors.grey.shade600,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-
-                              // AC-5, AC-12: Dark gradient overlay for text contrast
-                              Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Colors.transparent,
-                                      Colors.black.withOpacity(0.7),
-                                    ],
-                                    stops: const [0.5, 1.0],
-                                  ),
-                                ),
-                              ),
-
-                              // AC-4: Title overlay
-                              Positioned(
-                                left: 12,
-                                right: 12,
-                                bottom: 12,
-                                child: Text(
-                                  widget.item.title,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                    shadows: [
-                                      Shadow(
-                                        offset: Offset(0, 1),
-                                        blurRadius: 3,
-                                        color: Colors.black45,
-                                      ),
-                                    ],
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-
-                              // AC-13: Focus indicator
-                              if (_isFocused)
-                                Positioned.fill(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Theme.of(context).primaryColor,
-                                        width: 3,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                ),
-                            ],
+              onEnter: (_) => setState(() => _isHovering = true),
+              onExit: (_) => setState(() => _isHovering = false),
+              child: AnimatedContainer(
+                // AC-9: Hover effect (slight elevation change)
+                duration: const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: _isHovering || _isFocused
+                      ? [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
                           ),
+                        ]
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                ),
+                child: ConstrainedBox(
+                  // AC-11: Minimum touch target 44x44
+                  constraints: const BoxConstraints(
+                    minWidth: 44,
+                    minHeight: 44,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: _handleActivation,
+                        // AC-8: Keyboard support via autofocus and InkWell
+                        focusNode: FocusNode(skipTraversal: false),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            // FR-2, AC-4, AC-6: Background image with fallback
+                            Image.asset(
+                              widget.item.imagePath,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                // Fallback placeholder
+                                return Container(
+                                  color: Colors.grey.shade300,
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.image_not_supported,
+                                      size: 48,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+
+                            // AC-5, AC-12: Dark gradient overlay for text contrast
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.transparent,
+                                    Colors.black.withOpacity(0.7),
+                                  ],
+                                  stops: const [0.5, 1.0],
+                                ),
+                              ),
+                            ),
+
+                            // AC-4: Title overlay
+                            Positioned(
+                              left: 12,
+                              right: 12,
+                              bottom: 12,
+                              child: Text(
+                                widget.item.title,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  shadows: [
+                                    Shadow(
+                                      offset: Offset(0, 1),
+                                      blurRadius: 3,
+                                      color: Colors.black45,
+                                    ),
+                                  ],
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+
+                            // AC-13: Focus indicator
+                            if (_isFocused)
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Theme.of(context).primaryColor,
+                                      width: 3,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                ));
+                ),
+              ),
+            );
           },
         ),
       ),
