@@ -1,38 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:union_shop/widgets/app_header.dart';
+import 'package:union_shop/widgets/app_scaffold.dart';
 
 class PersonalisationPage extends StatelessWidget {
   const PersonalisationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const AppHeader(currentRoute: '/print-shack/personalisation'),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Personalisation Services',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF4d2963),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Details about personalisation options will appear here.',
-                    style: TextStyle(fontSize: 16, color: Colors.black87),
-                  ),
-                ],
+    return AppScaffold(
+      currentRoute: '/print-shack/personalisation',
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Personalisation Page',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              const Text('Create your personalised products here.'),
+            ],
+          ),
         ),
       ),
     );
