@@ -32,7 +32,7 @@ const List<CollectionItem> kCollectionItems = [
     slug: 'print-shack',
     title: 'Print Shack',
     description: 'Professional printing and design services',
-    imagePath: 'assets/images/collections/print-shack.jpg',
+    imagePath: 'assets/images/collections/print_shack.jpg',
   ),
   CollectionItem(
     slug: 'portsmouth',
