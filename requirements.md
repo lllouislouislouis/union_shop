@@ -1,131 +1,249 @@
-# Collections Page — Feature Requirements
+# Clothing Page — Feature Requirements
 
 ## 1. Feature overview
 Description
-- Implement a responsive Collections page that displays site collections (e.g., Clothing, Merchandise, Graduation, Personalisation, Print Shack, Portsmouth, Pride) as a tiled grid. Each tile shows an image and short label/description and navigates to the appropriate collection/category view when activated.
+- Implement a Clothing collection page that displays clothing products with filtering, sorting, and product count capabilities identical to the Sale page.
+- Reuse Sale page components (FilterBar, SortDropdown, ProductGrid, ProductCard) to maintain consistency and reduce duplication.
+- Integrate with existing navigation from Collections page and ensure accessible, responsive design.
 
 Purpose
-- Provide an easy, visual way for users to discover and navigate major collections.
-- Maintain consistency with app theming and accessibility requirements.
+- Provide users with a dedicated, filterable view of clothing products.
+- Enable discovery through filters (All products, clothing, merchandise, popular) and sorting options.
+- Maintain UX consistency across collection pages (Clothing, Sale, etc.).
 
 Scope
-- Add a CollectionsPage view at lib/views/collections_page.dart.
-- Provide a reusable CollectionTile widget and a small model (CollectionItem).
-- Ensure routing/navigation to collection/category screens (via existing ShopCategoryPage or new routes).
-- Add tests verifying rendering, navigation and accessibility.
+- Configure ShopCategoryPage to support clothing category with Sale-like controls, OR create a dedicated ClothingPage view.
+- Reuse existing filter/sort components and state management from Sale page.
+- Ensure routing from Collections -> Clothing works via '/shop/clothing' or ShopCategoryPage(category: 'clothing').
+- Add tests verifying filtering, sorting, product count updates, and navigation.
 
 ## 2. User stories
 
-US-1: Discover collections (visitor)
-- As a visitor, I want to scan a grid of collection tiles so I can quickly find collections to browse.
-- Expected: Tiles show image and title; tapping a tile opens that collection.
+US-1: Browse clothing products (visitor/shopper)
+- As a shopper, I want to view all clothing products in a grid so I can browse available items.
+- Expected: Page shows product cards with images, names, prices; count displays total products.
 
-US-2: Mobile browsing (mobile user)
-- As a mobile user, I want the layout to stack vertically so tiles are easy to read and tap.
-- Expected: Single column on narrow screens; tiles maintain minimum tappable size.
+US-2: Filter clothing products (shopper)
+- As a shopper, I want to filter by all products, clothing, merhandise and popular so I can narrow results to my preferences.
+- Expected: Selecting filters updates the grid immediately; count shows filtered total.
 
-US-3: Desktop browsing (desktop user)
-- As a desktop user, I want a denser grid so more collections are visible at once.
-- Expected: Three columns on wide screens; hover/focus states provide affordance.
+US-3: Sort clothing products (shopper)
+- As a shopper, I want to sort by Popularity, Price (Low→High, High→Low), and Newest so I can find items that match my priorities.
+- Expected: Changing sort reorders products; grid updates; count remains accurate.
 
-US-4: Developer / maintainer
-- As a developer, I want a small model and sample data so it’s easy to add or update collections and write tests.
+US-4: Navigate from Collections (visitor)
+- As a visitor, I want to click the "Clothing" tile on the Collections page so I can view clothing products.
+- Expected: Tapping tile navigates to Clothing page; products load immediately.
+
+US-5: Mobile shopping (mobile user)
+- As a mobile user, I want filters/sort controls and product cards to be touch-friendly and stack vertically so I can browse comfortably on small screens.
+- Expected: Single or dual column grid; controls accessible and tappable; no horizontal overflow.
+
+US-6: Keyboard navigation (accessibility user)
+- As a keyboard user, I want to tab through filters, sort options, and product cards so I can navigate without a mouse.
+- Expected: All controls focusable; Enter/Space activates; focus indicators visible.
+
+US-7: Developer/maintainer
+- As a developer, I want to reuse Sale page components and state logic so the Clothing page is easy to maintain and extend.
 
 ## 3. Acceptance criteria
 
-Layout & responsiveness
-- AC-1: Desktop/tablet (width > 800px) shows 3 columns; mobile (≤ 800px) shows 1 column.
-- AC-2: Grid spacing: 16px between tiles; 24px outer padding.
-- AC-3: Tiles maintain consistent aspect ratio (recommend childAspectRatio e.g., 4/3 or square) and do not overflow horizontally at common widths.
+Page structure & layout
+- AC-1: Page title displays "Clothing" at the top.
+- AC-2: Product count displays "X products" and updates after filters/sort.
+- AC-3: Controls bar includes "Filter By" (multi-select) and "Sort By" (dropdown), identical to Sale page.
+- AC-4: Product grid is responsive: >800px: 3–4 columns; ≤800px: 1–2 columns.
+- AC-5: Spacing and card design match Sale page for consistency.
 
-Tile content & visuals
-- AC-4: Each tile displays an image (BoxFit.cover) plus a title overlay (bold, 16–18px). Optional short description shown beneath or in overlay.
-- AC-5: Images use a dark gradient or semi-transparent overlay to keep text readable.
-- AC-6: If an image fails to load, a fallback placeholder (icon + neutral background) is shown.
+Filtering behavior
+- AC-6: Filter By includes options: all products, shopping, merchandise and popular.
+- AC-7: Selecting/deselecting a filter immediately updates:
+  - Filtered product list displayed in grid
+  - Product count
 
-Interaction & navigation
-- AC-7: Tapping/clicking a tile navigates to the collection view for that slug:
-  - Preferred: Navigator.pushNamed(context, '/collections/<slug>') OR Navigator.push(context, MaterialPageRoute(builder: (_) => ShopCategoryPage(category: slug))).
-- AC-8: Tile activation supports mouse click, touch
-- AC-9: Tiles provide hover/press visual feedback on supported platforms (scale, elevation, or overlay).
+Sorting behavior
+- AC-10: Sort By dropdown includes: Popularity, Price Low→High, Price High→Low, Newest.
+- AC-11: Changing sort option reorders the current filtered list and re-renders grid.
+- AC-12: Product count remains accurate after sorting (no change in count, only order).
+
+Product count
+- AC-13: Count displays total products after filters applied.
+- AC-14: Count updates immediately after any filter or sort change.
+
+Navigation & routing
+- AC-15: Clicking "Clothing" tile on Collections page navigates to '/shop/clothing' or ShopCategoryPage(category: 'clothing').
+- AC-16: Clicking a product card navigates to ProductPage for that item.
+- AC-17: Browser back button returns to Collections page.
 
 Accessibility
-- AC-10: Each tile has a Semantics label: "Open {title} collection".
-- AC-11: Controls meet minimum touch target of 44x44 px.
-- AC-12: Contrast of text on overlay meets WCAG AA.
-- AC-13: Focus order is logical; keyboard focus visible.
-
-Data & routing
-- AC-14: The page uses a static const List<CollectionItem> model with fields: slug, title, description (optional), imagePath, route (optional).
-- AC-15: Known slugs are mapped to existing ShopCategoryPage routes or registered in app routes.
-- AC-16: If route is missing, navigation falls back to ShopCategoryPage(category: slug).
+Performance
+- AC-22: Filtering and sorting complete within 300ms for typical product counts (<500 items).
+- AC-23: Grid renders efficiently; avoid unnecessary rebuilds (use keys, const widgets, memoization).
 
 Testing & QA
-- AC-17: Widget tests confirm:
-  - Grid renders expected number of items from the sample list.
-  - Tapping the first tile triggers Navigator.push (use WidgetTester with mock navigator).
-  - Semantics label present for at least one tile.
-- AC-18: Manual checks at widths: 360px, 800px, 1200px show no overflow and correct layout.
+- AC-24: Widget tests confirm:
+  - Changing a filter reduces product count and updates grid.
+  - Changing sort option reorders products correctly.
+  - Navigation from Collections -> Clothing works.
+  - Accessibility semantics present on controls and cards.
+- AC-25: Manual QA at widths: 360px, 800px, 1200px shows correct layout and no overflow.
 
 ## 4. Functional requirements (summary)
 
-FR-1 Layout
-- FR-1.1: Use GridView.count or SliverGrid with crossAxisCount = (width > 800 ? 3 : 1).
-- FR-1.2: crossAxisSpacing and mainAxisSpacing = 16px; padding = 24px.
-- FR-1.3: childAspectRatio tuned for consistent tile shape.
+FR-1 Page structure
+- FR-1.1: Use AppScaffold with currentRoute='/shop/clothing'.
+- FR-1.2: Display page title "Clothing" and product count in header/controls bar.
+- FR-1.3: Include FilterBar and SortDropdown components from Sale page.
+- FR-1.4: Display ProductGrid with responsive columns.
 
-FR-2 Tile
-- FR-2.1: Implement CollectionTile widget using InkWell (for ripple), Stack (Image + overlay), and Semantics + FocusableActionDetector.
-- FR-2.2: Provide keyboard activation and hover/press visuals.
-- FR-2.3: Expose semanticLabel: "Open {title} collection".
+FR-2 Data & state
+- FR-2.1: Load products where category == 'clothing' from catalog or mock data.
+- FR-2.2: Use same state management pattern as Sale page (setState/Provider/Riverpod/Bloc).
+- FR-2.3: State includes:
+  - allProducts: List<Product> (clothing items)
+  - activeFilters: Map<String, dynamic> (all products, clothing, merchandise, popular)
+  - sortOption: String (e.g., 'price-asc', 'newest')
+  - filteredProducts: List<Product> (computed)
+- FR-2.4: Recompute filteredProducts when filters or sort changes.
 
-FR-3 Data & model
-- FR-3.1: Add CollectionItem model:
-  - final String slug;
-  - final String title;
-  - final String? description;
-  - final String imagePath;
-  - final String? route;
-- FR-3.2: Provide a const sample list of items used by CollectionsPage.
+FR-3 Filtering
+- FR-3.1: Reuse FilterBar widget from Sale page.
+- FR-3.2: Filter options:
+  - All products
+  - Clothing
+  - Merchandise
+  - Popular
+- FR-3.3: Apply filters to allProducts; update filteredProducts and count.
 
-FR-4 Navigation
-- FR-4.1: Primary navigation via named routes '/collections/<slug>' if possible; otherwise push ShopCategoryPage.
-- FR-4.2: Ensure Navigator is used consistently with app routes.
+FR-4 Sorting
+- FR-4.1: Reuse SortDropdown widget from Sale page.
+- FR-4.2: Sort options:
+  - Popularity (if popularity data available; else omit or use placeholder)
+  - Price Low→High
+  - Price High→Low
+  - Newest (if date added available)
+- FR-4.3: Apply sort to filteredProducts; re-render grid.
 
-FR-5 Assets
-- FR-5.1: Images placed under assets/images/collections/*. Use placeholders if real assets are not available.
-- FR-5.2: Add fallback UI for missing assets.
+FR-5 Product grid
+- FR-5.1: Reuse ProductGrid and ProductCard widgets from Sale page.
+- FR-5.2: Responsive columns: >800px: 3–4; ≤800px: 1–2.
+- FR-5.3: Grid spacing: 16px between cards; 24px outer padding.
+- FR-5.4: Each card shows image, name, price, optional badge (e.g., "New").
+
+FR-6 Navigation
+- FR-6.1: Route '/shop/clothing' maps to ShopCategoryPage(category: 'clothing') or dedicated ClothingPage.
+- FR-6.2: Clicking product card navigates to ProductPage(productId: item.id).
+- FR-6.3: Ensure route is registered in main.dart routes.
+
+FR-7 Accessibility
+- FR-7.1: Wrap controls in Semantics with appropriate labels.
+- FR-7.2: Ensure keyboard navigation via Focus widgets.
+- FR-7.3: Product cards have semantic labels and minimum 44x44 touch targets.
 
 ## 5. Non-functional requirements
 
 NFR-1 Performance
-- Avoid expensive build-time work; prefer const widgets and preloaded assets where feasible.
+- Filter/sort operations complete in <300ms for typical product counts.
+- Use efficient list operations (where, orderBy) or memoization to avoid expensive rebuilds.
 
 NFR-2 Maintainability
-- Keep model and sample data near the page (lib/views/collections_page.dart) or in a small model file.
-- Keep widgets small and testable.
+- Reuse Sale page components (FilterBar, SortDropdown, ProductGrid, ProductCard).
+- Avoid duplicating filter/sort logic; extract into shared service/provider if needed.
+- Keep ClothingPage or ShopCategoryPage config simple and testable.
 
-NFR-3 Accessibility
-- Follow semantics and ensure contrast and keyboard navigation.
+NFR-3 Consistency
+- Match Sale page design and behavior exactly for filters, sorting, and product cards.
+- Use same spacing, fonts, colors, and interaction patterns.
+
+NFR-4 Accessibility
+- Follow WCAG AA standards for contrast and keyboard navigation.
+- Provide semantic labels and focus indicators.
 
 ## 6. Implementation notes & examples (brief)
-- Use a small const list of CollectionItem.
-- Grid implementation example: GridView.count(crossAxisCount: columns, childAspectRatio: 4/3,...)
-- Tile: InkWell -> Semantics -> Stack(Image.asset, Positioned overlay Text).
+
+Option A: Configure ShopCategoryPage
+- Add a feature flag or config to ShopCategoryPage: enableFiltersAndSort (default false; true for 'clothing' and 'sale').
+- Inject filter options and sort options via constructor or provider.
+- Example:
+  ```dart
+  ShopCategoryPage(
+    category: 'clothing',
+    enableFiltersAndSort: true,
+    filterOptions: kClothingFilters, // Reuse from Sale page
+    sortOptions: kDefaultSortOptions,
+  )
+  ```
+
+Option B: Create dedicated ClothingPage
+- Scaffold with AppScaffold.
+- Import and reuse FilterBar, SortDropdown, ProductGrid from Sale page.
+- Query products: `products.where((p) => p.category == 'clothing').toList()`.
+- Manage state with setState or provider; mirror Sale page logic.
+
+Recommended: Option A (configure ShopCategoryPage) for DRY and easier maintenance.
 
 ## 7. Subtasks (actionable)
 
-- [ ] Create model: lib/models/collection_item.dart or define inside collections_page.dart.
-- [ ] Implement CollectionsPage: lib/views/collections_page.dart with responsive GridView.
-- [ ] Implement CollectionTile widget with InkWell, Semantics, FocusableActionDetector and fallback image handling.
-- [ ] Add sample const List<CollectionItem> with at least 6 items (clothing, merchandise, graduation, personalisation, print-shack, ports mouth/pride).
-- [ ] Ensure image assets exist at assets/images/collections/* or use placeholders and update pubspec.yaml.
-- [ ] Wire navigation: add routes or ensure fallback to ShopCategoryPage(category: slug).
-- [ ] Add widget tests:
-  - Grid renders sample count.
-  - Tap triggers navigation.
-  - Semantics label exists.
-- [ ] Manual QA: test at widths 360px, 800px, 1200px for layout and accessibility checks.
+- [ ] **Subtask 1**: Identify and extract reusable components from Sale page:
+  - FilterBar widget
+  - SortDropdown widget (with Popularity, Price, Newest options)
+  - ProductGrid and ProductCard widgets
+  - Place in `lib/widgets/` if not already extracted.
+
+- [ ] **Subtask 2**: Update ShopCategoryPage to support filters and sorting:
+  - Add `enableFiltersAndSort` boolean parameter (default false).
+  - Add `filterOptions` and `sortOptions` parameters.
+  - When enabled, display FilterBar and SortDropdown above ProductGrid.
+  - Manage filter/sort state with setState or provider.
+
+- [ ] **Subtask 3**: Load clothing products:
+  - Query or filter products where category == 'clothing'.
+  - Use mock data if catalog not yet available.
+  - Ensure at least 10–20 sample clothing products for testing.
+
+- [ ] **Subtask 4**: Implement filtering logic:
+  - On filter change, recompute filteredProducts from allProducts.
+  - Update product count and re-render grid.
+
+- [ ] **Subtask 5**: Implement sorting logic:
+  - On sort change, apply orderBy to filteredProducts.
+  - Re-render grid with sorted list.
+  - Ensure product count remains accurate (sorting does not change count).
+
+- [ ] **Subtask 6**: Wire navigation:
+  - Ensure '/shop/clothing' route exists in main.dart:
+    ```dart
+    '/shop/clothing': (context) => ShopCategoryPage(
+      category: 'clothing',
+      enableFiltersAndSort: true,
+      filterOptions: kClothingFilters,
+      sortOptions: kDefaultSortOptions,
+    ),
+    ```
+  - Verify Collections -> Clothing navigation works.
+
+- [ ] **Subtask 7**: Add accessibility:
+  - Wrap FilterBar and SortDropdown in Semantics.
+  - Ensure keyboard focus order: Filters -> Sort -> Product Grid.
+  - Add semantic labels to product cards.
+  - Test with keyboard navigation and screen reader.
+
+- [ ] **Subtask 8**: Add widget tests:
+  - Test: Changing a filter updates product count and grid.
+  - Test: Changing sort option reorders products.
+  - Test: Navigation from Collections -> Clothing.
+  - Test: Product card tap navigates to ProductPage.
+
+- [ ] **Subtask 9**: Manual QA:
+  - Test at widths: 360px (mobile), 800px (tablet), 1200px (desktop).
+  - Verify filters, sorting, product count, and layout.
+  - Check keyboard navigation and screen reader.
+  - Compare with Sale page for consistency.
+
+- [ ] **Subtask 10**: Performance check:
+  - Profile filtering/sorting with 100+ products.
+  - Ensure <300ms response time.
+  - Optimize with memoization or debouncing if needed.
 
 --- 
 
