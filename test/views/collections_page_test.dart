@@ -19,14 +19,16 @@ void main() {
     ),
   ];
 
-  Widget buildTestApp(List<CollectionItem> items, Map<String, WidgetBuilder> routes) {
+  Widget buildTestApp(
+      List<CollectionItem> items, Map<String, WidgetBuilder> routes) {
     return MaterialApp(
       routes: routes,
       home: CollectionsPage(items: items),
     );
   }
 
-  testWidgets('CollectionsPage renders correct number of tiles', (tester) async {
+  testWidgets('CollectionsPage renders correct number of tiles',
+      (tester) async {
     await tester.pumpWidget(
       buildTestApp(testItems, {
         '/collections': (_) => const CollectionsPage(items: testItems),
@@ -41,10 +43,13 @@ void main() {
 
     // Expect 2 tiles rendered
     expect(find.byKey(const Key('collection_tile_clothing')), findsOneWidget);
-    expect(find.byKey(const Key('collection_tile_merchandise')), findsOneWidget);
+    expect(
+        find.byKey(const Key('collection_tile_merchandise')), findsOneWidget);
   });
 
-  testWidgets('Tapping a tile navigates to ShopCategoryPage fallback when route missing', (tester) async {
+  testWidgets(
+      'Tapping a tile navigates to ShopCategoryPage fallback when route missing',
+      (tester) async {
     // No named route for '/collections/clothing' provided, should fallback to ShopCategoryPage
     await tester.pumpWidget(
       buildTestApp(testItems, {
@@ -91,10 +96,11 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    final semantics = tester.getSemantics(find.byKey(const Key('collection_tile_clothing')));
+    final semantics =
+        tester.getSemantics(find.byKey(const Key('collection_tile_clothing')));
     // SemanticsNode does not have `hasLabel`; check label presence directly
     expect(semantics.label, isNotNull);
-    expect(semantics.label!.isNotEmpty, isTrue);
+    expect(semantics.label.isNotEmpty, isTrue);
     expect(semantics.label, contains('Open Clothing collection'));
 
     // Dispose semantics handle

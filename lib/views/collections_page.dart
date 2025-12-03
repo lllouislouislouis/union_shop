@@ -82,30 +82,19 @@ class CollectionsPage extends StatelessWidget {
 
   // FR-4.1, AC-7: Navigate to collection view
   void _navigateToCollection(BuildContext context, CollectionItem item) {
-    // Try to use the resolved route (either explicit or default '/collections/<slug>')
-    final route = item.resolvedRoute;
-
-    // Check if the route exists in named routes by attempting navigation
-    // If it fails, fall back to ShopCategoryPage
-    try {
-      Navigator.pushNamed(context, route).catchError((_) {
-        // FR-4.2, AC-7: Fallback to ShopCategoryPage if route doesn't exist
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ShopCategoryPage(category: item.slug),
-          ),
-        );
-      });
-    } catch (e) {
-      // If pushNamed throws immediately, use fallback
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ShopCategoryPage(category: item.slug),
-        ),
-      );
+    // Prefer explicit route when provided (e.g., Print Shack pages)
+    if (item.route != null && item.route!.isNotEmpty) {
+      Navigator.pushNamed(context, item.route!);
+      return;
     }
+
+    // Fallback: push a ShopCategoryPage with the collection slug
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ShopCategoryPage(category: item.slug),
+      ),
+    );
   }
 
   @override
