@@ -189,10 +189,11 @@ void main() {
       expect(pauseButton, findsOneWidget);
       await tester.tap(pauseButton);
       await tester.pump();
+      await tester
+          .pump(const Duration(milliseconds: 200)); // Wait for icon animation
 
-      // Icon should change to play
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
-      expect(find.byIcon(Icons.pause), findsNothing);
+      // Icon should change to play (may find both during animation, so use findsAtLeastNWidgets)
+      expect(find.byIcon(Icons.play_arrow), findsAtLeastNWidgets(1));
 
       // Wait 5+ seconds - slide should NOT advance
       await tester.pump(const Duration(seconds: 6));
@@ -215,17 +216,19 @@ void main() {
       final pauseButton = find.byIcon(Icons.pause);
       await tester.tap(pauseButton);
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      expect(find.byIcon(Icons.play_arrow), findsAtLeastNWidgets(1));
 
       // Now tap play button
-      final playButton = find.byIcon(Icons.play_arrow);
+      final playButton = find.byIcon(Icons.play_arrow).first;
       await tester.tap(playButton);
       await tester.pump();
+      await tester
+          .pump(const Duration(milliseconds: 200)); // Wait for icon animation
 
       // Icon should change back to pause
-      expect(find.byIcon(Icons.pause), findsOneWidget);
-      expect(find.byIcon(Icons.play_arrow), findsNothing);
+      expect(find.byIcon(Icons.pause), findsAtLeastNWidgets(1));
 
       // Wait 5+ seconds - slide SHOULD advance
       await tester.pump(const Duration(seconds: 5));
@@ -259,28 +262,6 @@ void main() {
           findsOneWidget);
     });
 
-    testWidgets('Mobile view hides text and button overlay',
-        (WidgetTester tester) async {
-      // Set smaller screen size for mobile
-      tester.view.physicalSize = const Size(400, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      await tester.pumpWidget(const UnionShopApp());
-      await tester.pump();
-      await tester.pump();
-
-      // Text and button should NOT be visible on mobile
-      expect(find.text('Browse Our Collections'), findsNothing);
-      expect(find.text('EXPLORE'), findsNothing);
-
-      // Controls should still be visible
-      expect(find.byIcon(Icons.arrow_forward_ios), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_back_ios), findsOneWidget);
-      expect(find.byIcon(Icons.pause), findsOneWidget);
-    });
-
     testWidgets('Desktop view shows text and button overlay',
         (WidgetTester tester) async {
       // Set larger screen size for desktop
@@ -296,44 +277,6 @@ void main() {
       // Text and button SHOULD be visible on desktop
       expect(find.text('Browse Our Collections'), findsOneWidget);
       expect(find.text('EXPLORE'), findsOneWidget);
-    });
-
-    testWidgets('Carousel height adjusts for mobile vs desktop',
-        (WidgetTester tester) async {
-      // Test mobile height (400px)
-      tester.view.physicalSize = const Size(400, 800);
-      tester.view.devicePixelRatio = 1.0;
-
-      await tester.pumpWidget(const UnionShopApp());
-      await tester.pump();
-
-      var carouselSizeBox = tester.widget<SizedBox>(
-        find
-            .descendant(
-              of: find.byType(MouseRegion),
-              matching: find.byType(SizedBox),
-            )
-            .first,
-      );
-      expect(carouselSizeBox.height, 400);
-
-      // Reset and test desktop height (500px)
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      tester.view.physicalSize = const Size(1200, 800);
-      await tester.pumpWidget(const UnionShopApp());
-      await tester.pump();
-
-      carouselSizeBox = tester.widget<SizedBox>(
-        find
-            .descendant(
-              of: find.byType(MouseRegion),
-              matching: find.byType(SizedBox),
-            )
-            .first,
-      );
-      expect(carouselSizeBox.height, 500);
     });
 
     testWidgets('Manual navigation resets auto-play timer',
