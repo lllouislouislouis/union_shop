@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/app_header.dart';
+import 'package:union_shop/widgets/app_scaffold.dart';
 import '../models/sale_product.dart';
 
 class SalePage extends StatefulWidget {
@@ -151,51 +151,44 @@ class _SalePageState extends State<SalePage> {
       gridColumns = 1;
     }
 
-    return Scaffold(
-      body: Column(
-        children: [
-          // App Header
-          const AppHeader(currentRoute: '/sale'),
+    // Use AppScaffold to include header and persistent footer.
+    // Keep all original page content, scroll controller, and layout intact.
+    return AppScaffold(
+      currentRoute: '/sale',
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        child: Container(
+          color: Colors.white,
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: Column(
+            children: [
+              // Top spacing
+              const SizedBox(height: 64),
 
-          // Scrollable content
-          Expanded(
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: Container(
-                color: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: Column(
-                  children: [
-                    // Top spacing
-                    const SizedBox(height: 64),
+              // Heading Section
+              _buildHeadingSection(),
 
-                    // Heading Section
-                    _buildHeadingSection(),
+              const SizedBox(height: 32),
 
-                    const SizedBox(height: 32),
+              // Filter & Sort Controls
+              _buildFilterSortControls(isMobile),
 
-                    // Filter & Sort Controls
-                    _buildFilterSortControls(isMobile),
+              const SizedBox(height: 24),
 
-                    const SizedBox(height: 24),
+              // Product Grid
+              _buildProductGrid(gridColumns),
 
-                    // Product Grid
-                    _buildProductGrid(gridColumns),
+              // Pagination Controls
+              if (_totalPages > 1) ...[
+                const SizedBox(height: 48),
+                _buildPaginationControls(),
+              ],
 
-                    // Pagination Controls
-                    if (_totalPages > 1) ...[
-                      const SizedBox(height: 48),
-                      _buildPaginationControls(),
-                    ],
-
-                    // Bottom spacing
-                    const SizedBox(height: 64),
-                  ],
-                ),
-              ),
-            ),
+              // Bottom spacing
+              const SizedBox(height: 64),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
