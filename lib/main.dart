@@ -7,6 +7,8 @@ import 'package:union_shop/views/shop_category_page.dart';
 import 'package:union_shop/views/print_shack_about_page.dart';
 import 'package:union_shop/views/personalisation_page.dart';
 import 'package:union_shop/views/collections_page.dart';
+import 'package:union_shop/views/search_page.dart';
+import 'package:union_shop/views/terms_and_conditions_page.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
 
 void main() {
@@ -55,6 +57,10 @@ class UnionShopApp extends StatelessWidget {
         '/print-shack/about': (context) => const PrintShackAboutPage(),
         '/print-shack/personalisation': (context) =>
             const PersonalisationPage(),
+
+        // Footer routes (NEW)
+        '/search': (context) => const SearchPage(),
+        '/policies/terms': (context) => const TermsAndConditionsPage(),
       },
     );
   }
