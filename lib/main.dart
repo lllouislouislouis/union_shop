@@ -205,202 +205,11 @@ class _HomeScreenState extends State<HomeScreen>
                 // Header - Now using reusable AppHeader component
                 const AppHeader(currentRoute: '/'),
 
-                // Hero Section
-                SizedBox(
-                  height: 400,
-                  width: double.infinity,
-                  child: Stack(
-                    children: [
-                      // Background image
-                      Positioned.fill(
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage(
-                                'assets/images/PortsmouthCityPostcard2.jpg',
-                              ),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.7),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Content overlay
-                      Positioned(
-                        left: 24,
-                        right: 24,
-                        top: 80,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'Placeholder Hero Title',
-                              style: TextStyle(
-                                fontSize: 48,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                height: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              "This is placeholder text for the hero section.",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                                height: 1.5,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 32),
-                            ElevatedButton(
-                              onPressed: placeholderCallbackForButtons,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF4d2963),
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 32,
-                                  vertical: 16,
-                                ),
-                              ),
-                              child: const Text(
-                                'SHOP NOW',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // NEW: Hero Carousel Section (replaces old static hero)
+                _buildHeroCarousel(),
 
-                // NEW: Carousel Section (FR-1.1)
-                Container(
-                  margin: const EdgeInsets.only(top: 24),
-                  child: Column(
-                    children: [
-                      // Carousel header
-                      Container(
-                        width: double.infinity,
-                        color: const Color(0xFF4d2963),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 24,
-                        ),
-                        child: const Text(
-                          'Welcome to Union Shop',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-
-                      // Carousel slider (FR-1.5)
-                      SizedBox(
-                        height: 300,
-                        child: PageView.builder(
-                          itemCount: _carouselSlides.length,
-                          itemBuilder: (context, index) {
-                            final slide = _carouselSlides[index];
-                            return GestureDetector(
-                              onTap: () {
-                                // Navigate to the route defined in the slide
-                                Navigator.pushNamed(context, slide.buttonRoute);
-                              },
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  // Slide image
-                                  Image.asset(
-                                    slide.imagePath,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        color: Colors.grey[300],
-                                        child: const Center(
-                                          child: Icon(Icons.image_not_supported,
-                                              color: Colors.grey),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  // Gradient overlay
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.black.withOpacity(0.7),
-                                          Colors.black.withOpacity(0.3),
-                                        ],
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                      ),
-                                    ),
-                                  ),
-                                  // Slide content
-                                  Positioned(
-                                    left: 24,
-                                    right: 24,
-                                    top: 40,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          slide.heading,
-                                          style: const TextStyle(
-                                            fontSize: 28,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                            height: 1.2,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 16),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            // Navigate to the route defined in the slide
-                                            Navigator.pushNamed(
-                                                context, slide.buttonRoute);
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.white,
-                                            foregroundColor:
-                                                const Color(0xFF4d2963),
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 32,
-                                              vertical: 16,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            slide.buttonLabel,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Remove old carousel section that was below hero
+                // (The PageView carousel that was added earlier)
 
                 // Products Section
                 Container(
@@ -474,6 +283,146 @@ class _HomeScreenState extends State<HomeScreen>
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  // FR-3, FR-4: Build hero carousel with responsive layout
+  Widget _buildHeroCarousel() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800; // FR-4.5: Responsive breakpoint
+    final currentSlide = _carouselSlides[_currentSlide];
+
+    return SizedBox(
+      height: isDesktop ? 500 : 400, // FR-3.1, FR-4.1: Responsive height
+      width: double.infinity,
+      child: Stack(
+        children: [
+          // FR-5: AnimatedSwitcher for crossfade transition between slides
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 600), // FR-5.2
+            switchInCurve: Curves.easeInOut, // FR-5.3
+            switchOutCurve: Curves.easeInOut,
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              // FR-5.5: Use FadeTransition for crossfade effect
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            child: _buildSlideContent(currentSlide, isDesktop),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build individual slide content with responsive layout
+  Widget _buildSlideContent(CarouselSlide slide, bool isDesktop) {
+    return Container(
+      key: ValueKey(_currentSlide), // FR-5.4: Key by index to trigger animation
+      width: double.infinity,
+      height: double.infinity,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // FR-3.3, FR-15.1: Background image
+          Image.asset(
+            slide.imagePath,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              // FR-15.2, FR-15.3: Error handling for missing images
+              return Container(
+                color: Colors.grey[300],
+                child: Center(
+                  child: Icon(
+                    Icons.image_not_supported,
+                    size: 64,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // FR-3.4: Dark overlay (desktop only for text readability)
+          if (isDesktop)
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.5),
+              ),
+            ),
+
+          // FR-3: Desktop content overlay (text + button)
+          // FR-4: Mobile shows image only (no text/button)
+          if (isDesktop)
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center, // FR-3.5
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // FR-3.6: Heading text
+                  Text(
+                    slide.heading,
+                    style: const TextStyle(
+                      fontSize: 56,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      height: 1.2,
+                      shadows: [
+                        Shadow(
+                          offset: Offset(0, 2),
+                          blurRadius: 4,
+                          color: Colors.black45,
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+
+                  // FR-3.7, FR-13: CTA Button
+                  ElevatedButton(
+                    onPressed: () {
+                      // FR-13.2: Navigate to slide route
+                      _autoPlayController.stop(); // FR-13.3: Stop auto-play
+                      Navigator.pushNamed(context, slide.buttonRoute);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF4d2963), // FR-13.4
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(200, 48), // FR-3.7
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8), // FR-13.5
+                      ),
+                      elevation: 4,
+                    ).copyWith(
+                      // FR-13.6: Hover effect (desktop)
+                      backgroundColor: WidgetStateProperty.resolveWith(
+                        (states) {
+                          if (states.contains(WidgetState.hovered)) {
+                            return const Color(0xFF3d1f4d); // 10% darker
+                          }
+                          return const Color(0xFF4d2963);
+                        },
+                      ),
+                    ),
+                    child: Text(
+                      slide.buttonLabel,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
