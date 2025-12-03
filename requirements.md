@@ -1,181 +1,132 @@
-# Footer Component Feature Requirements
+# Collections Page — Feature Requirements
 
-## 1. Feature Overview
+## 1. Feature overview
+Description
+- Implement a responsive Collections page that displays site collections (e.g., Clothing, Merchandise, Graduation, Personalisation, Print Shack, Portsmouth, Pride) as a tiled grid. Each tile shows an image and short label/description and navigates to the appropriate collection/category view when activated.
 
-### Description
-Implement a persistent, responsive footer that appears on all pages of the Union Shop app. The footer presents two content columns on desktop/tablet and stacks vertically on mobile (≤800px). It provides opening hours information and help & information actions (Search and Terms & Conditions of Sale Policy).
+Purpose
+- Provide an easy, visual way for users to discover and navigate major collections.
+- Maintain consistency with app theming and accessibility requirements.
 
-### Purpose
-- Provide consistent access to opening hours and help resources across the app.
-- Improve usability by exposing search and policy access at the site-wide footer.
-- Ensure accessibility and responsiveness consistent with the app’s design system.
+Scope
+- Add a CollectionsPage view at lib/views/collections_page.dart.
+- Provide a reusable CollectionTile widget and a small model (CollectionItem).
+- Ensure routing/navigation to collection/category screens (via existing ShopCategoryPage or new routes).
+- Add tests verifying rendering, navigation and accessibility.
 
-### Technical Context
-- New reusable widget: `AppFooter` in `lib/widgets/app_footer.dart`.
-- Shared layout: `AppScaffold` wraps pages to include `AppHeader`, page body, and `AppFooter`.
-- All views updated to use `AppScaffold(child: ...)`.
-- Theme: primary purple `#4d2963`.
-- Responsive breakpoint: 800px for mobile vs desktop/tablet.
-- New routes:
-  - `/search` → `SearchPage`
-  - `/policies/terms` → `TermsAndConditionsPage`
+## 2. User stories
 
----
+US-1: Discover collections (visitor)
+- As a visitor, I want to scan a grid of collection tiles so I can quickly find collections to browse.
+- Expected: Tiles show image and title; tapping a tile opens that collection.
 
-## 2. User Stories
+US-2: Mobile browsing (mobile user)
+- As a mobile user, I want the layout to stack vertically so tiles are easy to read and tap.
+- Expected: Single column on narrow screens; tiles maintain minimum tappable size.
 
-### US-F1: See Footer on All Pages
-As a visitor on any page,
-I want to see a consistent footer at the bottom,
-So that I can quickly find opening hours and help information.
+US-3: Desktop browsing (desktop user)
+- As a desktop user, I want a denser grid so more collections are visible at once.
+- Expected: Three columns on wide screens; hover/focus states provide affordance.
 
-Acceptance Criteria:
-- Footer is visible on all views: Home, Collections, Sale, About, Product, Category, Print Shack About, Personalisation.
-- Footer respects page theming and spacing.
+US-4: Developer / maintainer
+- As a developer, I want a small model and sample data so it’s easy to add or update collections and write tests.
 
----
+## 3. Acceptance criteria
 
-### US-F2: View Opening Hours
-As a user browsing the site,
-I want to view the shop’s opening hours,
-So that I know when the shop is open.
+Layout & responsiveness
+- AC-1: Desktop/tablet (width > 800px) shows 3 columns; mobile (≤ 800px) shows 1 column.
+- AC-2: Grid spacing: 16px between tiles; 24px outer padding.
+- AC-3: Tiles maintain consistent aspect ratio (recommend childAspectRatio e.g., 4/3 or square) and do not overflow horizontally at common widths.
 
-Acceptance Criteria:
-- Column title "Opening hours" is visible.
-- Static items:
-  - Monday–Friday: 9:00–17:00
-  - Saturday: 10:00–16:00
-  - Sunday: Closed
-- Text is selectable for copy.
-- Content is readable with sufficient contrast.
+Tile content & visuals
+- AC-4: Each tile displays an image (BoxFit.cover) plus a title overlay (bold, 16–18px). Optional short description shown beneath or in overlay.
+- AC-5: Images use a dark gradient or semi-transparent overlay to keep text readable.
+- AC-6: If an image fails to load, a fallback placeholder (icon + neutral background) is shown.
 
----
+Interaction & navigation
+- AC-7: Tapping/clicking a tile navigates to the collection view for that slug:
+  - Preferred: Navigator.pushNamed(context, '/collections/<slug>') OR Navigator.push(context, MaterialPageRoute(builder: (_) => ShopCategoryPage(category: slug))).
+- AC-8: Tile activation supports mouse click, touch
+- AC-9: Tiles provide hover/press visual feedback on supported platforms (scale, elevation, or overlay).
 
-### US-F3: Use Help & Information – Search
-As a user needing to find items or content,
-I want to use the Search action in the footer,
-So that I can quickly locate products or pages.
+Accessibility
+- AC-10: Each tile has a Semantics label: "Open {title} collection".
+- AC-11: Controls meet minimum touch target of 44x44 px.
+- AC-12: Contrast of text on overlay meets WCAG AA.
+- AC-13: Focus order is logical; keyboard focus visible.
 
-Acceptance Criteria:
-- Column title "Help & information" is visible.
-- Search button is clearly labeled "Search" and styled with purple background, white text.
-- On tap/click:
-  - navigates to `/search` route showing `SearchPage` with an input field.
+Data & routing
+- AC-14: The page uses a static const List<CollectionItem> model with fields: slug, title, description (optional), imagePath, route (optional).
+- AC-15: Known slugs are mapped to existing ShopCategoryPage routes or registered in app routes.
+- AC-16: If route is missing, navigation falls back to ShopCategoryPage(category: slug).
 
----
+Testing & QA
+- AC-17: Widget tests confirm:
+  - Grid renders expected number of items from the sample list.
+  - Tapping the first tile triggers Navigator.push (use WidgetTester with mock navigator).
+  - Semantics label present for at least one tile.
+- AC-18: Manual checks at widths: 360px, 800px, 1200px show no overflow and correct layout.
 
-### US-F4: Use Help & Information – Terms & Conditions of Sale Policy
-As a user seeking policy details,
-I want to open the Terms & Conditions of Sale Policy,
-So that I can read the sales terms before purchasing.
+## 4. Functional requirements (summary)
 
-Acceptance Criteria:
-- Terms button labeled "Terms & Conditions of Sale".
-- Styled as OutlinedButton or TextButton with purple color/border.
-- On tap/click: navigates to `/policies/terms` route showing `TermsAndConditionsPage`.
+FR-1 Layout
+- FR-1.1: Use GridView.count or SliverGrid with crossAxisCount = (width > 800 ? 3 : 1).
+- FR-1.2: crossAxisSpacing and mainAxisSpacing = 16px; padding = 24px.
+- FR-1.3: childAspectRatio tuned for consistent tile shape.
 
----
+FR-2 Tile
+- FR-2.1: Implement CollectionTile widget using InkWell (for ripple), Stack (Image + overlay), and Semantics + FocusableActionDetector.
+- FR-2.2: Provide keyboard activation and hover/press visuals.
+- FR-2.3: Expose semanticLabel: "Open {title} collection".
 
-### US-F5: Responsive Layout
-As a user on different devices,
-I want the footer to adapt layout,
-So that the content is easy to read and use on any screen size.
+FR-3 Data & model
+- FR-3.1: Add CollectionItem model:
+  - final String slug;
+  - final String title;
+  - final String? description;
+  - final String imagePath;
+  - final String? route;
+- FR-3.2: Provide a const sample list of items used by CollectionsPage.
 
-Acceptance Criteria:
-- Desktop/tablet (>800px): 2-column layout using Row with spacing.
-- Mobile (≤800px): stacked Column layout with vertical spacing.
-- Controls maintain minimum touch target size (≥44x44).
+FR-4 Navigation
+- FR-4.1: Primary navigation via named routes '/collections/<slug>' if possible; otherwise push ShopCategoryPage.
+- FR-4.2: Ensure Navigator is used consistently with app routes.
 
----
+FR-5 Assets
+- FR-5.1: Images placed under assets/images/collections/*. Use placeholders if real assets are not available.
+- FR-5.2: Add fallback UI for missing assets.
 
-### US-F6: Accessibility
-As an accessibility-focused user,
-I want meaningful labels and proper semantics,
-So that assistive technologies can interpret the footer correctly.
+## 5. Non-functional requirements
 
-Acceptance Criteria:
-- Semantic headings for "Opening hours" and "Help & information".
-- Buttons have clear accessible labels: "Search", "Terms & Conditions of Sale".
-- Contrast meets WCAG AA for text on background.
-- Focus order is logical; buttons are focusable.
+NFR-1 Performance
+- Avoid expensive build-time work; prefer const widgets and preloaded assets where feasible.
 
----
+NFR-2 Maintainability
+- Keep model and sample data near the page (lib/views/collections_page.dart) or in a small model file.
+- Keep widgets small and testable.
 
-## 3. Functional Requirements
+NFR-3 Accessibility
+- Follow semantics and ensure contrast and keyboard navigation.
 
-### FR-F1: Layout and Styling
-- FR-F1.1: Footer background: `Colors.grey[200]`, text: `Colors.black87`.
-- FR-F1.2: Column titles: fontSize 18, fontWeight bold.
-- FR-F1.3: Spacing: 24px vertical padding, 16px between items, 32px column gap (desktop).
-- FR-F1.4: Responsive switch via `LayoutBuilder` or `MediaQuery.width`: breakpoint at 800px.
+## 6. Implementation notes & examples (brief)
+- Use a small const list of CollectionItem.
+- Grid implementation example: GridView.count(crossAxisCount: columns, childAspectRatio: 4/3,...)
+- Tile: InkWell -> Semantics -> Stack(Image.asset, Positioned overlay Text).
 
-### FR-F2: Opening Hours Content
-- FR-F2.1: Static list of opening times as specified in US-F2.
-- FR-F2.2: Text selectable; no interaction beyond copy.
-- FR-F2.3: Proper semantics grouping.
+## 7. Subtasks (actionable)
 
-### FR-F3: Help & Information Actions
-- FR-F3.1: Search button:
-  - ElevatedButton with `backgroundColor: Color(0xFF4d2963)`, white text.
-  - OnPressed:
-    - `Navigator.pushNamed(context, '/search')`.
-- FR-F3.2: Terms button:
-  - OutlinedButton or TextButton with purple styling.
-  - OnPressed: `Navigator.pushNamed(context, '/policies/terms')`.
+- [ ] Create model: lib/models/collection_item.dart or define inside collections_page.dart.
+- [ ] Implement CollectionsPage: lib/views/collections_page.dart with responsive GridView.
+- [ ] Implement CollectionTile widget with InkWell, Semantics, FocusableActionDetector and fallback image handling.
+- [ ] Add sample const List<CollectionItem> with at least 6 items (clothing, merchandise, graduation, personalisation, print-shack, ports mouth/pride).
+- [ ] Ensure image assets exist at assets/images/collections/* or use placeholders and update pubspec.yaml.
+- [ ] Wire navigation: add routes or ensure fallback to ShopCategoryPage(category: slug).
+- [ ] Add widget tests:
+  - Grid renders sample count.
+  - Tap triggers navigation.
+  - Semantics label exists.
+- [ ] Manual QA: test at widths 360px, 800px, 1200px for layout and accessibility checks.
 
-### FR-F4: Integration Across Pages
-- FR-F4.1: Create `AppScaffold` in `lib/widgets/app_scaffold.dart` rendering `AppHeader`, page `child`, and `AppFooter`.
-- FR-F4.2: Update all views in `lib/views/*.dart` to use `AppScaffold(child: ...)`.
+--- 
 
-### FR-F5: Routes
-- FR-F5.1: Register `/search` → `SearchPage` placeholder (title "Search" and TextField).
-- FR-F5.2: Register `/policies/terms` → `TermsAndConditionsPage` placeholder (title "Terms & Conditions of Sale").
-
-### FR-F6: Accessibility
-- FR-F6.1: Add `Semantics` for section titles and buttons.
-- FR-F6.2: Ensure focusable controls and logical tab order.
-- FR-F6.3: Maintain contrast for text/background.
-
----
-
-## 4. Non-Functional Requirements
-
-### NFR-F1: Performance
-- Footer renders quickly and does not introduce jank.
-- No heavy operations on build; static content prefers const widgets.
-
-### NFR-F2: Maintainability
-- Footer encapsulated in `AppFooter` for reuse.
-- All pages standardize on `AppScaffold`.
-- Clear comments and consistent naming.
-
-### NFR-F3: Responsiveness
-- Works from 320px to 2560px widths.
-- No horizontal overflow on mobile.
-
----
-
-## 5. Acceptance Criteria Summary
-
-The feature is complete when:
-- [ ] Footer visible on all pages via `AppScaffold`.
-- [ ] Desktop/tablet uses two-column layout; mobile stacks vertically.
-- [ ] Column 1 shows opening hours exactly as specified.
-- [ ] Column 2 shows "Help & information" with:
-  - [ ] Search button opening SearchDelegate or `/search`.
-  - [ ] Terms button navigating to `/policies/terms`.
-- [ ] Buttons meet minimum touch size and accessible labels.
-- [ ] Styling matches theme: purple `#4d2963` for primary action.
-- [ ] Routes `/search` and `/policies/terms` are registered and render placeholder pages.
-- [ ] Accessibility semantics present for headings and buttons.
-- [ ] No layout overflows at common widths; mobile and desktop verified.
-
-### Subtasks
-- [ ] Implement `AppFooter` (layout, styling, semantics).
-- [ ] Implement `AppScaffold` and migrate all views.
-- [ ] Add `/search` and `/policies/terms` routes and placeholder pages.
-- [ ] Write widget tests:
-  - Footer presence on all pages.
-  - Responsive layout check at widths 600px and 1200px.
-  - Button navigation behavior for Search and Terms.
-  - Accessibility labels existence.
+End of requirements.
