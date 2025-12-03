@@ -1,65 +1,79 @@
-# Collections Page — Feature Implementation Prompt
+# Clothing Page — Feature Implementation Prompt
 
 Goal
-- Implement a collections grid for the CollectionsPage that shows a 3xY responsive grid of collection tiles (e.g., Clothing, Merchandise, Graduation, Personalisation, Print Shack, Portsmouth, Pride, etc.).
-- Each tile displays an image, a short text label/description, and is tappable/clickable to open that collection page.
+- Implement the Clothing collection page with the same structure, components, and interactions as the Sale page: “Filter By”, “Sort By”, and “Product Count”. 
+- Ensure routing from Collections -> Clothing, accessible controls, and performance comparable to the Sale page.
 
-UI / Layout Requirements
-- Grid: 3 columns on desktop/tablet (width > 800px); 1 column on mobile (≤ 800px). Rows expand as needed (3xY).
-- Tile size: keep consistent aspect ratio (e.g., 4:3 or square) with image covering the tile (BoxFit.cover) and a semi-transparent label overlay for readability.
-- Spacing: 16px gap between tiles, 24px padding around the grid.
-- Tappable target: ensure each tile minimum hit area 44x44 px.
-- Accessibility: images must have semantic/alt text; each tile must expose a semantic label like "Open Clothing collection".
+Page Structure
+- Header:
+  - Title: “Clothing”
+  - Optional breadcrumb
+  - Product count (“X products”)
+- Controls Bar (reused from Sale page if possible):
+  - Filter By: multi-select filters
+  - Sort By: dropdown (Popularity, Price Low→High, Price High→Low, Newest)
+  - Product Count: updates after filters/sort
+- Product Grid:
+  - Responsive grid of product cards (reuse Sale page card component)
+  - Columns: >800px: 3–4; ≤800px: 1–2
+  - Consistent spacing and pagination/lazy-load if already supported
 
-Tile Content
-- Required fields per tile:
-  - id / slug (e.g., "clothing", "merchandise")
-  - title (e.g., "Clothing")
-  - image asset path (e.g., assets/images/collections/clothing.jpg)
-  - optional route (default to '/collections/<slug>' or a common navigator handler)
-- Visuals:
-  - Title: bold, font size 16–18
-  - Image overlay: gradient or dark overlay for contrast
+Data/State
+- Use the same state management pattern as the Sale page (setState/Provider/Riverpod/Bloc).
+- Inputs:
+  - Products source: clothing category items from catalog or mock data
+  - Filters model: identical to Sale page
+  - Sort model: identical to Sale page
+- Outputs:
+  - Filtered + sorted product list
+  - Product count after filters applied
+  - Grid re-render on filter/sort change
 
-Behavior / Actions
-- Tap / Click on tile:
-  - Navigate to the collection route for that slug:
-    - Preferred route pattern: '/collections/<slug>' (e.g., '/collections/clothing')
+Behavior & Actions
+- Filter By:
+  - Description: Users select/deselect filter options to narrow the clothing products.
+  - Action: On change, recompute filtered list and refresh grid and count.
+  - Clear Filters: Resets all filters; grid shows all clothing items; count updates.
+- Sort By:
+  - Description: Users choose a sort option (Popularity, Price Low→High, Price High→Low, Newest).
+  - Action: On change, reorder the current filtered list, then re-render grid.
+- Product Count:
+  - Description: Displays the number of products currently visible after filters/sort.
+  - Action: Updates immediately after any filter or sort change.
+- Routing:
+  - Description: Clicking “Clothing” collection tile navigates to the clothing page.
+  - Action: Navigate via '/shop/clothing' or ShopCategoryPage(category: 'clothing'). Product card click opens ProductPage.
 
-Data & Implementation Notes
-- Use a static const List<CollectionItem> in collections_page.dart or a small model class:
-  - class CollectionItem { final String slug; final String title; final String description; final String imagePath; }
-- Generate the grid with GridView.count or SliverGrid.count:
-  - crossAxisCount: screenWidth > 800 ? 3 : 1
-  - crossAxisSpacing: 16, mainAxisSpacing: 16
-  - childAspectRatio to control tile shape
-- Each tile widget should:
-  - Use InkWell or GestureDetector wrapped in Semantics and FocusableActionDetector to support tap + keyboard.
-  - Use Ink.image or Stack with Image.asset and Positioned for label overlay.
-  - Provide Semantic label: "Open {title} collection".
-  - Ensure minimum size via ConstrainedBox or InkWell padding.
+Accessibility
+- Controls are focusable, labeled, and keyboard operable (Enter/Space).
+- Product cards have semantic labels including product name and price.
+- Ensure contrast and visible focus indicators.
 
-Routing & Navigation
-- Preferred: add dynamic route handling for '/collections/:slug' or map known slugs in routes:
-  - Add example routes for known slugs (optional) or accept arguments when pushing to '/collections'.
-- Example interaction:
-  - onTap: Navigator.pushNamed(context, '/shop/$slug') OR Navigator.push(context, MaterialPageRoute(builder: (_) => ShopCategoryPage(category: slug)));
+Performance
+- Avoid unnecessary rebuilds (reuse widgets, memoize filtered results where appropriate).
+- Debounce expensive operations if necessary (e.g., text filter).
 
-Example Acceptance Criteria (for testing / QA)
-- Desktop (width > 800): Grid shows 3 columns with 16px gaps; images fill tiles; titles readable.
-- Mobile (≤ 800): Single column stacked tiles, vertical spacing 16px.
-- Clicking the Clothing tile navigates to the Clothing collection page (route receives slug).
-- Tappable target is at least 44x44 px.
-- Images load from assets and show fallback placeholder icon if missing.
+Acceptance Criteria
+- Clothing page renders with Filter By, Sort By, and Product Count identical to the Sale page.
+- Filtering updates the grid and count immediately.
+- Sorting reorders products correctly for each option.
+- Product count reflects the filtered list accurately.
+- Navigation from Collections -> Clothing opens the page.
+- Keyboard navigation and screen reader semantics work for controls and product cards.
 
-Deliverables for the LLM / PR
-- Update lib/views/collections_page.dart with:
-  - CollectionItem model and sample data list
-  - Responsive grid implementation (GridView or SliverGrid)
-  - Tile widget implementing accessibility and navigation
-- Add or ensure routes exist that accept collection slugs or push to ShopCategoryPage
-- Add required image assets under assets/images/collections/* (placeholder images acceptable)
-- Add unit/widget test verifying:
-  - Grid renders correct number of tiles
-  - Tap on the first tile triggers Navigator.push (use mock Navigator or WidgetTester)
-  - Accessibility semantics exist for at least one tile
+Implementation Notes
+- If using ShopCategoryPage:
+  - Add a config to enable sale-like controls when category == 'clothing'.
+  - Inject filter/sort options via constructor/provider, mirroring Sale page configuration.
+- If creating a dedicated ClothingPage:
+  - Scaffold with AppScaffold.
+  - Extract and reuse Sale page controls bar and product card components.
+  - Query products where category == 'clothing'; apply filters and sorting in memory or via service.
+
+Deliverables
+- New view or configured ShopCategoryPage for clothing.
+- Reused controls and product card components from Sale page.
+- Unit/widget tests:
+  - Changing filters reduces product count and updates cards.
+  - Changing sort option reorders products.
+  - Navigation from Collections -> Clothing works.
