@@ -170,7 +170,6 @@ class _CollectionTileState extends State<CollectionTile> {
 
   @override
   Widget build(BuildContext context) {
-    // AC-10: Semantic label for screen readers
     return Semantics(
       label: 'Open ${widget.item.title} collection',
       button: true,
@@ -185,49 +184,43 @@ class _CollectionTileState extends State<CollectionTile> {
                 onEnter: (_) => setState(() => _isHovering = true),
                 onExit: (_) => setState(() => _isHovering = false),
                 child: AnimatedContainer(
-                  // AC-9: Hover effect (slight elevation change)
                   duration: const Duration(milliseconds: 200),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: _isHovering || _isFocused
                         ? [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
                           ]
                         : [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
                           ],
                   ),
                   child: ConstrainedBox(
-                    // AC-11: Minimum touch target 44x44
-                    constraints: const BoxConstraints(
-                      minWidth: 44,
-                      minHeight: 44,
-                    ),
+                    constraints:
+                        const BoxConstraints(minWidth: 44, minHeight: 44),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
                           onTap: _handleActivation,
-                          // AC-8: Keyboard support via autofocus and InkWell
                           focusNode: FocusNode(skipTraversal: false),
                           child: Stack(
                             fit: StackFit.expand,
                             children: [
-                              // FR-2, AC-4, AC-6: Background image with fallback
+                              // Background image with fallback
                               Image.asset(
                                 widget.item.imagePath,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
-                                  // Fallback placeholder
                                   return Container(
                                     color: Colors.grey.shade300,
                                     child: Center(
@@ -240,8 +233,7 @@ class _CollectionTileState extends State<CollectionTile> {
                                   );
                                 },
                               ),
-
-                              // AC-5, AC-12: Dark gradient overlay for text contrast
+                              // Gradient overlay for contrast
                               Container(
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
@@ -249,14 +241,13 @@ class _CollectionTileState extends State<CollectionTile> {
                                     end: Alignment.bottomCenter,
                                     colors: [
                                       Colors.transparent,
-                                      Colors.black.withOpacity(0.7),
+                                      Colors.black.withValues(alpha: 0.7),
                                     ],
                                     stops: const [0.5, 1.0],
                                   ),
                                 ),
                               ),
-
-                              // AC-4: Title overlay
+                              // Title overlay
                               Positioned(
                                 left: 12,
                                 right: 12,
@@ -279,17 +270,18 @@ class _CollectionTileState extends State<CollectionTile> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-
-                              // AC-13: Focus indicator
+                              // Focus indicator
                               if (_isFocused)
                                 Positioned.fill(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Theme.of(context).primaryColor,
-                                        width: 3,
+                                  child: IgnorePointer(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Theme.of(context).primaryColor,
+                                          width: 3,
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
-                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
                                 ),
