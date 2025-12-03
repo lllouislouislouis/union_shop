@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:union_shop/models/collection_item.dart';
+import 'package:union_shop/views/shop_category_page.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
 
 // FR-3.2: Sample collection items
@@ -27,12 +28,14 @@ const List<CollectionItem> kCollectionItems = [
     title: 'Personalisation',
     description: 'Custom embroidery and printing services',
     imagePath: 'assets/images/collections/personalisation.jpg',
+    route: '/print-shack/personalisation',
   ),
   CollectionItem(
     slug: 'print-shack',
     title: 'Print Shack',
     description: 'Professional printing and design services',
     imagePath: 'assets/images/collections/print_shack.jpg',
+    route: '/print-shack/about',
   ),
   CollectionItem(
     slug: 'portsmouth',
@@ -77,6 +80,34 @@ class CollectionsPage extends StatelessWidget {
     required this.items,
   });
 
+  // FR-4.1, AC-7: Navigate to collection view
+  void _navigateToCollection(BuildContext context, CollectionItem item) {
+    // Try to use the resolved route (either explicit or default '/collections/<slug>')
+    final route = item.resolvedRoute;
+
+    // Check if the route exists in named routes by attempting navigation
+    // If it fails, fall back to ShopCategoryPage
+    try {
+      Navigator.pushNamed(context, route).catchError((_) {
+        // FR-4.2, AC-7: Fallback to ShopCategoryPage if route doesn't exist
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ShopCategoryPage(category: item.slug),
+          ),
+        );
+      });
+    } catch (e) {
+      // If pushNamed throws immediately, use fallback
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ShopCategoryPage(category: item.slug),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
@@ -103,10 +134,7 @@ class CollectionsPage extends StatelessWidget {
             return CollectionTile(
               key: Key('collection_tile_${item.slug}'),
               item: item,
-              onTap: () {
-                // Navigation will be wired in next subtask
-                debugPrint('Tapped: ${item.slug}');
-              },
+              onTap: () => _navigateToCollection(context, item), // AC-7
             );
           },
         ),
@@ -154,125 +182,124 @@ class _CollectionTileState extends State<CollectionTile> {
         child: Builder(
           builder: (context) {
             return MouseRegion(
-              onEnter: (_) => setState(() => _isHovering = true),
-              onExit: (_) => setState(() => _isHovering = false),
-              child: AnimatedContainer(
-                // AC-9: Hover effect (slight elevation change)
-                duration: const Duration(milliseconds: 200),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: _isHovering || _isFocused
-                      ? [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ]
-                      : [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                ),
-                child: ConstrainedBox(
-                  // AC-11: Minimum touch target 44x44
-                  constraints: const BoxConstraints(
-                    minWidth: 44,
-                    minHeight: 44,
-                  ),
-                  child: ClipRRect(
+                onEnter: (_) => setState(() => _isHovering = true),
+                onExit: (_) => setState(() => _isHovering = false),
+                child: AnimatedContainer(
+                  // AC-9: Hover effect (slight elevation change)
+                  duration: const Duration(milliseconds: 200),
+                  decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: _handleActivation,
-                        // AC-8: Keyboard support via autofocus and InkWell
-                        focusNode: FocusNode(skipTraversal: false),
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            // FR-2, AC-4, AC-6: Background image with fallback
-                            Image.asset(
-                              widget.item.imagePath,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                // Fallback placeholder
-                                return Container(
-                                  color: Colors.grey.shade300,
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.image_not_supported,
-                                      size: 48,
-                                      color: Colors.grey.shade600,
-                                    ),
-                                  ),
-                                );
-                              },
+                    boxShadow: _isHovering || _isFocused
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
                             ),
-
-                            // AC-5, AC-12: Dark gradient overlay for text contrast
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.black.withOpacity(0.7),
-                                  ],
-                                  stops: const [0.5, 1.0],
-                                ),
-                              ),
+                          ]
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
                             ),
-
-                            // AC-4: Title overlay
-                            Positioned(
-                              left: 12,
-                              right: 12,
-                              bottom: 12,
-                              child: Text(
-                                widget.item.title,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  shadows: [
-                                    Shadow(
-                                      offset: Offset(0, 1),
-                                      blurRadius: 3,
-                                      color: Colors.black45,
-                                    ),
-                                  ],
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-
-                            // AC-13: Focus indicator
-                            if (_isFocused)
-                              Positioned.fill(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Theme.of(context).primaryColor,
-                                      width: 3,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              ),
                           ],
+                  ),
+                  child: ConstrainedBox(
+                    // AC-11: Minimum touch target 44x44
+                    constraints: const BoxConstraints(
+                      minWidth: 44,
+                      minHeight: 44,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _handleActivation,
+                          // AC-8: Keyboard support via autofocus and InkWell
+                          focusNode: FocusNode(skipTraversal: false),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              // FR-2, AC-4, AC-6: Background image with fallback
+                              Image.asset(
+                                widget.item.imagePath,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  // Fallback placeholder
+                                  return Container(
+                                    color: Colors.grey.shade300,
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.image_not_supported,
+                                        size: 48,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              // AC-5, AC-12: Dark gradient overlay for text contrast
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.black.withOpacity(0.7),
+                                    ],
+                                    stops: const [0.5, 1.0],
+                                  ),
+                                ),
+                              ),
+
+                              // AC-4: Title overlay
+                              Positioned(
+                                left: 12,
+                                right: 12,
+                                bottom: 12,
+                                child: Text(
+                                  widget.item.title,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    shadows: [
+                                      Shadow(
+                                        offset: Offset(0, 1),
+                                        blurRadius: 3,
+                                        color: Colors.black45,
+                                      ),
+                                    ],
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+
+                              // AC-13: Focus indicator
+                              if (_isFocused)
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Theme.of(context).primaryColor,
+                                        width: 3,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
-            );
+                ));
           },
         ),
       ),

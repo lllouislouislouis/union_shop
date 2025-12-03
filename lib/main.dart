@@ -55,6 +55,11 @@ class UnionShopApp extends StatelessWidget {
         '/shop/graduation': (context) =>
             const ShopCategoryPage(category: 'graduation'),
 
+        // NEW: Additional collection routes
+        '/shop/stationery': (context) =>
+            const ShopCategoryPage(category: 'stationery'),
+        '/shop/sports': (context) => const ShopCategoryPage(category: 'sports'),
+
         // Print Shack routes (FR-17)
         '/print-shack/about': (context) => const PrintShackAboutPage(),
         '/print-shack/personalisation': (context) =>
