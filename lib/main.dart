@@ -8,6 +8,7 @@ import 'package:union_shop/views/shop_category_page.dart';
 import 'package:union_shop/views/print_shack_about_page.dart';
 import 'package:union_shop/views/personalisation_page.dart';
 import 'package:union_shop/views/collections_page.dart';
+import 'package:union_shop/widgets/app_scaffold.dart';
 
 void main() {
   runApp(const UnionShopApp());
@@ -222,92 +223,61 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
+    return AppScaffold(
+      currentRoute: '/',
+      child: Column(
         children: [
-          // Main content
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                // Header - Now using reusable AppHeader component
-                const AppHeader(currentRoute: '/'),
+          //Hero Carousel Section
+          _buildHeroCarousel(),
 
-                // NEW: Hero Carousel Section (replaces old static hero)
-                _buildHeroCarousel(),
-
-                // Remove old carousel section that was below hero
-                // (The PageView carousel that was added earlier)
-
-                // Products Section
-                Container(
-                  color: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.all(40.0),
-                    child: Column(
-                      children: [
-                        const Text(
-                          'PRODUCTS SECTION',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.black,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                        const SizedBox(height: 48),
-                        GridView.count(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisCount:
-                              MediaQuery.of(context).size.width > 600 ? 2 : 1,
-                          crossAxisSpacing: 24,
-                          mainAxisSpacing: 48,
-                          children: const [
-                            ProductCard(
-                              title: 'Placeholder Product 1',
-                              price: '£10.00',
-                              imageUrl:
-                                  'assets/images/PortsmouthCityMagnet1.jpg',
-                            ),
-                            ProductCard(
-                              title: 'Placeholder Product 2',
-                              price: '£15.00',
-                              imageUrl:
-                                  'assets/images/PortsmouthCityMagnet1.jpg',
-                            ),
-                            ProductCard(
-                              title: 'Placeholder Product 3',
-                              price: '£20.00',
-                              imageUrl:
-                                  'assets/images/PortsmouthCityMagnet1.jpg',
-                            ),
-                            ProductCard(
-                              title: 'Placeholder Product 4',
-                              price: '£25.00',
-                              imageUrl:
-                                  'assets/images/PortsmouthCityMagnet1.jpg',
-                            ),
-                          ],
-                        ),
-                      ],
+          // Products Section
+          Container(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(40.0),
+              child: Column(
+                children: [
+                  const Text(
+                    'PRODUCTS SECTION',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                      letterSpacing: 1,
                     ),
                   ),
-                ),
-
-                // Footer
-                // Container(
-                //   width: double.infinity,
-                //   color: Colors.grey[50],
-                //   padding: const EdgeInsets.all(24),
-                //   child: const Text(
-                //     'Placeholder Footer',
-                //     style: TextStyle(
-                //       color: Colors.grey,
-                //       fontSize: 16,
-                //       fontWeight: FontWeight.w600,
-                //     ),
-                //   ),
-                // ),
-              ],
+                  const SizedBox(height: 48),
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount:
+                        MediaQuery.of(context).size.width > 600 ? 2 : 1,
+                    crossAxisSpacing: 24,
+                    mainAxisSpacing: 48,
+                    children: const [
+                      ProductCard(
+                        title: 'Placeholder Product 1',
+                        price: '£10.00',
+                        imageUrl: 'assets/images/PortsmouthCityMagnet1.jpg',
+                      ),
+                      ProductCard(
+                        title: 'Placeholder Product 2',
+                        price: '£15.00',
+                        imageUrl: 'assets/images/PortsmouthCityMagnet1.jpg',
+                      ),
+                      ProductCard(
+                        title: 'Placeholder Product 3',
+                        price: '£20.00',
+                        imageUrl: 'assets/images/PortsmouthCityMagnet1.jpg',
+                      ),
+                      ProductCard(
+                        title: 'Placeholder Product 4',
+                        price: '£25.00',
+                        imageUrl: 'assets/images/PortsmouthCityMagnet1.jpg',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
