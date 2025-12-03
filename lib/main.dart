@@ -63,9 +63,16 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  // NEW: Carousel state - define 4 slides with content (FR-1.2, FR-1.3)
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  // MODIFIED: Added mixin
+  // Carousel state - define 4 slides with content (FR-1.2, FR-1.3)
   late final List<CarouselSlide> _carouselSlides;
+
+  // NEW: Auto-play state management (FR-2)
+  int _currentSlide = 0; // FR-2.3: Track current slide index (0-3)
+  bool _isAutoPlayEnabled = true; // FR-2.6: Control auto-play on/off
+  late AnimationController _autoPlayController; // FR-2.1: Animation-based timer
 
   @override
   void initState() {
@@ -102,6 +109,84 @@ class _HomeScreenState extends State<HomeScreen> {
         buttonRoute: '/about',
       ),
     ];
+
+    // FR-2.1, FR-2.2: Initialize auto-play controller with 5-second duration
+    _autoPlayController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    );
+
+    // FR-2.3, FR-2.4: Listen for animation completion to advance slides
+    _autoPlayController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        if (_isAutoPlayEnabled) {
+          setState(() {
+            // Loop to slide 0 after slide 3 using modulo
+            _currentSlide = (_currentSlide + 1) % _carouselSlides.length;
+          });
+          // Restart timer for next slide
+          _autoPlayController.reset();
+          _autoPlayController.forward();
+        }
+      }
+    });
+
+    // FR-2.2: Start auto-play immediately
+    _autoPlayController.forward();
+  }
+
+  @override
+  void dispose() {
+    // FR-2.5: Clean up controller to prevent memory leaks
+    _autoPlayController.dispose();
+    super.dispose();
+  }
+
+  // FR-2.7: Restart timer when user manually changes slide
+  void _restartAutoPlayTimer() {
+    if (_isAutoPlayEnabled) {
+      _autoPlayController.reset();
+      _autoPlayController.forward();
+    }
+  }
+
+  // Helper method to change to specific slide
+  void _goToSlide(int index) {
+    setState(() {
+      _currentSlide = index;
+    });
+    _restartAutoPlayTimer();
+  }
+
+  // Helper method to go to next slide
+  void _nextSlide() {
+    setState(() {
+      _currentSlide = (_currentSlide + 1) % _carouselSlides.length;
+    });
+    _restartAutoPlayTimer();
+  }
+
+  // Helper method to go to previous slide
+  void _previousSlide() {
+    setState(() {
+      _currentSlide =
+          (_currentSlide - 1 + _carouselSlides.length) % _carouselSlides.length;
+    });
+    _restartAutoPlayTimer();
+  }
+
+  // Toggle auto-play on/off
+  void _toggleAutoPlay() {
+    setState(() {
+      _isAutoPlayEnabled = !_isAutoPlayEnabled;
+      if (_isAutoPlayEnabled) {
+        // Resume auto-play
+        _autoPlayController.forward();
+      } else {
+        // Pause auto-play
+        _autoPlayController.stop();
+      }
+    });
   }
 
   void placeholderCallbackForButtons() {
