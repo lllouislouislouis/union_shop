@@ -65,13 +65,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-  // MODIFIED: Added mixin
   // Carousel state - define 4 slides with content (FR-1.2, FR-1.3)
   late final List<CarouselSlide> _carouselSlides;
 
-  // NEW: Auto-play state management (FR-2)
+  // Auto-play state management (FR-2)
   int _currentSlide = 0; // FR-2.3: Track current slide index (0-3)
   bool _isAutoPlayEnabled = true; // FR-2.6: Control auto-play on/off
+  bool _isHovering = false; // NEW FR-10: Track hover state (desktop only)
   late AnimationController _autoPlayController; // FR-2.1: Animation-based timer
 
   @override
@@ -144,7 +144,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   // FR-2.7: Restart timer when user manually changes slide
   void _restartAutoPlayTimer() {
-    if (_isAutoPlayEnabled) {
+    // FR-10.3: Don't restart if hovering
+    if (_isAutoPlayEnabled && !_isHovering) {
       _autoPlayController.reset();
       _autoPlayController.forward();
     }
@@ -180,13 +181,35 @@ class _HomeScreenState extends State<HomeScreen>
     setState(() {
       _isAutoPlayEnabled = !_isAutoPlayEnabled;
       if (_isAutoPlayEnabled) {
-        // Resume auto-play
-        _autoPlayController.forward();
+        // Resume auto-play (but not if hovering)
+        if (!_isHovering) {
+          _autoPlayController.forward();
+        }
       } else {
         // Pause auto-play
         _autoPlayController.stop();
       }
     });
+  }
+
+  // FR-10.2: Handle mouse enter (pause auto-play)
+  void _onCarouselHoverEnter() {
+    setState(() {
+      _isHovering = true;
+    });
+    // Pause auto-play timer while hovering
+    _autoPlayController.stop();
+  }
+
+  // FR-10.3: Handle mouse exit (resume auto-play)
+  void _onCarouselHoverExit() {
+    setState(() {
+      _isHovering = false;
+    });
+    // Resume auto-play if enabled
+    if (_isAutoPlayEnabled) {
+      _autoPlayController.forward();
+    }
   }
 
   void placeholderCallbackForButtons() {
@@ -288,35 +311,40 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  // FR-3, FR-4: Build hero carousel with responsive layout
+  // FR-3, FR-4, FR-10: Build hero carousel with responsive layout and hover detection
   Widget _buildHeroCarousel() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800; // FR-4.5: Responsive breakpoint
     final currentSlide = _carouselSlides[_currentSlide];
 
-    return SizedBox(
-      height: isDesktop ? 500 : 400, // FR-3.1, FR-4.1: Responsive height
-      width: double.infinity,
-      child: Stack(
-        children: [
-          // FR-5: AnimatedSwitcher for crossfade transition between slides
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 600), // FR-5.2
-            switchInCurve: Curves.easeInOut, // FR-5.3
-            switchOutCurve: Curves.easeInOut,
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              // FR-5.5: Use FadeTransition for crossfade effect
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            child: _buildSlideContent(currentSlide, isDesktop),
-          ),
+    return MouseRegion(
+      // FR-10.1: Wrap carousel in MouseRegion for hover detection
+      onEnter: (_) => _onCarouselHoverEnter(), // FR-10.2
+      onExit: (_) => _onCarouselHoverExit(), // FR-10.3
+      child: SizedBox(
+        height: isDesktop ? 500 : 400, // FR-3.1, FR-4.1: Responsive height
+        width: double.infinity,
+        child: Stack(
+          children: [
+            // FR-5: AnimatedSwitcher for crossfade transition between slides
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 600), // FR-5.2
+              switchInCurve: Curves.easeInOut, // FR-5.3
+              switchOutCurve: Curves.easeInOut,
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                // FR-5.5: Use FadeTransition for crossfade effect
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+              child: _buildSlideContent(currentSlide, isDesktop),
+            ),
 
-          // FR-6, FR-7, FR-8, FR-9: Navigation controls
-          _buildCarouselControls(isDesktop),
-        ],
+            // FR-6, FR-7, FR-8, FR-9: Navigation controls
+            _buildCarouselControls(isDesktop),
+          ],
+        ),
       ),
     );
   }
