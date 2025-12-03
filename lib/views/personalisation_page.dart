@@ -6,20 +6,20 @@ class PersonalisationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
+    return const AppScaffold(
       currentRoute: '/print-shack/personalisation',
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'Personalisation Page',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
-              const Text('Create your personalised products here.'),
+              SizedBox(height: 16),
+              Text('Create your personalised products here.'),
             ],
           ),
         ),

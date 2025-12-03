@@ -28,7 +28,7 @@ class AppFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bg = backgroundColor ?? Colors.grey[200];
-    final textColor = Colors.black87;
+    const textColor = Colors.black87;
 
     return Material(
       color: bg,
@@ -136,8 +136,6 @@ class _FooterSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = Colors.black87;
-
     return MergeSemantics(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -330,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   // Build individual slide content with responsive layout
   Widget _buildSlideContent(CarouselSlide slide, bool isDesktop) {
-    return Container(
+    return SizedBox(
       key: ValueKey(_currentSlide), // FR-5.4: Key by index to trigger animation
       width: double.infinity,
       height: double.infinity,
