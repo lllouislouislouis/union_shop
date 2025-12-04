@@ -36,7 +36,6 @@ class UnionShopApp extends StatelessWidget {
         '/sale': (context) => const SalePage(),
 
         // NEW FR-14.1: Collections route
-        '/': (context) => const HomeScreen(),
         '/collections': (context) =>
             const CollectionsPage(items: kCollectionItems),
         '/shop/clothing': (context) => const ShopCategoryPage(
