@@ -3,6 +3,8 @@
 ## 1. Feature overview
 Description
 - Implement a Clothing collection page that displays clothing products with filtering, sorting, and product count capabilities identical to the Sale page.
+- **Filter and sort controls must have the exact same options and functionality as the Sale page.**
+- Only one filter can be selected at a time (no multi-select); there is **no "Reset Filters" button** (same as Sale page).
 - Reuse Sale page components (FilterBar, SortDropdown, ProductGrid, ProductCard) to maintain consistency and reduce duplication.
 - Integrate with existing navigation from Collections page and ensure accessible, responsive design.
 
@@ -24,8 +26,9 @@ US-1: Browse clothing products (visitor/shopper)
 - Expected: Page shows product cards with images, names, prices; count displays total products.
 
 US-2: Filter clothing products (shopper)
-- As a shopper, I want to filter by all products, clothing, merhandise and popular so I can narrow results to my preferences.
-- Expected: Selecting filters updates the grid immediately; count shows filtered total.
+- As a shopper, I want to filter by all products, clothing, merchandise and popular so I can narrow results to my preferences.
+- Expected: Selecting a filter updates the grid immediately; count shows filtered total.
+- **Only one filter can be selected at a time, and there is no reset filters button (identical to Sale page).**
 
 US-3: Sort clothing products (shopper)
 - As a shopper, I want to sort by Popularity, Price (Low→High, High→Low), and Newest so I can find items that match my priorities.
@@ -56,10 +59,12 @@ Page structure & layout
 - AC-5: Spacing and card design match Sale page for consistency.
 
 Filtering behavior
-- AC-6: Filter By includes options: all products, shopping, merchandise and popular.
-- AC-7: Selecting/deselecting a filter immediately updates:
+- AC-6: Filter By includes options: all products, clothing, merchandise and popular.
+- AC-7: Selecting a filter immediately updates:
   - Filtered product list displayed in grid
   - Product count
+- **AC-8: Only one filter can be selected at a time (no multi-select, no reset button), matching Sale page behavior.**
+- **AC-9: Filter and sort controls/options are exactly the same as on the Sale page.**
 
 Sorting behavior
 - AC-10: Sort By dropdown includes: Popularity, Price Low→High, Price High→Low, Newest.
@@ -113,6 +118,7 @@ FR-3 Filtering
   - Clothing
   - Merchandise
   - Popular
+- **FR-3.2.1: Only one filter can be selected at a time (no multi-select, no reset button), matching Sale page.**
 - FR-3.3: Apply filters to allProducts; update filteredProducts and count.
 
 FR-4 Sorting
@@ -122,6 +128,7 @@ FR-4 Sorting
   - Price Low→High
   - Price High→Low
   - Newest (if date added available)
+- **FR-4.2.1: Sort options and logic must match Sale page exactly.**
 - FR-4.3: Apply sort to filteredProducts; re-render grid.
 
 FR-5 Product grid
@@ -164,13 +171,14 @@ NFR-4 Accessibility
 Option A: Configure ShopCategoryPage
 - Add a feature flag or config to ShopCategoryPage: enableFiltersAndSort (default false; true for 'clothing' and 'sale').
 - Inject filter options and sort options via constructor or provider.
+- **Use the exact same filter and sort options as the Sale page.**
 - Example:
   ```dart
   ShopCategoryPage(
     category: 'clothing',
     enableFiltersAndSort: true,
-    filterOptions: kClothingFilters, // Reuse from Sale page
-    sortOptions: kDefaultSortOptions,
+    filterOptions: kSaleFilters, // Use same as Sale page
+    sortOptions: kSaleSortOptions, // Use same as Sale page
   )
   ```
 
@@ -194,6 +202,7 @@ Recommended: Option A (configure ShopCategoryPage) for DRY and easier maintenanc
   - Add `enableFiltersAndSort` boolean parameter (default false).
   - Add `filterOptions` and `sortOptions` parameters.
   - When enabled, display FilterBar and SortDropdown above ProductGrid.
+  - **FilterBar must allow only one filter to be selected at a time (no reset button), matching Sale page.**
   - Manage filter/sort state with setState or provider.
 
 - [ ] **Subtask 3**: Load clothing products:
