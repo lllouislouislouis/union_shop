@@ -238,53 +238,56 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 16),
 
                   // FR-21.6, FR-21.7: Additional links
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // FR-21.6: Forgot Password link
-                      TextButton(
-                        onPressed: () {
-                          // Non-functional at this stage
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Password recovery coming soon!',
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // FR-21.6: Forgot Password link
+                        TextButton(
+                          onPressed: () {
+                            // Non-functional at this stage
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Password recovery coming soon!',
+                                ),
+                                duration: Duration(seconds: 2),
                               ),
-                              duration: Duration(seconds: 2),
+                            );
+                          },
+                          child: const Text(
+                            'Forgot Password?',
+                            style: TextStyle(
+                              color: Color(0xFF4d2963),
+                              fontSize: 14,
+                              decoration: TextDecoration.none,
                             ),
-                          );
-                        },
-                        child: const Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            color: Color(0xFF4d2963),
-                            fontSize: 14,
-                            decoration: TextDecoration.none,
                           ),
                         ),
-                      ),
-                      const Text('·', style: TextStyle(color: Colors.grey)),
-                      // FR-21.7: Sign Up link
-                      TextButton(
-                        onPressed: () {
-                          // Non-functional at this stage
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Sign up coming soon!'),
-                              duration: Duration(seconds: 2),
+                        const Text('·', style: TextStyle(color: Colors.grey)),
+                        // FR-21.7: Sign Up link
+                        TextButton(
+                          onPressed: () {
+                            // Non-functional at this stage
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Sign up coming soon!'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'Sign Up',
+                            style: TextStyle(
+                              color: Color(0xFF4d2963),
+                              fontSize: 14,
+                              decoration: TextDecoration.none,
                             ),
-                          );
-                        },
-                        child: const Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            color: Color(0xFF4d2963),
-                            fontSize: 14,
-                            decoration: TextDecoration.none,
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
