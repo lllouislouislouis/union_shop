@@ -33,10 +33,19 @@ class _ProductPageState extends State<ProductPage> {
     // Load product data from route arguments only once
     if (!_isInitialized) {
       try {
-        _product =
-            ModalRoute.of<Product>(context)?.settings.arguments as Product;
+        // Get the route settings from the current route
+        final route = ModalRoute.of(context);
+        if (route != null && route.settings.arguments is Product) {
+          _product = route.settings.arguments as Product;
+          print(
+              'DEBUG: Product loaded: ${_product.title} (ID: ${_product.id})');
+        } else {
+          print('DEBUG: No Product arguments found, using fallback');
+          _product = mockProducts.first;
+        }
         _isInitialized = true;
       } catch (e) {
+        print('DEBUG: Error loading product: $e');
         // Fallback: use a default product if route arguments are missing
         _product = mockProducts.first;
         _isInitialized = true;
