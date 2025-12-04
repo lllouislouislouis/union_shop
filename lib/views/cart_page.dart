@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:union_shop/providers/cart_provider.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
+import 'package:union_shop/widgets/cart_item_card.dart';
 
 /// Shopping cart page displaying cart items or empty state
 /// 
@@ -176,26 +177,11 @@ class CartPage extends StatelessWidget {
   Widget _buildCartItemsList(BuildContext context, CartProvider cartProvider) {
     return Column(
       children: [
-        // Placeholder for cart items (will be implemented in next subtask)
+        // FR-27: Display cart items using CartItemCard widget
         for (var item in cartProvider.items)
-          Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Text(
-              'Cart Item: ${item.productName} (Qty: ${item.quantity})',
-              style: const TextStyle(fontSize: 14),
-            ),
+          CartItemCard(
+            item: item,
+            isMobile: MediaQuery.of(context).size.width < 900,
           ),
       ],
     );
