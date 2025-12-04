@@ -160,7 +160,7 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     if (!_isInitialized) {
-      final loadingWidget = const Center(child: CircularProgressIndicator());
+      const loadingWidget = Center(child: CircularProgressIndicator());
       if (widget.useAppScaffold) {
         return const AppScaffold(
           currentRoute: '/product',

@@ -33,8 +33,8 @@ void main() {
   group('ProductPage - Layout Tests', () {
     testWidgets('Product page displays with all required elements',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -61,8 +61,8 @@ void main() {
 
     testWidgets('Color dropdown appears for products with colors',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -79,8 +79,8 @@ void main() {
 
     testWidgets('Size dropdown appears for products with sizes',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -98,8 +98,8 @@ void main() {
     testWidgets(
         'Color and size dropdowns do not appear for products without them',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductNoOptions),
@@ -116,8 +116,8 @@ void main() {
 
     testWidgets('Quantity selector displays with correct initial value',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -134,8 +134,8 @@ void main() {
 
     testWidgets('Add to Cart and Buy Now buttons are displayed',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -154,10 +154,10 @@ void main() {
   group('ProductPage - Color Selection Tests', () {
     testWidgets('Color dropdown displays all available colors',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 1600);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
+      tester.view.physicalSize = const Size(1200, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -186,10 +186,10 @@ void main() {
 
     testWidgets('Selecting a color updates the dropdown display',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 1600);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
+      tester.view.physicalSize = const Size(1200, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -221,10 +221,10 @@ void main() {
   group('ProductPage - Size Selection Tests', () {
     testWidgets('Size dropdown displays all available sizes',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 1600);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
+      tester.view.physicalSize = const Size(1200, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -255,10 +255,10 @@ void main() {
 
     testWidgets('Selecting a size updates the dropdown display',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 1600);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
+      tester.view.physicalSize = const Size(1200, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -290,8 +290,8 @@ void main() {
   group('ProductPage - Quantity Selector Tests', () {
     testWidgets('Quantity increment button increases quantity',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -310,8 +310,8 @@ void main() {
 
     testWidgets('Quantity decrement button decreases quantity',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -333,8 +333,8 @@ void main() {
 
     testWidgets('Decrement button is disabled when quantity is 1',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -351,8 +351,8 @@ void main() {
 
     testWidgets('Increment button is disabled at maximum stock',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       // Create a product with low max stock
       final lowStockProduct = Product(
@@ -385,8 +385,8 @@ void main() {
     testWidgets(
         'Add to Cart button is disabled when required options not selected',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -404,10 +404,10 @@ void main() {
     testWidgets(
         'Add to Cart button is enabled when all required options selected',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 1600);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
+      tester.view.physicalSize = const Size(1200, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -450,8 +450,8 @@ void main() {
 
     testWidgets('Add to Cart button is enabled when no options required',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductNoOptions),
@@ -468,8 +468,8 @@ void main() {
   group('ProductPage - Responsive Layout Tests', () {
     testWidgets('Desktop layout displays two-column layout',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1200, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -485,8 +485,8 @@ void main() {
     testWidgets('Mobile layout displays single-column layout',
         (WidgetTester tester) async {
       // Use minimum 600px width to avoid AppHeader overflow
-      tester.binding.window.physicalSizeTestValue = const Size(600, 800);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(600, 800);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -515,7 +515,7 @@ Widget _buildTestProductPage(Product product) {
         onGenerateRoute: (RouteSettings settings) {
           return MaterialPageRoute(
             builder: (BuildContext context) {
-              return ProductPage(useAppScaffold: false);
+              return const ProductPage(useAppScaffold: false);
             },
             settings: RouteSettings(
               name: '/product',
@@ -527,3 +527,6 @@ Widget _buildTestProductPage(Product product) {
     ),
   );
 }
+
+
+
