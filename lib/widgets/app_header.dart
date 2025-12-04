@@ -671,11 +671,13 @@ class _AppHeaderState extends State<AppHeader> {
           foregroundColor: isActive ? const Color(0xFF4d2963) : Colors.black,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+        child: Flexible(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
         ),
       ),
