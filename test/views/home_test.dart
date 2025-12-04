@@ -26,7 +26,7 @@ void main() {
       expect(find.text('EXPLORE'), findsOneWidget);
 
       // Check products section
-      expect(find.text('PRODUCTS SECTION'), findsOneWidget);
+      expect(find.text('FEATURED PRODUCTS'), findsOneWidget);
       expect(find.byType(ProductCard), findsNWidgets(4));
 
       // Check that AppFooter is present
@@ -160,17 +160,17 @@ void main() {
       // Check that exactly 4 product cards are displayed
       expect(find.byType(ProductCard), findsNWidgets(4));
 
-      // Check product titles
-      expect(find.text('Placeholder Product 1'), findsOneWidget);
-      expect(find.text('Placeholder Product 2'), findsOneWidget);
-      expect(find.text('Placeholder Product 3'), findsOneWidget);
-      expect(find.text('Placeholder Product 4'), findsOneWidget);
+      // Check product titles (match `kFeaturedProducts`)
+      expect(find.text('Portsmouth University Hoodie'), findsOneWidget);
+      expect(find.text('Portsmouth City Mug'), findsOneWidget);
+      expect(find.text('Signature Portsmouth T-Shirt'), findsOneWidget);
+      expect(find.text('Portsmouth University Tote Bag'), findsOneWidget);
 
       // Check product prices
-      expect(find.text('£10.00'), findsOneWidget);
-      expect(find.text('£15.00'), findsOneWidget);
-      expect(find.text('£20.00'), findsOneWidget);
-      expect(find.text('£25.00'), findsOneWidget);
+      expect(find.text('£35.00'), findsOneWidget);
+      expect(find.text('£8.99'), findsOneWidget);
+      expect(find.text('£12.99'), findsOneWidget);
+      expect(find.text('£9.99'), findsOneWidget);
     });
 
     testWidgets('should show products in 2-column grid on desktop',
