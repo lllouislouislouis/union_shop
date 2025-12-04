@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
+import 'package:union_shop/widgets/category_filter_dropdown.dart';
+import 'package:union_shop/widgets/sort_dropdown.dart';
+import 'package:union_shop/widgets/product_count_display.dart';
+import 'package:union_shop/widgets/sale_product_card.dart';
 import '../models/sale_product.dart';
 
 class SalePage extends StatefulWidget {
@@ -21,6 +25,25 @@ class _SalePageState extends State<SalePage> {
   int _totalPages = 1;
 
   static const int _productsPerPage = 9;
+
+  // Define filter and sort options as constants for reuse
+  static const List<String> _filterOptions = [
+    'All Categories',
+    'Clothing',
+    'Merchandise',
+    'PSUT',
+  ];
+
+  static const List<String> _sortOptions = [
+    'Featured',
+    'Best Selling',
+    'Alphabetically, A-Z',
+    'Alphabetically, Z-A',
+    'Price: Low to High',
+    'Price: High to Low',
+    'Date, old to new',
+    'Date, new to old',
+  ];
 
   // ScrollController to handle scroll-to-top on page change
   final ScrollController _scrollController = ScrollController();
@@ -280,7 +303,19 @@ class _SalePageState extends State<SalePage> {
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(child: _buildCategoryFilter(fullWidth: true)),
+              Expanded(
+                child: CategoryFilterDropdown(
+                  selectedCategory: _selectedCategory,
+                  categories: _filterOptions,
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedCategory = newValue;
+                      _applyFilters();
+                    });
+                  },
+                  fullWidth: true,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -296,12 +331,24 @@ class _SalePageState extends State<SalePage> {
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(child: _buildSortDropdown(fullWidth: true)),
+              Expanded(
+                child: SortDropdown(
+                  selectedSort: _selectedSort,
+                  sortOptions: _sortOptions,
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedSort = newValue;
+                      _applySorting();
+                    });
+                  },
+                  fullWidth: true,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
           // Product count
-          _buildProductCount(),
+          ProductCountDisplay(count: _filteredProducts.length),
         ],
       );
     } else {
@@ -324,7 +371,17 @@ class _SalePageState extends State<SalePage> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  _buildCategoryFilter(fullWidth: false),
+                  CategoryFilterDropdown(
+                    selectedCategory: _selectedCategory,
+                    categories: _filterOptions,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _selectedCategory = newValue;
+                        _applyFilters();
+                      });
+                    },
+                    fullWidth: false,
+                  ),
                 ],
               ),
               const SizedBox(width: 24),
@@ -340,147 +397,26 @@ class _SalePageState extends State<SalePage> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  _buildSortDropdown(fullWidth: false),
+                  SortDropdown(
+                    selectedSort: _selectedSort,
+                    sortOptions: _sortOptions,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _selectedSort = newValue;
+                        _applySorting();
+                      });
+                    },
+                    fullWidth: false,
+                  ),
                 ],
               ),
             ],
           ),
           // Right side: Product count
-          _buildProductCount(),
+          ProductCountDisplay(count: _filteredProducts.length),
         ],
       );
     }
-  }
-
-  // Build category filter dropdown
-  Widget _buildCategoryFilter({required bool fullWidth}) {
-    return Container(
-      width: fullWidth ? double.infinity : 200,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _selectedCategory,
-          isExpanded: true,
-          icon: const Icon(Icons.arrow_drop_down),
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[900],
-            fontWeight: FontWeight.w500,
-          ),
-          dropdownColor: Colors.white,
-          items: const [
-            DropdownMenuItem(
-              value: 'All Categories',
-              child: Text('All Categories'),
-            ),
-            DropdownMenuItem(
-              value: 'Clothing',
-              child: Text('Clothing'),
-            ),
-            DropdownMenuItem(
-              value: 'Merchandise',
-              child: Text('Merchandise'),
-            ),
-            DropdownMenuItem(
-              value: 'PSUT',
-              child: Text('PSUT'),
-            ),
-          ],
-          onChanged: (String? newValue) {
-            if (newValue != null && newValue != _selectedCategory) {
-              setState(() {
-                _selectedCategory = newValue;
-                _applyFilters();
-              });
-            }
-          },
-        ),
-      ),
-    );
-  }
-
-  // Build sort dropdown
-  Widget _buildSortDropdown({required bool fullWidth}) {
-    return Container(
-      width: fullWidth ? double.infinity : 220,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _selectedSort,
-          isExpanded: true,
-          icon: const Icon(Icons.arrow_drop_down),
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[900],
-            fontWeight: FontWeight.w500,
-          ),
-          dropdownColor: Colors.white,
-          items: const [
-            DropdownMenuItem(
-              value: 'Featured',
-              child: Text('Featured'),
-            ),
-            DropdownMenuItem(
-              value: 'Best Selling',
-              child: Text('Best Selling'),
-            ),
-            DropdownMenuItem(
-              value: 'Alphabetically, A-Z',
-              child: Text('Alphabetically, A-Z'),
-            ),
-            DropdownMenuItem(
-              value: 'Alphabetically, Z-A',
-              child: Text('Alphabetically, Z-A'),
-            ),
-            DropdownMenuItem(
-              value: 'Price: Low to High',
-              child: Text('Price: Low to High'),
-            ),
-            DropdownMenuItem(
-              value: 'Price: High to Low',
-              child: Text('Price: High to Low'),
-            ),
-            DropdownMenuItem(
-              value: 'Date, old to new',
-              child: Text('Date, old to new'),
-            ),
-            DropdownMenuItem(
-              value: 'Date, new to old',
-              child: Text('Date, new to old'),
-            ),
-          ],
-          onChanged: (String? newValue) {
-            if (newValue != null && newValue != _selectedSort) {
-              setState(() {
-                _selectedSort = newValue;
-                _applySorting();
-              });
-            }
-          },
-        ),
-      ),
-    );
-  }
-
-  // Build product count display
-  Widget _buildProductCount() {
-    final productText = _filteredProducts.length == 1 ? 'product' : 'products';
-    return Text(
-      '${_filteredProducts.length} $productText',
-      style: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-        color: Colors.grey[700],
-      ),
-    );
   }
 
   // Build empty state when no products
