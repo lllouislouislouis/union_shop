@@ -1,258 +1,390 @@
-# Clothing Page — Feature Requirements
+# Product Page — Feature Requirements
 
-## 1. Feature overview
-Description
-- Implement a Clothing collection page that displays clothing products with filtering, sorting, and product count capabilities identical to the Sale page.
-- **Filter and sort controls must have the exact same options and functionality as the Sale page.**
-- Only one filter can be selected at a time (no multi-select); there is **no "Reset Filters" button** (same as Sale page).
-- Reuse Sale page components (FilterBar, SortDropdown, ProductGrid, ProductCard) to maintain consistency and reduce duplication.
-- Integrate with existing navigation from Collections page and ensure accessible, responsive design.
+## 1. Feature Overview
 
-Purpose
-- Provide users with a dedicated, filterable view of clothing products.
-- Enable discovery through filters (All products, clothing, merchandise, popular) and sorting options.
-- Maintain UX consistency across collection pages (Clothing, Sale, etc.).
+### Description
+- Implement a fully functional Product Page that displays detailed information for a single product.
+- Page includes: product image, title, price, customization options (color, size), quantity selection, and purchase actions (Add to Cart, Buy Now).
+- Support dynamic product data loading from route arguments or product ID lookup.
+- Ensure responsive design for desktop, tablet, and mobile devices.
+- Reuse existing app components (AppScaffold, color scheme, typography) for consistency.
 
-Scope
-- Configure ShopCategoryPage to support clothing category with Sale-like controls, OR create a dedicated ClothingPage view.
-- Reuse existing filter/sort components and state management from Sale page.
-- Ensure routing from Collections -> Clothing works via '/shop/clothing' or ShopCategoryPage(category: 'clothing').
-- Add tests verifying filtering, sorting, product count updates, and navigation.
+### Purpose
+- Provide users with a detailed view of individual products with all necessary information for purchase decisions.
+- Enable product customization (color, size selection) before adding to cart or checkout.
+- Create a clear, accessible product browsing and purchasing experience.
+- Support navigation from collection pages (Sale, Clothing) to individual product details.
 
-## 2. User stories
+### Scope
+- Build Product Page as a StatefulWidget to manage product selection state.
+- Create/extend Product model with all required fields (id, title, price, originalPrice, imageUrl, availableColors, availableSizes, description, maxStock).
+- Implement responsive layout: two-column desktop, single-column mobile.
+- Add validation for required product options (color, size) before purchase actions.
+- Integrate with cart service/state management for "Add to Cart" functionality.
+- Wire navigation to checkout page for "Buy Now" action.
+- Include widget tests and manual QA.
 
-US-1: Browse clothing products (visitor/shopper)
-- As a shopper, I want to view all clothing products in a grid so I can browse available items.
-- Expected: Page shows product cards with images, names, prices; count displays total products.
+## 2. User Stories
 
-US-2: Filter clothing products (shopper)
-- As a shopper, I want to filter by all products, clothing, merchandise and popular so I can narrow results to my preferences.
-- Expected: Selecting a filter updates the grid immediately; count shows filtered total.
-- **Only one filter can be selected at a time, and there is no reset filters button (identical to Sale page).**
+### US-1: View Product Details (Visitor/Shopper)
+- **As a** shopper, **I want to** view detailed information about a product (image, title, price, description) **so that** I can make an informed purchasing decision.
+- **Expected:** Product page displays all details clearly; image is prominent; price is easy to find; description is readable.
 
-US-3: Sort clothing products (shopper)
-- As a shopper, I want to sort by Popularity, Price (Low→High, High→Low), and Newest so I can find items that match my priorities.
-- Expected: Changing sort reorders products; grid updates; count remains accurate.
+### US-2: Select Product Color (Shopper)
+- **As a** shopper, **I want to** select a product color from a dropdown **so that** I can customize my purchase.
+- **Expected:** Color dropdown is visible (if product has colors); selecting a color updates the selection state; Add to Cart and Buy Now buttons remain disabled until color is selected (if required).
 
-US-4: Navigate from Collections (visitor)
-- As a visitor, I want to click the "Clothing" tile on the Collections page so I can view clothing products.
-- Expected: Tapping tile navigates to Clothing page; products load immediately.
+### US-3: Select Product Size (Shopper)
+- **As a** shopper, **I want to** select a product size from a dropdown **so that** I can ensure the product fits my needs.
+- **Expected:** Size dropdown is visible (if product has sizes); selecting a size updates the selection state; Add to Cart and Buy Now buttons remain disabled until size is selected (if required).
 
-US-5: Mobile shopping (mobile user)
-- As a mobile user, I want filters/sort controls and product cards to be touch-friendly and stack vertically so I can browse comfortably on small screens.
-- Expected: Single or dual column grid; controls accessible and tappable; no horizontal overflow.
+### US-4: Choose Quantity (Shopper)
+- **As a** shopper, **I want to** choose how many items to purchase using increment/decrement buttons or direct input **so that** I can buy the correct quantity.
+- **Expected:** Quantity selector shows 1 by default; + button increases quantity (up to stock limit); - button decreases quantity (minimum 1); direct input validates on blur (1-maxStock range).
 
-US-6: Keyboard navigation (accessibility user)
-- As a keyboard user, I want to tab through filters, sort options, and product cards so I can navigate without a mouse.
-- Expected: All controls focusable; Enter/Space activates; focus indicators visible.
+### US-5: Add Product to Cart (Shopper)
+- **As a** shopper, **I want to** click "Add to Cart" with my selected options **so that** I can save items for later purchase or checkout.
+- **Expected:** Add to Cart button is disabled until all required options selected; clicking adds product to cart; success message appears ("Added to cart!").
 
-US-7: Developer/maintainer
-- As a developer, I want to reuse Sale page components and state logic so the Clothing page is easy to maintain and extend.
+### US-6: Buy Product Now (Shopper)
+- **As a** shopper, **I want to** click "Buy Now" to proceed directly to checkout **so that** I can complete my purchase without additional steps.
+- **Expected:** Buy Now button is disabled until all required options selected; clicking navigates to checkout page with product details.
 
-## 3. Acceptance criteria
+### US-7: View Sale Price (Sale Shopper)
+- **As a** shopper, **I want to** see both original and sale prices for discounted items **so that** I can understand the savings.
+- **Expected:** Original price shown struck through; sale price shown in bold purple; discount percentage visible (if applicable).
 
-Page structure & layout
-- AC-1: Page title displays "Clothing" at the top.
-- AC-2: Product count displays "X products" and updates after filters/sort.
-- AC-3: Controls bar includes "Filter By" (multi-select) and "Sort By" (dropdown), identical to Sale page.
-- AC-4: Product grid is responsive: >800px: 3–4 columns; ≤800px: 1–2 columns.
-- AC-5: Spacing and card design match Sale page for consistency.
+### US-8: Browse on Mobile (Mobile User)
+- **As a** mobile user, **I want to** view product details on a single column layout **so that** I can comfortably browse on my phone.
+- **Expected:** Image, details, buttons stack vertically; no horizontal overflow; buttons are touch-friendly (large tap targets).
 
-Filtering behavior
-- AC-6: Filter By includes options: all products, clothing, merchandise and popular.
-- AC-7: Selecting a filter immediately updates:
-  - Filtered product list displayed in grid
-  - Product count
-- **AC-8: Only one filter can be selected at a time (no multi-select, no reset button), matching Sale page behavior.**
-- **AC-9: Filter and sort controls/options are exactly the same as on the Sale page.**
+### US-10: Navigate from Product Cards (Visitor)
+- **As a** visitor, **I want to** click on a product card from Sale or Clothing pages **so that** I can view detailed product information.
+- **Expected:** Product cards are clickable; clicking navigates to Product Page with correct product data; page loads immediately.
 
-Sorting behavior
-- AC-10: Sort By dropdown includes: Popularity, Price Low→High, Price High→Low, Newest.
-- AC-11: Changing sort option reorders the current filtered list and re-renders grid.
-- AC-12: Product count remains accurate after sorting (no change in count, only order).
+## 3. Acceptance Criteria
 
-Product count
-- AC-13: Count displays total products after filters applied.
-- AC-14: Count updates immediately after any filter or sort change.
+### Page Structure & Layout
+- **AC-1:** Product page uses AppScaffold with currentRoute='/product'.
+- **AC-2:** Desktop layout (>800px): Two-column layout with image on left (50%), details on right (50%).
+- **AC-3:** Mobile/Tablet layout (≤800px): Single-column layout with image top, details below.
+- **AC-4:** Consistent padding (24-40px horizontal) matches Sale/Clothing pages.
+- **AC-5:** Page includes: image, title, price, color dropdown, size dropdown, quantity selector, Add to Cart button, Buy Now button, and description.
 
-Navigation & routing
-- AC-15: Clicking "Clothing" tile on Collections page navigates to '/shop/clothing' or ShopCategoryPage(category: 'clothing').
-- AC-16: Clicking a product card navigates to ProductPage for that item.
-- AC-17: Browser back button returns to Collections page.
+### Product Image
+- **AC-6:** Large product image displays from imageUrl.
+- **AC-7:** Placeholder icon shows while image loads.
+- **AC-8:** Error icon displays if image fails to load.
+- **AC-9:** Image responsive: max width 100%, maintains aspect ratio.
 
-Accessibility
-Performance
-- AC-22: Filtering and sorting complete within 300ms for typical product counts (<500 items).
-- AC-23: Grid renders efficiently; avoid unnecessary rebuilds (use keys, const widgets, memoization).
+### Product Title & Price
+- **AC-10:** Product title displays as h1 heading (48px, bold, purple #4d2963).
+- **AC-11:** Current price displays as large text (32px, bold, purple).
+- **AC-12:** For sale items: original price shown struck through (18px, grey), sale price shown bold (32px, purple).
 
-Testing & QA
-- AC-24: Widget tests confirm:
-  - Changing a filter reduces product count and updates grid.
-  - Changing sort option reorders products correctly.
-  - Navigation from Collections -> Clothing works.
-  - Accessibility semantics present on controls and cards.
-- AC-25: Manual QA at widths: 360px, 800px, 1200px shows correct layout and no overflow.
+### Color Dropdown
+- **AC-13:** Color dropdown renders only if product.availableColors is not empty.
+- **AC-14:** Dropdown shows "Select Color" placeholder initially.
+- **AC-15:** Dropdown lists all available colors from product.availableColors.
+- **AC-16:** Selecting a color updates selectedColor state.
+- **AC-17:** Selected color value displays in dropdown.
 
-## 4. Functional requirements (summary)
+### Size Dropdown
+- **AC-18:** Size dropdown renders only if product.availableSizes is not empty.
+- **AC-19:** Dropdown shows "Select Size" placeholder initially.
+- **AC-20:** Dropdown lists all available sizes from product.availableSizes.
+- **AC-21:** Selecting a size updates selectedSize state.
+- **AC-22:** Selected size value displays in dropdown.
 
-FR-1 Page structure
-- FR-1.1: Use AppScaffold with currentRoute='/shop/clothing'.
-- FR-1.2: Display page title "Clothing" and product count in header/controls bar.
-- FR-1.3: Include FilterBar and SortDropdown components from Sale page.
-- FR-1.4: Display ProductGrid with responsive columns.
+### Quantity Selector
+- **AC-23:** Quantity selector shows: [- button] [input field] [+ button].
+- **AC-24:** Initial quantity: 1.
+- **AC-25:** + button: increases quantity by 1 (max: product.maxStock or 10).
+- **AC-26:** - button: decreases quantity by 1 (min: 1); disabled when quantity is 1.
+- **AC-27:** Input field: accepts numeric input; validates on blur (must be 1-maxStock).
+- **AC-28:** Invalid input (zero, negative, non-numeric) rejected; error message shown.
 
-FR-2 Data & state
-- FR-2.1: Load products where category == 'clothing' from catalog or mock data.
-- FR-2.2: Use same state management pattern as Sale page (setState/Provider/Riverpod/Bloc).
-- FR-2.3: State includes:
-  - allProducts: List<Product> (clothing items)
-  - activeFilters: Map<String, dynamic> (all products, clothing, merchandise, popular)
-  - sortOption: String (e.g., 'price-asc', 'newest')
-  - filteredProducts: List<Product> (computed)
-- FR-2.4: Recompute filteredProducts when filters or sort changes.
+### Add to Cart Button
+- **AC-29:** Button text: "Add to Cart".
+- **AC-30:** Button disabled (grey) if required options not selected (color if colors exist, size if sizes exist).
+- **AC-31:** Button enabled (purple background, white text) when all required options selected.
+- **AC-32:** Clicking button: validates options, adds {productId, title, price, selectedColor, selectedSize, selectedQuantity, imageUrl} to cart.
+- **AC-33:** On success: snackbar/toast displays "Added to cart!".
+- **AC-34:** On error: error message displays (e.g., "Please select a color and size").
 
-FR-3 Filtering
-- FR-3.1: Reuse FilterBar widget from Sale page.
-- FR-3.2: Filter options:
-  - All products
-  - Clothing
-  - Merchandise
-  - Popular
-- **FR-3.2.1: Only one filter can be selected at a time (no multi-select, no reset button), matching Sale page.**
-- FR-3.3: Apply filters to allProducts; update filteredProducts and count.
+### Buy Now Button
+- **AC-35:** Button text: "Buy Now".
+- **AC-36:** Button disabled (white with grey border) if required options not selected.
+- **AC-37:** Button enabled (white background, purple border/text) when all required options selected.
+- **AC-38:** Clicking button: validates options, navigates to '/checkout' with {productId, selectedColor, selectedSize, selectedQuantity} as route arguments.
+- **AC-39:** On error: error message displays (e.g., "Please select a color and size").
 
-FR-4 Sorting
-- FR-4.1: Reuse SortDropdown widget from Sale page.
-- FR-4.2: Sort options:
-  - Popularity (if popularity data available; else omit or use placeholder)
-  - Price Low→High
-  - Price High→Low
-  - Newest (if date added available)
-- **FR-4.2.1: Sort options and logic must match Sale page exactly.**
-- FR-4.3: Apply sort to filteredProducts; re-render grid.
+### Product Description
+- **AC-40:** Description displays below buttons as multi-line text.
+- **AC-41:** Description text size: 16px, grey (#888), line height 1.5.
+- **AC-42:** Description supports line breaks and basic formatting (plain text).
+- **AC-43:** Long descriptions are scrollable or wrapped; no horizontal overflow.
 
-FR-5 Product grid
-- FR-5.1: Reuse ProductGrid and ProductCard widgets from Sale page.
-- FR-5.2: Responsive columns: >800px: 3–4; ≤800px: 1–2.
-- FR-5.3: Grid spacing: 16px between cards; 24px outer padding.
-- FR-5.4: Each card shows image, name, price, optional badge (e.g., "New").
+### Navigation & Routing
+- **AC-44:** Route '/product' maps to ProductPage; product data passed via route arguments.
+- **AC-45:** On page load: Product data fetched by ID from route arguments or provider.
+- **AC-46:** Back button (browser or app navigation) returns to previous page (Sale, Clothing, etc.).
+- **AC-47:** Product cards on Sale/Clothing pages include onTap that navigates to '/product' with product data.
 
-FR-6 Navigation
-- FR-6.1: Route '/shop/clothing' maps to ShopCategoryPage(category: 'clothing') or dedicated ClothingPage.
-- FR-6.2: Clicking product card navigates to ProductPage(productId: item.id).
-- FR-6.3: Ensure route is registered in main.dart routes.
+### Responsiveness
+- **AC-48:** At 360px width (mobile): single-column layout, buttons full width, no overflow.
+- **AC-48:** At 800px width (tablet): verify layout transitions correctly, controls visible.
+- **AC-49:** At 1200px width (desktop): two-column layout, image and details side-by-side.
 
-FR-7 Accessibility
-- FR-7.1: Wrap controls in Semantics with appropriate labels.
-- FR-7.2: Ensure keyboard navigation via Focus widgets.
-- FR-7.3: Product cards have semantic labels and minimum 44x44 touch targets.
+### Performance
+- **AC-60:** Product page loads and renders in <500ms.
+- **AC-61:** Image loads efficiently; lazy loading or caching used if applicable.
+- **AC-62:** State updates (color, size, quantity) respond immediately (<50ms).
 
-## 5. Non-functional requirements
+## 4. Functional Requirements (Summary)
 
-NFR-1 Performance
-- Filter/sort operations complete in <300ms for typical product counts.
-- Use efficient list operations (where, orderBy) or memoization to avoid expensive rebuilds.
+### FR-1 Page Structure & Layout
+- FR-1.1: Use AppScaffold with currentRoute='/product' and back navigation.
+- FR-1.2: Desktop (>800px): Render Row with Expanded(child: image) + Expanded(child: details).
+- FR-1.3: Mobile (≤800px): Render Column with image first, details below.
+- FR-1.4: Padding: 24px mobile, 32px tablet, 40px desktop.
+- FR-1.5: SingleChildScrollView wraps content for vertical scrolling.
 
-NFR-2 Maintainability
-- Reuse Sale page components (FilterBar, SortDropdown, ProductGrid, ProductCard).
-- Avoid duplicating filter/sort logic; extract into shared service/provider if needed.
-- Keep ClothingPage or ShopCategoryPage config simple and testable.
+### FR-2 Data & State
+- FR-2.1: Product model includes: id, title, price, originalPrice (nullable), imageUrl, availableColors[], availableSizes[], description, maxStock, discountPercentage (computed).
+- FR-2.2: State: selectedColor (nullable), selectedSize (nullable), selectedQuantity (default 1).
+- FR-2.3: Load product from route arguments: `ModalRoute.of<Product>(context)?.settings.arguments as Product`.
+- FR-2.4: Getter _canAddToCart: validates color (if colors exist), size (if sizes exist).
 
-NFR-3 Consistency
-- Match Sale page design and behavior exactly for filters, sorting, and product cards.
-- Use same spacing, fonts, colors, and interaction patterns.
+### FR-3 Product Image
+- FR-3.1: Image.asset(product.imageUrl, fit: BoxFit.cover).
+- FR-3.2: ClipRRect(borderRadius: 8) for rounded corners.
+- FR-3.3: ErrorBuilder: show grey container + shopping bag icon.
+- FR-3.4: SizedBox(height: 300) for consistent image area size.
 
-NFR-4 Accessibility
-- Follow WCAG AA standards for contrast and keyboard navigation.
-- Provide semantic labels and focus indicators.
+### FR-4 Product Title & Price
+- FR-4.1: Title: Text(product.title, style: TextStyle(fontSize: 48, bold, purple)).
+- FR-4.2: Price display: if originalPrice exists, show struck-through original + bold sale price; else show price only.
+- FR-4.3: Price Row layout: [original struck] [SizedBox 8] [sale price bold].
 
-## 6. Implementation notes & examples (brief)
+### FR-5 Color Dropdown
+- FR-5.1: Conditionally render: `if (product.availableColors.isNotEmpty) { ... }`.
+- FR-5.2: DropdownButton<String> with items from product.availableColors.
+- FR-5.3: Placeholder: "Select Color".
+- FR-5.4: onChanged: setState(() { selectedColor = value; }).
+- FR-5.5: Semantics wrapper with label "Choose product color".
 
-Option A: Configure ShopCategoryPage
-- Add a feature flag or config to ShopCategoryPage: enableFiltersAndSort (default false; true for 'clothing' and 'sale').
-- Inject filter options and sort options via constructor or provider.
-- **Use the exact same filter and sort options as the Sale page.**
-- Example:
-  ```dart
-  ShopCategoryPage(
-    category: 'clothing',
-    enableFiltersAndSort: true,
-    filterOptions: kSaleFilters, // Use same as Sale page
-    sortOptions: kSaleSortOptions, // Use same as Sale page
-  )
-  ```
+### FR-6 Size Dropdown
+- FR-6.1: Conditionally render: `if (product.availableSizes.isNotEmpty) { ... }`.
+- FR-6.2: DropdownButton<String> with items from product.availableSizes.
+- FR-6.3: Placeholder: "Select Size".
+- FR-6.4: onChanged: setState(() { selectedSize = value; }).
+- FR-6.5: Semantics wrapper with label "Choose product size".
 
-Option B: Create dedicated ClothingPage
-- Scaffold with AppScaffold.
-- Import and reuse FilterBar, SortDropdown, ProductGrid from Sale page.
-- Query products: `products.where((p) => p.category == 'clothing').toList()`.
-- Manage state with setState or provider; mirror Sale page logic.
+### FR-7 Quantity Selector
+- FR-7.1: Row layout: [IconButton(-)] [TextField] [IconButton(+)].
+- FR-7.2: IconButton(-): onPressed decrement (min 1, disable if at 1).
+- FR-7.3: IconButton(+): onPressed increment (max product.maxStock or 10).
+- FR-7.4: TextField: TextInputType.number, validator (1-maxStock), onChanged setState.
+- FR-7.5: Semantics wrappers for buttons: "Increase quantity", "Decrease quantity".
 
-Recommended: Option A (configure ShopCategoryPage) for DRY and easier maintenance.
+### FR-8 Add to Cart Button
+- FR-8.1: ElevatedButton with text "Add to Cart".
+- FR-8.2: enabled: _canAddToCart.
+- FR-8.3: onPressed: validate, add to cart, show snackbar.
+- FR-8.4: Call CartService.instance.addItem({productId, selectedColor, selectedSize, selectedQuantity}) or update state.
+- FR-8.5: ScaffoldMessenger.of(context).showSnackBar(...) on success.
+- FR-8.6: Style: purple background, white text, full width mobile, fixed width desktop.
 
-## 7. Subtasks (actionable)
+### FR-9 Buy Now Button
+- FR-9.1: OutlinedButton with text "Buy Now".
+- FR-9.2: enabled: _canAddToCart.
+- FR-9.3: onPressed: validate, navigate to '/checkout' with route arguments.
+- FR-9.4: Navigator.pushNamed(context, '/checkout', arguments: {productId, selectedColor, selectedSize, selectedQuantity}).
+- FR-9.5: Style: white background, purple border/text, full width mobile, fixed width desktop.
 
-- [ ] **Subtask 1**: Identify and extract reusable components from Sale page:
-  - FilterBar widget
-  - SortDropdown widget (with Popularity, Price, Newest options)
-  - ProductGrid and ProductCard widgets
-  - Place in `lib/widgets/` if not already extracted.
+### FR-10 Product Description
+- FR-10.1: Text(product.description, style: TextStyle(fontSize: 16, grey, height: 1.5)).
+- FR-10.2: Support line breaks: use '\n' in description text.
+- FR-10.3: Padding: 24px horizontal, responsive layout.
 
-- [ ] **Subtask 2**: Update ShopCategoryPage to support filters and sorting:
-  - Add `enableFiltersAndSort` boolean parameter (default false).
-  - Add `filterOptions` and `sortOptions` parameters.
-  - When enabled, display FilterBar and SortDropdown above ProductGrid.
-  - **FilterBar must allow only one filter to be selected at a time (no reset button), matching Sale page.**
-  - Manage filter/sort state with setState or provider.
+### FR-11 Navigation & Routing
+- FR-11.1: ProductPage StatefulWidget with Product parameter or route arguments.
+- FR-11.2: initState: retrieve product from route arguments or provider.
+- FR-11.3: Product cards (Sale, Clothing) navigate: Navigator.pushNamed(context, '/product', arguments: product).
+- FR-11.4: main.dart route: '/product': (context) => ProductPage().
 
-- [ ] **Subtask 3**: Load clothing products:
-  - Query or filter products where category == 'clothing'.
-  - Use mock data if catalog not yet available.
-  - Ensure at least 10–20 sample clothing products for testing.
+## 5. Non-Functional Requirements
 
-- [ ] **Subtask 4**: Implement filtering logic:
-  - On filter change, recompute filteredProducts from allProducts.
-  - Update product count and re-render grid.
+### NFR-1 Performance
+- Product page loads and renders in <500ms.
+- Image loads efficiently; lazy load or cache if necessary.
+- State updates respond immediately (<50ms).
+- Avoid unnecessary rebuilds; use const widgets where possible.
 
-- [ ] **Subtask 5**: Implement sorting logic:
-  - On sort change, apply orderBy to filteredProducts.
-  - Re-render grid with sorted list.
-  - Ensure product count remains accurate (sorting does not change count).
+### NFR-2 Maintainability
+- Reuse AppScaffold, existing dropdown widgets, or create ProductOptionDropdown.
+- Keep ProductPage simple; separate UI logic from business logic.
+- Extract product card navigation logic into utility if shared across pages.
+- Use clear variable names and comments for complex logic.
 
-- [ ] **Subtask 6**: Wire navigation:
-  - Ensure '/shop/clothing' route exists in main.dart:
-    ```dart
-    '/shop/clothing': (context) => ShopCategoryPage(
-      category: 'clothing',
-      enableFiltersAndSort: true,
-      filterOptions: kClothingFilters,
-      sortOptions: kDefaultSortOptions,
-    ),
-    ```
-  - Verify Collections -> Clothing navigation works.
+### NFR-3 Consistency
+- Match design patterns from Sale/Clothing pages (colors, fonts, spacing, button styles).
+- Use purple theme color (#4d2963) for primary actions and accents.
+- Maintain responsive breakpoints: >800px desktop, 600-800px tablet, <600px mobile.
+- Button styles: purple primary, outlined secondary, white text primary, grey text secondary.
 
-- [ ] **Subtask 7**: Add accessibility:
-  - Wrap FilterBar and SortDropdown in Semantics.
-  - Ensure keyboard focus order: Filters -> Sort -> Product Grid.
-  - Add semantic labels to product cards.
-  - Test with keyboard navigation and screen reader.
+## 6. Implementation Notes & Examples
 
-- [ ] **Subtask 8**: Add widget tests:
-  - Test: Changing a filter updates product count and grid.
-  - Test: Changing sort option reorders products.
-  - Test: Navigation from Collections -> Clothing.
-  - Test: Product card tap navigates to ProductPage.
+### Product Model (Dart Example)
+```dart
+class Product {
+  final String id;
+  final String title;
+  final double price;
+  final double? originalPrice; // Null if not on sale
+  final String imageUrl;
+  final List<String> availableColors;
+  final List<String> availableSizes;
+  final String description;
+  final int maxStock;
 
-- [ ] **Subtask 9**: Manual QA:
+  Product({
+    required this.id,
+    required this.title,
+    required this.price,
+    this.originalPrice,
+    required this.imageUrl,
+    this.availableColors = const [],
+    this.availableSizes = const [],
+    required this.description,
+    this.maxStock = 10,
+  });
+
+  // Computed property for discount percentage
+  int get discountPercentage {
+    if (originalPrice == null || originalPrice == 0) return 0;
+    return (((originalPrice! - price) / originalPrice!) * 100).round();
+  }
+
+  bool get isOnSale => originalPrice != null && originalPrice! > price;
+}
+```
+
+### State Management Pattern (Example)
+```dart
+class _ProductPageState extends State<ProductPage> {
+  late Product _product;
+  String? _selectedColor;
+  String? _selectedSize;
+  int _selectedQuantity = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _product = ModalRoute.of<Product>(context)?.settings.arguments as Product;
+  }
+
+  bool get _canAddToCart {
+    if (_product.availableColors.isNotEmpty && _selectedColor == null) return false;
+    if (_product.availableSizes.isNotEmpty && _selectedSize == null) return false;
+    return true;
+  }
+
+  void _addToCart() {
+    if (!_canAddToCart) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select all required options')),
+      );
+      return;
+    }
+    // Add to cart logic
+    CartService.instance.addItem({
+      'productId': _product.id,
+      'title': _product.title,
+      'price': _product.price,
+      'color': _selectedColor,
+      'size': _selectedSize,
+      'quantity': _selectedQuantity,
+      'imageUrl': _product.imageUrl,
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Added to cart!')),
+    );
+  }
+
+  void _buyNow() {
+    if (!_canAddToCart) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select all required options')),
+      );
+      return;
+    }
+    Navigator.pushNamed(context, '/checkout', arguments: {
+      'productId': _product.id,
+      'color': _selectedColor,
+      'size': _selectedSize,
+      'quantity': _selectedQuantity,
+    });
+  }
+}
+```
+
+## 7. Subtasks (Actionable)
+
+- [ ] **Subtask 1**: Define or extend Product model with all required fields (id, title, price, originalPrice, imageUrl, availableColors, availableSizes, description, maxStock, discountPercentage getter).
+
+- [ ] **Subtask 2**: Convert ProductPage from StatelessWidget to StatefulWidget; add state variables (selectedColor, selectedSize, selectedQuantity).
+
+- [ ] **Subtask 3**: Implement product data loading from route arguments in initState().
+
+- [ ] **Subtask 4**: Build responsive layout structure:
+  - Desktop (>800px): Row with two Expanded columns.
+  - Mobile (≤800px): Column with stacked widgets.
+  - Use MediaQuery.of(context).size.width for breakpoint detection.
+
+- [ ] **Subtask 5**: Implement product image section with ClipRRect, error handling, and placeholder.
+
+- [ ] **Subtask 6**: Implement product title and price display with sale price support (originalPrice struck through, salePrice bold).
+
+- [ ] **Subtask 7**: Create color dropdown widget (conditionally rendered if colors exist, updates selectedColor on change).
+
+- [ ] **Subtask 8**: Create size dropdown widget (conditionally rendered if sizes exist, updates selectedSize on change).
+
+- [ ] **Subtask 9**: Implement quantity selector (Row with - button, TextField, + button; validation and state updates).
+
+- [ ] **Subtask 10**: Implement Add to Cart button (validation check via _canAddToCart, call CartService, show success snackbar).
+
+- [ ] **Subtask 11**: Implement Buy Now button (validation check, navigate to /checkout with route arguments).
+
+- [ ] **Subtask 12**: Implement product description display (multi-line text, responsive width, line breaks supported).
+
+- [ ] **Subtask 13**: Add validation logic (_canAddToCart getter, error messages for missing required options).
+
+- [ ] **Subtask 15**: Wire navigation from product cards (Sale, Clothing pages):
+  - Update onTap to navigate to '/product' with product as argument.
+  - Verify route is registered in main.dart.
+
+- [ ] **Subtask 16**: Add widget tests:
+  - Test: Selecting color updates selectedColor state.
+  - Test: Selecting size updates selectedSize state.
+  - Test: Quantity increment/decrement works correctly (min 1, max stock).
+  - Test: Add to Cart button disabled until options selected.
+  - Test: Clicking Add to Cart calls CartService and shows snackbar.
+  - Test: Buy Now button disabled until options selected.
+  - Test: Clicking Buy Now navigates to /checkout with correct arguments.
+  - Test: Product image shows error icon on load failure.
+
+- [ ] **Subtask 17**: Manual QA:
   - Test at widths: 360px (mobile), 800px (tablet), 1200px (desktop).
-  - Verify filters, sorting, product count, and layout.
-  - Check keyboard navigation and screen reader.
-  - Compare with Sale page for consistency.
+  - Verify layout transitions, responsiveness, no overflow.
+  - Verify product navigation from Sale/Clothing pages.
+  - Test Add to Cart and Buy Now flows.
 
-- [ ] **Subtask 10**: Performance check:
-  - Profile filtering/sorting with 100+ products.
-  - Ensure <300ms response time.
-  - Optimize with memoization or debouncing if needed.
+- [ ] **Subtask 18**: Performance check:
+  - Profile product page load time (<500ms target).
+  - Verify image loading performance.
+  - Test state updates respond immediately.
 
 --- 
 
