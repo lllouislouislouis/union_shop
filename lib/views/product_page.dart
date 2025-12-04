@@ -291,14 +291,21 @@ class _ProductPageState extends State<ProductPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Product title
-        Text(
-          _product.title,
-          style: const TextStyle(
-            fontSize: 48,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF4d2963),
-            height: 1.2,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                _product.title,
+                style: const TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF4d2963),
+                  height: 1.2,
+                ),
+                overflow: TextOverflow.ellipsis, // Prevent overflow
+              ),
+            ),
+          ],
         ),
 
         const SizedBox(height: 16),
@@ -340,26 +347,32 @@ class _ProductPageState extends State<ProductPage> {
       children: [
         // Original price (if on sale)
         if (_product.isOnSale)
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Text(
-              '£${_product.originalPrice!.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
-                decoration: TextDecoration.lineThrough,
-                decorationColor: Colors.grey[600],
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Text(
+                '£${_product.originalPrice!.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey[600],
+                  decoration: TextDecoration.lineThrough,
+                  decorationColor: Colors.grey[600],
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
 
         // Current price (sale price if on sale, regular price otherwise)
-        Text(
-          '£${_product.price.toStringAsFixed(2)}',
-          style: const TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF4d2963),
+        Flexible(
+          child: Text(
+            '£${_product.price.toStringAsFixed(2)}',
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF4d2963),
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
