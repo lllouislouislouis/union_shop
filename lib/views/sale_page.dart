@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:union_shop/models/sale_product.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
 import '../widgets/product_card.dart';
 
@@ -11,9 +12,9 @@ class SalePage extends StatefulWidget {
 
 class _SalePageState extends State<SalePage> {
   // State variables for filtering, sorting, and pagination
-  List<SaleProduct> _allProducts = [];
-  List<SaleProduct> _filteredProducts = [];
-  List<SaleProduct> _displayedProducts = [];
+  late List<SaleProduct> _allProducts;
+  late List<SaleProduct> _filteredProducts;
+  late List<SaleProduct> _displayedProducts;
 
   String _selectedCategory = 'All Categories';
   String _selectedSort = 'Featured';
@@ -30,6 +31,8 @@ class _SalePageState extends State<SalePage> {
     super.initState();
     // Initialize with mock data
     _allProducts = List.from(mockSaleProducts);
+    _filteredProducts = [];
+    _displayedProducts = [];
     _applyFilters(); // Apply initial filter (All Categories)
   }
 
