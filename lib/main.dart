@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:union_shop/models/carousel_slide.dart';
 import 'package:union_shop/models/product.dart';
 import 'package:union_shop/constants/featured_products.dart';
+import 'package:union_shop/providers/cart_provider.dart';
 import 'package:union_shop/views/about_page.dart';
 import 'package:union_shop/views/product_page.dart';
 import 'package:union_shop/views/sale_page.dart';
@@ -13,6 +15,7 @@ import 'package:union_shop/views/search_page.dart';
 import 'package:union_shop/views/terms_and_conditions_page.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
 import 'package:union_shop/views/login_page.dart';
+import 'package:union_shop/views/cart_page.dart';
 
 void main() {
   runApp(const UnionShopApp());
@@ -23,79 +26,87 @@ class UnionShopApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Union Shop',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4d2963)),
+    // FR-33.1: Wrap MaterialApp with ChangeNotifierProvider<CartProvider>
+    return ChangeNotifierProvider(
+      create: (context) => CartProvider(),
+      child: MaterialApp(
+        title: 'Union Shop',
+        theme: ThemeData(
+          primarySwatch: Colors.purple,
+          fontFamily: 'Roboto',
+        ),
+        home: const HomeScreen(),
+        // By default, the app starts at the '/' route, which is the HomeScreen
+        initialRoute: '/',
+        // Define all application routes
+        routes: {
+          '/product': (context) => const ProductPage(),
+          '/about': (context) => const AboutPage(),
+          '/sale': (context) => const SalePage(),
+
+          // NEW FR-14.1: Collections route
+          '/collections': (context) => const CollectionsPage(
+                items: kCollectionItems,
+              ),
+
+          // Shop category routes (FR-16)
+          // Clothing page with filters and sorting (matching Sale page exactly)
+          '/shop/clothing': (context) => const ShopCategoryPage(
+                category: 'clothing',
+                enableFiltersAndSort: true,
+                filterOptions: [
+                  'All Categories',
+                  'Clothing',
+                  'Merchandise',
+                  'PSUT',
+                ],
+                initialFilter: 'All Categories',
+                sortOptions: [
+                  'Featured',
+                  'Best Selling',
+                  'Alphabetically, A-Z',
+                  'Alphabetically, Z-A',
+                  'Price: Low to High',
+                  'Price: High to Low',
+                  'Date, old to new',
+                  'Date, new to old',
+                ],
+                initialSort: 'Featured',
+              ),
+          '/shop/merchandise': (context) =>
+              const ShopCategoryPage(category: 'merchandise'),
+          '/shop/halloween': (context) =>
+              const ShopCategoryPage(category: 'halloween'),
+          '/shop/signature-essential': (context) =>
+              const ShopCategoryPage(category: 'signature-essential'),
+          '/shop/portsmouth': (context) =>
+              const ShopCategoryPage(category: 'portsmouth'),
+          '/shop/pride': (context) => const ShopCategoryPage(category: 'pride'),
+          '/shop/graduation': (context) =>
+              const ShopCategoryPage(category: 'graduation'),
+
+          // NEW: Additional collection routes
+          '/shop/stationery': (context) =>
+              const ShopCategoryPage(category: 'stationery'),
+          '/shop/sports': (context) =>
+              const ShopCategoryPage(category: 'sports'),
+
+          // Print Shack routes (FR-17)
+          '/print-shack/about': (context) => const PrintShackAboutPage(),
+          '/print-shack/personalisation': (context) =>
+              const PersonalisationPage(),
+
+          // Footer routes (NEW)
+          '/search': (context) => const SearchPage(),
+          '/policies/terms': (context) => const TermsAndConditionsPage(),
+
+          // NEW FR-22: Login route
+          '/login': (context) => const LoginPage(),
+
+          // FR-32.1, FR-32.2: Cart route
+          '/cart': (context) => const CartPage(),
+        },
       ),
-      home: const HomeScreen(),
-      // By default, the app starts at the '/' route, which is the HomeScreen
-      initialRoute: '/',
-      // Define all application routes
-      routes: {
-        '/product': (context) => const ProductPage(),
-        '/about': (context) => const AboutPage(),
-        '/sale': (context) => const SalePage(),
-
-        // NEW FR-14.1: Collections route
-        '/collections': (context) => const CollectionsPage(
-              items: kCollectionItems,
-            ),
-
-        // Shop category routes (FR-16)
-        // Clothing page with filters and sorting (matching Sale page exactly)
-        '/shop/clothing': (context) => const ShopCategoryPage(
-              category: 'clothing',
-              enableFiltersAndSort: true,
-              filterOptions: [
-                'All Categories',
-                'Clothing',
-                'Merchandise',
-                'PSUT',
-              ],
-              initialFilter: 'All Categories',
-              sortOptions: [
-                'Featured',
-                'Best Selling',
-                'Alphabetically, A-Z',
-                'Alphabetically, Z-A',
-                'Price: Low to High',
-                'Price: High to Low',
-                'Date, old to new',
-                'Date, new to old',
-              ],
-              initialSort: 'Featured',
-            ),
-        '/shop/merchandise': (context) =>
-            const ShopCategoryPage(category: 'merchandise'),
-        '/shop/halloween': (context) =>
-            const ShopCategoryPage(category: 'halloween'),
-        '/shop/signature-essential': (context) =>
-            const ShopCategoryPage(category: 'signature-essential'),
-        '/shop/portsmouth': (context) =>
-            const ShopCategoryPage(category: 'portsmouth'),
-        '/shop/pride': (context) => const ShopCategoryPage(category: 'pride'),
-        '/shop/graduation': (context) =>
-            const ShopCategoryPage(category: 'graduation'),
-
-        // NEW: Additional collection routes
-        '/shop/stationery': (context) =>
-            const ShopCategoryPage(category: 'stationery'),
-        '/shop/sports': (context) => const ShopCategoryPage(category: 'sports'),
-
-        // Print Shack routes (FR-17)
-        '/print-shack/about': (context) => const PrintShackAboutPage(),
-        '/print-shack/personalisation': (context) =>
-            const PersonalisationPage(),
-
-        // Footer routes (NEW)
-        '/search': (context) => const SearchPage(),
-        '/policies/terms': (context) => const TermsAndConditionsPage(),
-
-        // NEW FR-22: Login route
-        '/login': (context) => const LoginPage(),
-      },
     );
   }
 }

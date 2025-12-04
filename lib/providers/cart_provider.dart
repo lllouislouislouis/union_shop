@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:union_shop/models/cart_item.dart';
 
 /// Global cart state management using Provider pattern
