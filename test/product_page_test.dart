@@ -154,8 +154,10 @@ void main() {
   group('ProductPage - Color Selection Tests', () {
     testWidgets('Color dropdown displays all available colors',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
+      tester.binding.window.physicalSizeTestValue = const Size(1200, 1600);
+      tester.binding.window.devicePixelRatioTestValue = 1.0;
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -163,8 +165,16 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      // Scroll to make dropdown visible
+      await tester.dragUntilVisible(
+        find.text('Select Color'),
+        find.byType(SingleChildScrollView),
+        const Offset(0, -50),
+      );
+      await tester.pumpAndSettle();
+
       // Tap the color dropdown
-      await tester.tap(find.byType(DropdownButton).first);
+      await tester.tap(find.text('Select Color'));
       await tester.pumpAndSettle();
 
       // Verify all colors are displayed
@@ -176,8 +186,10 @@ void main() {
 
     testWidgets('Selecting a color updates the dropdown display',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
+      tester.binding.window.physicalSizeTestValue = const Size(1200, 1600);
+      tester.binding.window.devicePixelRatioTestValue = 1.0;
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -185,8 +197,16 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      // Scroll to make dropdown visible
+      await tester.dragUntilVisible(
+        find.text('Select Color'),
+        find.byType(SingleChildScrollView),
+        const Offset(0, -50),
+      );
+      await tester.pumpAndSettle();
+
       // Tap the color dropdown
-      await tester.tap(find.byType(DropdownButton).first);
+      await tester.tap(find.text('Select Color'));
       await tester.pumpAndSettle();
 
       // Select "Black" color
@@ -201,8 +221,10 @@ void main() {
   group('ProductPage - Size Selection Tests', () {
     testWidgets('Size dropdown displays all available sizes',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
+      tester.binding.window.physicalSizeTestValue = const Size(1200, 1600);
+      tester.binding.window.devicePixelRatioTestValue = 1.0;
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -210,8 +232,16 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      // Scroll to make dropdown visible
+      await tester.dragUntilVisible(
+        find.text('Select Size'),
+        find.byType(SingleChildScrollView),
+        const Offset(0, -50),
+      );
+      await tester.pumpAndSettle();
+
       // Tap the size dropdown (second dropdown)
-      await tester.tap(find.byType(DropdownButton).last);
+      await tester.tap(find.text('Select Size'));
       await tester.pumpAndSettle();
 
       // Verify all sizes are displayed
@@ -225,8 +255,10 @@ void main() {
 
     testWidgets('Selecting a size updates the dropdown display',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
+      tester.binding.window.physicalSizeTestValue = const Size(1200, 1600);
+      tester.binding.window.devicePixelRatioTestValue = 1.0;
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -234,8 +266,16 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      // Scroll to make dropdown visible
+      await tester.dragUntilVisible(
+        find.text('Select Size'),
+        find.byType(SingleChildScrollView),
+        const Offset(0, -50),
+      );
+      await tester.pumpAndSettle();
+
       // Tap the size dropdown
-      await tester.tap(find.byType(DropdownButton).last);
+      await tester.tap(find.text('Select Size'));
       await tester.pumpAndSettle();
 
       // Select "L" size
@@ -364,8 +404,10 @@ void main() {
     testWidgets(
         'Add to Cart button is enabled when all required options selected',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
+      tester.binding.window.physicalSizeTestValue = const Size(1200, 1600);
+      tester.binding.window.devicePixelRatioTestValue = 1.0;
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
 
       await tester.pumpWidget(
         _buildTestProductPage(testProductWithOptions),
@@ -373,14 +415,30 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      // Scroll to color dropdown and select
+      await tester.dragUntilVisible(
+        find.text('Select Color'),
+        find.byType(SingleChildScrollView),
+        const Offset(0, -50),
+      );
+      await tester.pumpAndSettle();
+
       // Select a color
-      await tester.tap(find.byType(DropdownButton).first);
+      await tester.tap(find.text('Select Color'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Purple').last);
       await tester.pumpAndSettle();
 
+      // Scroll to size dropdown and select
+      await tester.dragUntilVisible(
+        find.text('Select Size'),
+        find.byType(SingleChildScrollView),
+        const Offset(0, -50),
+      );
+      await tester.pumpAndSettle();
+
       // Select a size
-      await tester.tap(find.byType(DropdownButton).at(1));
+      await tester.tap(find.text('Select Size'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('M').last);
       await tester.pumpAndSettle();

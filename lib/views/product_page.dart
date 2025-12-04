@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
 import 'package:union_shop/models/product.dart';
 
-
 class ProductPage extends StatefulWidget {
   final bool useAppScaffold;
   const ProductPage({super.key, this.useAppScaffold = true});
