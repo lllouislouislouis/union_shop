@@ -22,7 +22,6 @@ class _SearchPageState extends State<SearchPage> {
     setState(() {
       _searchQuery = _searchController.text;
     });
-    // TODO: Implement actual search functionality
   }
 
   @override

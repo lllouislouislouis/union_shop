@@ -14,14 +14,11 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
       case TargetPlatform.windows:
       case TargetPlatform.linux:
+      case TargetPlatform.fuchsia:
         throw UnsupportedError(
           'DefaultFirebaseOptions are not supported for this platform.',
         );
     }
-
-    throw UnsupportedError(
-      'DefaultFirebaseOptions are not supported for this platform.',
-    );
   }
 
   static const FirebaseOptions web = FirebaseOptions(

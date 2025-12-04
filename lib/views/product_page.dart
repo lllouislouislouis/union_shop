@@ -114,7 +114,6 @@ class _ProductPageState extends State<ProductPage> {
       return;
     }
 
-    // TODO: Implement Add to Cart logic
     // For now, just show success message
     _showSuccessMessage('Added to cart!');
   }
@@ -126,7 +125,6 @@ class _ProductPageState extends State<ProductPage> {
       return;
     }
 
-    // TODO: Implement Buy Now navigation to checkout
     // Navigator.pushNamed(context, '/checkout', arguments: {
     //   'productId': _product.id,
     //   'color': _selectedColor,
