@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:union_shop/services/firebase_init_helper.dart';
 import 'package:union_shop/models/carousel_slide.dart';
 import 'package:union_shop/models/product.dart';
 import 'package:union_shop/constants/featured_products.dart';
@@ -21,12 +22,29 @@ import 'package:union_shop/views/cart_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  
+  // Optional: Initialize with sample products on first run
+  // Comment this out after first run to avoid duplicate uploads
+  // await _initializeSampleProducts();
+  
   runApp(const UnionShopApp());
+}
+
+/// Initialize sample products (call this once during development)
+Future<void> _initializeSampleProducts() async {
+  // Check if products already exist
+  final hasProducts = await FirebaseInitHelper.hasExistingProducts();
+  
+  if (!hasProducts) {
+    debugPrint('No products found. Uploading sample products...');
+    await FirebaseInitHelper.uploadSampleProducts();
+  } else {
+    debugPrint('Products already exist in Firestore');
+  }
 }
 
 class UnionShopApp extends StatelessWidget {
