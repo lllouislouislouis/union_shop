@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:union_shop/providers/cart_provider.dart';
 
 // Menu item model for dropdown/submenu items
 class MenuItem {
@@ -64,6 +66,9 @@ class _AppHeaderState extends State<AppHeader> {
 
   // FR-18.4: Track profile icon hover state (desktop only)
   bool _isProfileIconHovering = false;
+
+  // FR-24: Track shopping bag icon hover state (desktop only)
+  bool _isShoppingBagHovering = false;
 
   // Dropdown state management (FR-1.1)
   bool _isShopDropdownOpen = false;
@@ -298,203 +303,236 @@ class _AppHeaderState extends State<AppHeader> {
 
   @override
   Widget build(BuildContext context) {
+    // FR-24: Access cart state for badge
+    final cartProvider = context.watch<CartProvider>();
+    final cartItemCount = cartProvider.getTotalItems();
+
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
 
-    return SizedBox(
-      width: double.infinity,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Header
-          Container(
-            color: Colors.white,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Top banner
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  color: const Color(0xFF4d2963),
-                  child: const Text(
-                    'BIG SALE! OUR ESSENTIAL RANGE HAS DROPPED IN PRICE! OVER 20% OFF! COME GRAB YOURS WHILE STOCK LASTS!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
+    return Column(
+      children: [
+        // Header
+        Container(
+          color: Colors.white,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Top banner
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                color: const Color(0xFF4d2963),
+                child: const Text(
+                  'BIG SALE! OUR ESSENTIAL RANGE HAS DROPPED IN PRICE! OVER 20% OFF! COME GRAB YOURS WHILE STOCK LASTS!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
-                // Main header
-                Container(
-                  height: 64,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 16),
-                      // Logo section
-                      InkWell(
-                        onTap: () => navigateToHome(context),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF4d2963),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Center(
-                                child: Text(
-                                  'US',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
+              ),
+              // Main header
+              Container(
+                height: 64,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 16),
+                    // Logo section
+                    InkWell(
+                      onTap: () => navigateToHome(context),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF4d2963),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'US',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'Union Shop',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF4d2963),
-                              ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Union Shop',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF4d2963),
                             ),
-                          ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    // Desktop Navigation
+                    if (isDesktop) ...[
+                      _buildNavButton(
+                        'Home',
+                        () => navigateToHome(context),
+                        widget.currentRoute == '/',
+                      ),
+                      // Shop button with key
+                      Container(
+                        key: _shopButtonKey,
+                        child: _buildNavButton(
+                          'Shop ⏷',
+                          _toggleShopDropdown,
+                          widget.currentRoute.startsWith('/shop/'),
                         ),
                       ),
-
-                      const Spacer(),
-
-                      // Desktop Navigation
-                      if (isDesktop) ...[
-                        _buildNavButton(
-                          'Home',
-                          () => navigateToHome(context),
-                          widget.currentRoute == '/',
-                        ),
-                        // Shop button with key
-                        Container(
-                          key: _shopButtonKey,
-                          child: _buildNavButton(
-                            'Shop ⏷',
-                            _toggleShopDropdown,
-                            widget.currentRoute.startsWith('/shop/'),
-                          ),
-                        ),
-                        // Print Shack button with key
-                        Container(
-                          key: _printShackButtonKey,
-                          child: _buildNavButton(
-                            'The Print Shack ⏷',
-                            _togglePrintShackDropdown,
-                            widget.currentRoute.startsWith('/print-shack/'),
-                          ),
-                        ),
-                        _buildNavButton(
-                          'SALE!',
-                          () => navigateToSale(context),
-                          widget.currentRoute == '/sale',
-                        ),
-                        _buildNavButton(
-                          'About',
-                          () => navigateToAbout(context),
-                          widget.currentRoute == '/about',
-                        ),
-                      ],
-
-                      const Spacer(),
-
-                      // Right side icons
-                      IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: placeholderCallbackForButtons,
-                      ),
-                      // FR-18.1-18.5: Profile icon button for login
-                      MouseRegion(
-                        onEnter: (_) {
-                          setState(() => _isProfileIconHovering = true);
-                        },
-                        onExit: (_) {
-                          setState(() => _isProfileIconHovering = false);
-                        },
-                        cursor: SystemMouseCursors.click,
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.person_outline,
-                            color: _isProfileIconHovering
-                                ? const Color(0xFF4d2963).withValues(
-                                    alpha: 0.7) // FR-18.4: Hover effect
-                                : const Color(
-                                    0xFF4d2963), // FR-18.3: Primary color
-                          ),
-                          tooltip: 'Login', // FR-18: Accessibility tooltip
-                          onPressed: () {
-                            // FR-18.5: Navigate to login page
-                            Navigator.pushNamed(context, '/login');
-                          },
+                      // Print Shack button with key
+                      Container(
+                        key: _printShackButtonKey,
+                        child: _buildNavButton(
+                          'The Print Shack ⏷',
+                          _togglePrintShackDropdown,
+                          widget.currentRoute.startsWith('/print-shack/'),
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.shopping_bag_outlined),
-                        onPressed: placeholderCallbackForButtons,
+                      _buildNavButton(
+                        'SALE!',
+                        () => navigateToSale(context),
+                        widget.currentRoute == '/sale',
                       ),
-
-                      // Mobile menu button
-                      if (!isDesktop)
-                        IconButton(
-                          icon: Icon(
-                            _isMobileMenuOpen ? Icons.close : Icons.menu,
-                          ),
-                          onPressed: _toggleMobileMenu,
-                        ),
-
-                      const SizedBox(width: 8),
+                      _buildNavButton(
+                        'About',
+                        () => navigateToAbout(context),
+                        widget.currentRoute == '/about',
+                      ),
                     ],
-                  ),
+
+                    const Spacer(),
+
+                    // Right side icons
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: placeholderCallbackForButtons,
+                    ),
+                    // FR-18.1-18.5: Profile icon button for login
+                    MouseRegion(
+                      onEnter: (_) {
+                        setState(() => _isProfileIconHovering = true);
+                      },
+                      onExit: (_) {
+                        setState(() => _isProfileIconHovering = false);
+                      },
+                      cursor: SystemMouseCursors.click,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.person_outline,
+                          color: _isProfileIconHovering
+                              ? const Color(0xFF4d2963).withValues(
+                                  alpha: 0.7) // FR-18.4: Hover effect
+                              : const Color(
+                                  0xFF4d2963), // FR-18.3: Primary color
+                        ),
+                        tooltip: 'Login', // FR-18: Accessibility tooltip
+                        onPressed: () {
+                          // FR-18.5: Navigate to login page
+                          Navigator.pushNamed(context, '/login');
+                        },
+                      ),
+                    ),
+                    // FR-24: Shopping bag icon with badge
+                    MouseRegion(
+                      onEnter: (_) =>
+                          setState(() => _isShoppingBagHovering = true),
+                      onExit: (_) =>
+                          setState(() => _isShoppingBagHovering = false),
+                      child: Opacity(
+                        opacity: _isShoppingBagHovering ? 0.7 : 1.0,
+                        child: IconButton(
+                          icon: cartItemCount > 0
+                              ? Badge(
+                                  // FR-24.3: Display total item count
+                                  label: Text(
+                                    '$cartItemCount',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  // FR-24.4: Badge styling
+                                  backgroundColor: const Color(0xFF4d2963),
+                                  textColor: Colors.white,
+                                  child: const Icon(
+                                    Icons.shopping_bag_outlined,
+                                    color: Color(0xFF4d2963),
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.shopping_bag_outlined,
+                                  color: Color(0xFF4d2963),
+                                ),
+                          // FR-24.6: Navigate to cart page
+                          onPressed: () =>
+                              Navigator.pushNamed(context, '/cart'),
+                          tooltip: 'Shopping Cart',
+                        ),
+                      ),
+                    ),
+
+                    // Mobile menu button
+                    if (!isDesktop)
+                      IconButton(
+                        icon: Icon(
+                          _isMobileMenuOpen ? Icons.close : Icons.menu,
+                        ),
+                        onPressed: _toggleMobileMenu,
+                      ),
+
+                    const SizedBox(width: 8),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
 
-          // Mobile menu with slide animation (FR-15)
-          if (!isDesktop && _isMobileMenuOpen)
-            Material(
-              elevation: 8,
-              child: Container(
-                color: Colors.white,
-                child: ClipRect(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    transitionBuilder:
-                        (Widget child, Animation<double> animation) {
-                      // Slide from right when opening submenu, slide from left when closing
-                      final inFromRight =
-                          child.key == const ValueKey('submenu');
-                      final offsetAnimation = Tween<Offset>(
-                        begin: Offset(inFromRight ? 1.0 : -1.0, 0.0),
-                        end: Offset.zero,
-                      ).animate(CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeInOut,
-                      ));
+        // Mobile menu with slide animation (FR-15)
+        if (!isDesktop && _isMobileMenuOpen)
+          Material(
+            elevation: 8,
+            child: Container(
+              color: Colors.white,
+              child: ClipRect(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    // Slide from right when opening submenu, slide from left when closing
+                    final inFromRight = child.key == const ValueKey('submenu');
+                    final offsetAnimation = Tween<Offset>(
+                      begin: Offset(inFromRight ? 1.0 : -1.0, 0.0),
+                      end: Offset.zero,
+                    ).animate(CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeInOut,
+                    ));
 
-                      return SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      );
-                    },
-                    child: _isMobileSubmenuOpen
-                        ? _buildMobileSubmenu()
-                        : _buildMainMobileMenu(),
-                  ),
+                    return SlideTransition(
+                      position: offsetAnimation,
+                      child: child,
+                    );
+                  },
+                  child: _isMobileSubmenuOpen
+                      ? _buildMobileSubmenu()
+                      : _buildMainMobileMenu(),
                 ),
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
