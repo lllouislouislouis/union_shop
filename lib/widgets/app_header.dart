@@ -341,33 +341,36 @@ class _AppHeaderState extends State<AppHeader> {
                       onTap: () => navigateToHome(context),
                       child: Row(
                         children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF4d2963),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                'US',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
+                          SizedBox(
+                            width: isDesktop ? 48 : 32,
+                            height: isDesktop ? 48 : 32,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF4d2963),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'US',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            'Union Shop',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF4d2963),
+                          if (isDesktop)
+                            const Text(
+                              'Union Shop',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4d2963),
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),
@@ -434,7 +437,7 @@ class _AppHeaderState extends State<AppHeader> {
                               ? const Color(0xFF4d2963).withValues(
                                   alpha: 0.7) // FR-18.4: Hover effect
                               : const Color(
-                                  0xFF4d2963), // FR-18.3: Primary color
+                                0xFF4d2963), // FR-18.3: Primary color
                         ),
                         tooltip: 'Login', // FR-18: Accessibility tooltip
                         onPressed: () {
@@ -671,13 +674,12 @@ class _AppHeaderState extends State<AppHeader> {
           foregroundColor: isActive ? const Color(0xFF4d2963) : Colors.black,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
-        child: Flexible(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            ),
+        child: Text(
+          label,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
           ),
         ),
       ),

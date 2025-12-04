@@ -43,8 +43,7 @@ void main() {
 
     // Expect 2 tiles rendered
     expect(find.byKey(const Key('collection_tile_clothing')), findsOneWidget);
-    expect(
-        find.byKey(const Key('collection_tile_merchandise')), findsOneWidget);
+    expect(find.byKey(const Key('collection_tile_merchandise')), findsOneWidget);
   });
 
   testWidgets(

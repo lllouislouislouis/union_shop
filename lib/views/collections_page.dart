@@ -177,7 +177,7 @@ class _CollectionTileState extends State<CollectionTile> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: _isHovering || _isFocused
-                        ? [
+                            ? [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 8,
