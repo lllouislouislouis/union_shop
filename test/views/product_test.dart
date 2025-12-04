@@ -4,7 +4,6 @@ import 'package:union_shop/views/product_page.dart';
 import 'package:provider/provider.dart';
 import 'package:union_shop/providers/cart_provider.dart';
 import 'package:union_shop/providers/products_provider.dart';
-import 'package:union_shop/main.dart';
 
 void main() {
   group('Product Page Tests', () {

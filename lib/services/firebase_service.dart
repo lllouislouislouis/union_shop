@@ -3,13 +3,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:union_shop/models/product.dart';
 
+/// Base interface for Firebase service functionality. Allows injecting
+/// test doubles that don't rely on real Firebase instances.
+abstract class FirebaseServiceBase {
+  Future<List<Product>> getAllProducts();
+  Future<List<Product>> getProductsByCategory(String category);
+  Future<Product?> getProductById(String productId);
+  Future<String> getImageUrl(String imagePath);
+  Stream<List<Product>> watchAllProducts();
+}
+
 /// Firebase Service for managing product data and images
 ///
 /// Handles:
 /// - Fetching products from Firestore
 /// - Getting image URLs from Firebase Storage
 /// - Error handling and logging
-class FirebaseService {
+class FirebaseService implements FirebaseServiceBase {
   // Firestore instance
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 

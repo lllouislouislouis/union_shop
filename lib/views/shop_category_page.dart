@@ -46,6 +46,7 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
 
   // ScrollController to handle scroll-to-top on page change
   final ScrollController _scrollController = ScrollController();
+  bool _hasRequestedLoad = false;
 
   @override
   void initState() {
@@ -227,10 +228,16 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
       currentRoute: route,
       child: Consumer<ProductsProvider>(
         builder: (context, productsProvider, _) {
-          // Load products if needed
-          if (_allProducts.isEmpty && !productsProvider.isLoading) {
-            _loadProducts();
-            _applyFilters();
+          // Load products if needed. Defer side-effects to after build
+          // so we don't call setState during the build phase.
+          if (_allProducts.isEmpty &&
+              !productsProvider.isLoading &&
+              !_hasRequestedLoad) {
+            _hasRequestedLoad = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _loadProducts();
+              _applyFilters();
+            });
           }
 
           // Show loading state

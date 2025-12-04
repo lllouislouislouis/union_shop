@@ -3,21 +3,25 @@ import 'package:union_shop/models/product.dart';
 import 'package:union_shop/services/firebase_service.dart';
 
 /// Provider for managing product data from Firebase
-/// 
+///
 /// Handles:
 /// - Fetching products from Firestore
 /// - Caching products locally
 /// - Filtering by category
 /// - Loading states
 class ProductsProvider extends ChangeNotifier {
-  final FirebaseService _firebaseService = FirebaseService();
+  final FirebaseServiceBase _firebaseService;
+
+  /// Allow injecting a FirebaseServiceBase for easier testing.
+  ProductsProvider({FirebaseServiceBase? firebaseService})
+      : _firebaseService = firebaseService ?? FirebaseService();
 
   // Product list cache
   List<Product> _allProducts = [];
-  
+
   // Loading state
   bool _isLoading = false;
-  
+
   // Error message
   String? _errorMessage;
 
@@ -27,7 +31,7 @@ class ProductsProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   /// Fetch all products from Firebase
-  /// 
+  ///
   /// Called on app startup or when refresh is needed
   Future<void> fetchAllProducts() async {
     _isLoading = true;
@@ -48,25 +52,23 @@ class ProductsProvider extends ChangeNotifier {
   }
 
   /// Get products by category
-  /// 
+  ///
   /// [category] - Category name to filter by
   /// Returns filtered list of products
   List<Product> getProductsByCategory(String category) {
     if (category.isEmpty || category == 'all') {
       return _allProducts;
     }
-    
-    return _allProducts
-        .where((product) {
-          // Parse category from imageUrl or other field
-          // For now, filter by description or other logic
-          return true; // Update based on your category logic
-        })
-        .toList();
+
+    return _allProducts.where((product) {
+      // Parse category from imageUrl or other field
+      // For now, filter by description or other logic
+      return true; // Update based on your category logic
+    }).toList();
   }
 
   /// Search products by title
-  /// 
+  ///
   /// [query] - Search query string
   /// Returns matching products
   List<Product> searchProducts(String query) {
@@ -83,7 +85,7 @@ class ProductsProvider extends ChangeNotifier {
   }
 
   /// Get featured products (e.g., on sale)
-  /// 
+  ///
   /// Returns products with originalPrice set (on sale)
   List<Product> getFeaturedProducts() {
     return _allProducts
@@ -92,7 +94,7 @@ class ProductsProvider extends ChangeNotifier {
   }
 
   /// Get a single product by ID
-  /// 
+  ///
   /// [productId] - Product ID to fetch
   /// Returns the product or null if not found
   Future<Product?> getProductById(String productId) async {
@@ -105,7 +107,7 @@ class ProductsProvider extends ChangeNotifier {
   }
 
   /// Refresh products from Firebase
-  /// 
+  ///
   /// Clears cache and fetches fresh data
   Future<void> refreshProducts() async {
     _allProducts = [];
