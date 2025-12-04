@@ -285,8 +285,8 @@ class _SalePageState extends State<SalePage> {
               price: saleProduct.salePrice,
               originalPrice: saleProduct.originalPrice,
               imageUrl: saleProduct.imageUrl,
-              availableColors: const [],
-              availableSizes: const [],
+              availableColors: _getColorsForProduct(saleProduct.category),
+              availableSizes: _getSizesForProduct(saleProduct.category),
               description:
                   'Sale Product: ${saleProduct.title}\n\nDiscount: ${saleProduct.discountPercentage}% off',
               maxStock: 50,
@@ -300,6 +300,22 @@ class _SalePageState extends State<SalePage> {
         );
       },
     );
+  }
+
+  // Helper method to get colors based on product category
+  List<String> _getColorsForProduct(String category) {
+    if (category == 'Clothing') {
+      return ['Purple', 'Black', 'White', 'Navy', 'Grey'];
+    }
+    return [];
+  }
+
+  // Helper method to get sizes based on product category
+  List<String> _getSizesForProduct(String category) {
+    if (category == 'Clothing') {
+      return ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+    }
+    return [];
   }
 
   // Build filter and sort controls
