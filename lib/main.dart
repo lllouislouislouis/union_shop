@@ -19,6 +19,8 @@ import 'package:union_shop/views/terms_and_conditions_page.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
 import 'package:union_shop/views/login_page.dart';
 import 'package:union_shop/views/cart_page.dart';
+import 'package:union_shop/providers/products_provider.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,24 +29,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   
-  // Optional: Initialize with sample products on first run
-  // Comment this out after first run to avoid duplicate uploads
-  // await _initializeSampleProducts();
-  
   runApp(const UnionShopApp());
-}
-
-/// Initialize sample products (call this once during development)
-Future<void> _initializeSampleProducts() async {
-  // Check if products already exist
-  final hasProducts = await FirebaseInitHelper.hasExistingProducts();
-  
-  if (!hasProducts) {
-    debugPrint('No products found. Uploading sample products...');
-    await FirebaseInitHelper.uploadSampleProducts();
-  } else {
-    debugPrint('Products already exist in Firestore');
-  }
 }
 
 class UnionShopApp extends StatelessWidget {
@@ -52,9 +37,13 @@ class UnionShopApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // FR-33.1: Wrap MaterialApp with ChangeNotifierProvider<CartProvider>
-    return ChangeNotifierProvider(
-      create: (context) => CartProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CartProvider()),
+        ChangeNotifierProvider(
+          create: (context) => ProductsProvider()..fetchAllProducts(),
+        ),
+      ],
       child: MaterialApp(
         title: 'Union Shop',
         theme: ThemeData(
