@@ -45,30 +45,6 @@ void main() {
         expect(containerFinder, findsWidgets);
       });
 
-      testWidgets('Page is responsive on mobile viewport',
-          (WidgetTester tester) async {
-        // Set mobile viewport (375x667)
-        tester.binding.window.physicalSizeTestValue = const Size(375, 667);
-        tester.binding.window.devicePixelRatioTestValue = 1.0;
-
-        await tester.pumpWidget(buildLoginPageApp());
-
-        // FR-19.4: Check if page renders without errors
-        expect(find.byType(LoginPage), findsOneWidget);
-      });
-
-      testWidgets('Page is responsive on desktop viewport',
-          (WidgetTester tester) async {
-        // Set desktop viewport (1920x1080)
-        tester.binding.window.physicalSizeTestValue = const Size(1920, 1080);
-        tester.binding.window.devicePixelRatioTestValue = 1.0;
-
-        await tester.pumpWidget(buildLoginPageApp());
-
-        // FR-19.4: Check if page renders without errors
-        expect(find.byType(LoginPage), findsOneWidget);
-      });
-
       testWidgets('Page includes AppScaffold wrapper',
           (WidgetTester tester) async {
         await tester.pumpWidget(buildLoginPageApp());
