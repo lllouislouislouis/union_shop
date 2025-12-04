@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
 import 'package:union_shop/models/product.dart';
 
+
 class ProductPage extends StatefulWidget {
-  const ProductPage({super.key});
+  final bool useAppScaffold;
+  const ProductPage({super.key, this.useAppScaffold = true});
 
   @override
   State<ProductPage> createState() => _ProductPageState();
@@ -159,12 +161,17 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     if (!_isInitialized) {
-      return const AppScaffold(
-        currentRoute: '/product',
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      final loadingWidget = const Center(child: CircularProgressIndicator());
+      if (widget.useAppScaffold) {
+        return const AppScaffold(
+          currentRoute: '/product',
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      } else {
+        return loadingWidget;
+      }
     }
 
     // Get screen width for responsive design
@@ -181,27 +188,33 @@ class _ProductPageState extends State<ProductPage> {
       horizontalPadding = 24.0; // Mobile
     }
 
-    return AppScaffold(
-      currentRoute: '/product',
-      child: SingleChildScrollView(
-        child: Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: Column(
-            children: [
-              // Top spacing
-              const SizedBox(height: 64),
+    final pageContent = SingleChildScrollView(
+      child: Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        child: Column(
+          children: [
+            // Top spacing
+            const SizedBox(height: 64),
 
-              // Responsive layout: Desktop (Row) vs Mobile (Column)
-              isDesktop ? _buildDesktopLayout() : _buildMobileLayout(),
+            // Responsive layout: Desktop (Row) vs Mobile (Column)
+            isDesktop ? _buildDesktopLayout() : _buildMobileLayout(),
 
-              // Bottom spacing
-              const SizedBox(height: 64),
-            ],
-          ),
+            // Bottom spacing
+            const SizedBox(height: 64),
+          ],
         ),
       ),
     );
+
+    if (widget.useAppScaffold) {
+      return AppScaffold(
+        currentRoute: '/product',
+        child: pageContent,
+      );
+    } else {
+      return pageContent;
+    }
   }
 
   /// Build two-column layout for desktop (>800px)

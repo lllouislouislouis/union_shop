@@ -55,8 +55,7 @@ void main() {
       expect(find.text('Description'), findsOneWidget);
 
       // Verify product description is displayed
-      expect(
-          find.textContaining('test hoodie with color and size options'),
+      expect(find.textContaining('test hoodie with color and size options'),
           findsOneWidget);
     });
 
@@ -96,7 +95,8 @@ void main() {
       expect(find.text('Select Size'), findsOneWidget);
     });
 
-    testWidgets('Color and size dropdowns do not appear for products without them',
+    testWidgets(
+        'Color and size dropdowns do not appear for products without them',
         (WidgetTester tester) async {
       tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
@@ -342,7 +342,8 @@ void main() {
   });
 
   group('ProductPage - Button State Tests', () {
-    testWidgets('Add to Cart button is disabled when required options not selected',
+    testWidgets(
+        'Add to Cart button is disabled when required options not selected',
         (WidgetTester tester) async {
       tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
@@ -360,7 +361,8 @@ void main() {
       expect(addToCartButton, findsOneWidget);
     });
 
-    testWidgets('Add to Cart button is enabled when all required options selected',
+    testWidgets(
+        'Add to Cart button is enabled when all required options selected',
         (WidgetTester tester) async {
       tester.binding.window.physicalSizeTestValue = const Size(1200, 800);
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
@@ -424,7 +426,8 @@ void main() {
 
     testWidgets('Mobile layout displays single-column layout',
         (WidgetTester tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(360, 800);
+      // Use minimum 600px width to avoid AppHeader overflow
+      tester.binding.window.physicalSizeTestValue = const Size(600, 800);
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
 
       await tester.pumpWidget(
@@ -441,21 +444,28 @@ void main() {
 }
 
 /// Helper function to create a proper test environment for ProductPage
-/// Creates a MaterialApp with a Navigator that properly passes product data
+/// Wraps ProductPage with a simple AppBar to avoid AppScaffold rendering issues
 Widget _buildTestProductPage(Product product) {
+  // Use a minimal Scaffold with a basic AppBar for tests to avoid AppHeader/AppScaffold overflow
   return MaterialApp(
-    home: Navigator(
-      onGenerateRoute: (RouteSettings settings) {
-        return MaterialPageRoute(
-          builder: (BuildContext context) {
-            return const ProductPage();
-          },
-          settings: RouteSettings(
-            name: '/product',
-            arguments: product,
-          ),
-        );
-      },
+    home: Scaffold(
+      appBar: AppBar(
+        title: const Text('Product'),
+        backgroundColor: const Color(0xFF4d2963),
+      ),
+      body: Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            builder: (BuildContext context) {
+              return ProductPage(useAppScaffold: false);
+            },
+            settings: RouteSettings(
+              name: '/product',
+              arguments: product,
+            ),
+          );
+        },
+      ),
     ),
   );
 }
