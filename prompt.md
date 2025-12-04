@@ -1,375 +1,439 @@
-# Product Page — Feature Implementation Prompt
+# Homepage Featured Products — Feature Implementation Prompt
 
-Goal
-- Implement a fully functional Product Page that displays detailed information for a single product, including image, title, price, customization options (color, size), quantity selection, and purchase actions (Add to Cart, Buy Now).
-- Ensure the page is responsive, accessible, and follows the existing app design patterns (reusing AppScaffold, color scheme, typography).
-- Support navigation from product cards (Sale page, Clothing page, etc.) and display product-specific data dynamically.
+## Goal
+- Replace the 4 placeholder products on the homepage with real, curated featured products from the catalog.
+- Each product should display accurate information (image, title, price) and navigate to its respective Product Page when clicked.
+- Products should be hardcoded/selected as featured items to showcase popular or promotional items.
+- Ensure the product grid is responsive, maintains the existing design, and integrates seamlessly with the current homepage layout.
 
-Page Structure
-- Header:
-  - Uses existing AppScaffold with currentRoute='/product'
-  - Back button navigation (browser back or app navigation)
-- Product Image Section:
-  - Large product image (responsive sizing)
-  - Placeholder/error state for missing images
-- Product Details Section:
-  - Product title (heading style, prominent)
-  - Product price (large, bold, purple theme color)
-  - Color dropdown (if applicable to product)
-  - Size dropdown (if applicable to product)
-  - Quantity selector (increment/decrement buttons + number input)
-  - Add to Cart button (primary action)
-  - Buy Now button (secondary action, proceeds directly to checkout)
-  - Product description (multi-line text, supports formatting)
+## Page Structure
+- Location: Homepage (`HomeScreen` widget in `main.dart`)
+- Section: "PRODUCTS SECTION" — appears below the hero carousel
 - Layout:
-  - Desktop (>800px): Two-column layout (image left, details right)
-  - Mobile (≤800px): Single-column layout (image top, details below)
-  - Consistent spacing and padding with Sale/Clothing pages
+  - Desktop (>600px): 2-column grid
+  - Mobile (≤600px): 1-column grid
+  - Grid spacing: 24px horizontal, 48px vertical
+  - Section padding: 40px all sides
 
-Data/State
+## Data/State
 - Inputs:
-  - Product data: passed via route arguments or fetched by product ID
-    - Product model should include: id, title, price, imageUrl, availableColors, availableSizes, description, stock availability
-  - Selected options: color, size, quantity (managed in state)
-- Outputs:
-  - Add to Cart: adds {productId, selectedColor, selectedSize, quantity} to cart state/service
-  - Buy Now: navigates to checkout with current product configuration
+  - Featured products list: 4 hardcoded `Product` objects (use existing Product model)
+  - Each product includes: id, title, price, originalPrice (optional for sale items), imageUrl, availableColors, availableSizes, description, maxStock
+- Source:
+  - Define a constant list `kFeaturedProducts` at the top of `main.dart` or in a separate `constants/featured_products.dart` file
+  - Products should represent a diverse mix (e.g., clothing item, merchandise, sale item, signature product)
 - State Management:
-  - Use same pattern as Sale/Clothing pages (setState, Provider, Riverpod, or Bloc)
-  - Track: selectedColor, selectedSize, selectedQuantity
-  - Validate: size/color selection required before adding to cart
+  - No local state required (static list)
+  - Product data is immutable and defined at compile time
 
-Behavior & Actions
+## Behavior & Actions
 
-1. Product Image
-   - Description: Displays the main product image prominently.
-   - Action: On load, fetch and display image from imageUrl. Show placeholder if loading or error icon if failed.
+### 1. Product Display
+- **Description**: Each product card displays product image, title, and price in the existing `ProductCard` widget style.
+- **Action**: On page load, render 4 featured products in a responsive grid layout.
+- **Behavior**:
+  - Product image fills the card's image area (maintain aspect ratio, cover fit)
+  - Title displays below image (max 2 lines, ellipsis if overflow)
+  - Price displays below title in grey text
+  - If product is on sale, display originalPrice (struck through) and salePrice (bold, purple)
+- **Visual**: Match existing `ProductCard` component design exactly
 
-2. Product Title
-   - Description: Displays the product name as a large, bold heading.
-   - Action: Static display, no interaction required.
+### 2. Product Card Click
+- **Description**: User clicks anywhere on a product card to view full product details.
+- **Action**: On tap/click, navigate to Product Page (`/product`) with the selected product's ID or full product object.
+- **Behavior**:
+  - Navigation uses `Navigator.pushNamed(context, '/product', arguments: product)` or similar routing mechanism
+  - Product Page receives product data via route arguments
+  - Browser back button returns user to homepage
 
-3. Product Price
-   - Description: Displays the current price in large, bold text (purple theme color: #4d2963).
-   - Action: Static display. If product has sale/original price, show original price struck through next to sale price (similar to SaleProductCard).
-   - Format: £XX.XX
+### 3. Product Image Loading
+- **Description**: Product images load from asset paths specified in `imageUrl`.
+- **Action**: On render, display product image using `Image.asset()` with error handling.
+- **Behavior**:
+  - Show grey placeholder while image loads (if loading async)
+  - Show image-not-supported icon if image fails to load (existing error handling in `ProductCard`)
+  - Images should be optimized and load quickly (<500ms)
+- **Error Handling**: Use `errorBuilder` to display fallback icon/placeholder if asset is missing
 
-4. Color Dropdown
-   - Description: A dropdown selector for choosing product color (e.g., Purple, Black, White, Red).
-   - Action: User selects a color from the dropdown. Selection updates selectedColor state.
-   - Behavior:
-     - Default: No color selected initially (show "Select Color" placeholder).
-     - On change: Update selectedColor state; enable Add to Cart/Buy Now buttons only if all required options are selected.
-   - Validation: If product has colors, user must select one before adding to cart.
-   - Accessibility: Dropdown is keyboard navigable and has semantic label "Choose product color".
+### 4. Responsive Grid Layout
+- **Description**: Product grid adapts to screen width for optimal viewing on all devices.
+- **Action**: Automatically adjust grid columns based on viewport width.
+- **Behavior**:
+  - Desktop/Tablet (>600px): 2 columns with 24px gap
+  - Mobile (≤600px): 1 column, full width
+  - Grid uses `shrinkWrap: true` and `NeverScrollableScrollPhysics` (embedded in scrollable page)
+  - Maintain consistent card heights within each row
+- **Responsive Breakpoint**: 600px (matches existing MediaQuery check in `main.dart`)
 
-5. Size Dropdown
-   - Description: A dropdown selector for choosing product size (e.g., XS, S, M, L, XL, XXL).
-   - Action: User selects a size from the dropdown. Selection updates selectedSize state.
-   - Behavior:
-     - Default: No size selected initially (show "Select Size" placeholder).
-     - On change: Update selectedSize state; enable Add to Cart/Buy Now buttons only if all required options are selected.
-   - Validation: If product has sizes, user must select one before adding to cart.
-   - Accessibility: Dropdown is keyboard navigable and has semantic label "Choose product size".
+## Performance
+- Product data loads instantly (hardcoded, no API calls)
+- Images load efficiently; use optimized asset sizes (recommended: 800x800px)
+- Navigation to Product Page is immediate (<100ms)
+- Avoid unnecessary rebuilds; use `const` constructors where possible
 
-6. Quantity Selector
-   - Description: A numeric input with increment (+) and decrement (-) buttons to choose quantity.
-   - Action:
-     - User clicks + button: Increase quantity by 1 (max limit based on stock availability, e.g., max 10 or stock count).
-     - User clicks - button: Decrease quantity by 1 (minimum 1, cannot go below).
-     - User types in input field: Validate and update quantity (must be positive integer between 1 and max stock).
-   - Default: Quantity starts at 1.
-   - Validation: Prevent invalid input (e.g., zero, negative, non-numeric).
-   - Accessibility: Buttons have semantic labels "Increase quantity" and "Decrease quantity". Input field has label "Quantity".
+## Acceptance Criteria
+- **AC-1**: Homepage displays 4 real featured products (not placeholders) with accurate images, titles, and prices.
+- **AC-2**: Clicking a product card navigates to Product Page with correct product data.
+- **AC-3**: Product Page displays full details for the selected product (handled by existing Product Page implementation).
+- **AC-4**: Product grid is responsive: 2 columns on desktop, 1 column on mobile.
+- **AC-5**: Product images load correctly; missing images show error placeholder.
+- **AC-6**: Sale items display both original price (struck through) and sale price (bold, purple).
+- **AC-7**: Product cards maintain existing visual design (no style regressions).
+- **AC-8**: Navigation back to homepage from Product Page
 
-7. Add to Cart Button
-   - Description: Primary action button to add the configured product to the shopping cart.
-   - Action:
-     - On click: Validate that required options (color, size if applicable) are selected.
-     - If valid: Add {productId, selectedColor, selectedSize, selectedQuantity} to cart state/service. Show success feedback (e.g., snackbar "Added to cart!").
-     - If invalid: Show error message (e.g., "Please select a color and size").
-   - Behavior:
-     - Button is disabled (greyed out) until all required options are selected.
-     - Button is enabled (purple background, white text) when options are valid.
-     - On success: Optional animation or feedback; cart icon badge updates (if implemented).
-   - Style: Large button, full width on mobile, fixed width on desktop. Purple background (#4d2963), white text, rounded corners.
+## Functional Requirements (Summary)
 
-8. Buy Now Button
-   - Description: Secondary action button to proceed directly to checkout with the current product.
-   - Action:
-     - On click: Validate that required options (color, size if applicable) are selected.
-     - If valid: Navigate to checkout page with {productId, selectedColor, selectedSize, selectedQuantity} as route arguments or state.
-     - If invalid: Show error message (e.g., "Please select a color and size").
-   - Behavior:
-     - Button is disabled (greyed out) until all required options are selected.
-     - Button is enabled (white background, purple border/text) when options are valid.
-   - Style: Large button, full width on mobile, fixed width on desktop. White background, purple border and text, rounded corners.
+### FR-1 Featured Products Data
+- **FR-1.1**: Define a constant list `kFeaturedProducts` containing 4 `Product` objects.
+- **FR-1.2**: Each product must include:
+  - `id` (String): Unique identifier (e.g., "clothing-001", "merch-hoodie-purple")
+  - `title` (String): Product name (e.g., "Portsmouth University Hoodie")
+  - `price` (double): Current price in GBP (e.g., 25.00)
+  - `originalPrice` (double?): Original price if on sale (null if not on sale)
+  - `imageUrl` (String): Asset path (e.g., "assets/images/hoodie_purple.jpg")
+  - `availableColors` (List<String>): Available colors (e.g., ["Purple", "Black", "White"])
+  - `availableSizes` (List<String>): Available sizes (e.g., ["XS", "S", "M", "L", "XL"])
+  - `description` (String): Product description (used on Product Page)
+  - `maxStock` (int): Maximum purchasable quantity (e.g., 10)
+- **FR-1.3**: Products should represent a diverse mix:
+  - Product 1: Clothing item (e.g., hoodie or t-shirt)
+  - Product 2: Merchandise item (e.g., mug, tote bag, stationery)
+  - Product 3: Sale item (with originalPrice and discounted price)
+  - Product 4: Signature/essential item (popular product)
+- **FR-1.4**: All product images must exist in `assets/images/` directory and be declared in `pubspec.yaml`.
 
-9. Product Description
-   - Description: Multi-line text area displaying product details, features, materials, care instructions, etc.
-   - Action: Static display, no interaction required. Supports line breaks and basic formatting (plain text or simple Markdown).
-   - Behavior: Scrollable if description is long; responsive width.
+### FR-2 Homepage Integration
+- **FR-2.1**: Replace placeholder `ProductCard` widgets in `HomeScreen` with dynamic cards generated from `kFeaturedProducts`.
+- **FR-2.2**: Use `GridView.builder` or map over `kFeaturedProducts` list to generate cards.
+- **FR-2.3**: Pass product data to `ProductCard` widget via constructor parameters.
+- **FR-2.4**: Remove hardcoded placeholder data (current title/price/imageUrl strings).
 
-Performance
-- Product data loads quickly (<500ms if fetched remotely).
-- Image loads efficiently; use placeholders while loading.
-- Avoid unnecessary rebuilds; use const widgets where possible.
-- Validate inputs synchronously without lag.
+### FR-3 ProductCard Enhancement
+- **FR-3.1**: Update `ProductCard` widget to accept full `Product` object instead of individual strings.
+- **FR-3.2**: If product has `originalPrice`, display both originalPrice (struck through, grey, smaller font) and price (bold, purple, larger font).
+- **FR-3.3**: Price display format: "£XX.XX" (e.g., "£25.00", "£19.99").
+- **FR-3.4**: On tap, navigate to Product Page with product object: `Navigator.pushNamed(context, '/product', arguments: product)`.
 
-Acceptance Criteria
-- AC-1: Product page displays product image, title, price, color dropdown, size dropdown, quantity selector, Add to Cart button, Buy Now button, and description.
-- AC-2: Selecting a color updates selectedColor state; dropdown shows selected value.
-- AC-3: Selecting a size updates selectedSize state; dropdown shows selected value.
-- AC-4: Quantity selector increments/decrements correctly (min 1, max based on stock).
-- AC-5: Add to Cart button is disabled until required options (color, size) are selected.
-- AC-6: Clicking Add to Cart adds product to cart with selected options; shows success feedback.
-- AC-7: Buy Now button is disabled until required options are selected.
-- AC-8: Clicking Buy Now navigates to checkout with selected product configuration.
-- AC-9: Product description displays full text with line breaks and formatting.
-- AC-10: Page is responsive: desktop shows two-column layout; mobile shows single-column layout.
-- AC-12: Product image shows placeholder while loading and error icon if failed.
-- AC-13: Navigation from product cards (Sale, Clothing pages) opens Product page with correct product data.
+### FR-4 Product Page Navigation
+- **FR-4.1**: Update Product Page to receive product data from route arguments.
+- **FR-4.2**: Extract product object using `ModalRoute.of(context)!.settings.arguments as Product`.
+- **FR-4.3**: Display received product data in Product Page UI (image, title, price, colors, sizes, description).
 
-Functional Requirements (Summary)
+### FR-5 Image Handling
+- **FR-5.1**: All product images must be added to `assets/images/` directory.
 
-FR-1 Page Structure & Layout
-- FR-1.1: Use AppScaffold with currentRoute='/product'.
-- FR-1.2: Desktop (>800px): Two-column layout (image 50%, details 50%).
-- FR-1.3: Mobile (≤800px): Single-column layout (image full width, details below).
-- FR-1.4: Consistent padding and spacing with Sale/Clothing pages (24-40px horizontal padding).
+- **FR-5.3**: Use `Image.asset()` with `fit: BoxFit.cover` and `errorBuilder` for fallback.
+- **FR-5.4**: Optimize images for web/mobile (recommended size: 800x800px, format: JPEG or PNG).
 
-FR-2 Data & State
-- FR-2.1: Product data includes: id, title, price, originalPrice (optional), imageUrl, availableColors, availableSizes, description, maxStock.
-- FR-2.2: State includes: selectedColor, selectedSize, selectedQuantity (default 1).
-- FR-2.3: Fetch product data by ID from route arguments or provider.
-- FR-2.4: If product is a sale item, display originalPrice (struck through) and salePrice (bold, purple).
+### FR-6 Styling & Consistency
+- **FR-6.1**: Maintain existing `ProductCard` visual design (no style changes).
+- **FR-6.2**: Use purple theme color (#4d2963) for sale prices and accents.
+- **FR-6.3**: Match font sizes and weights with existing homepage typography:
+  - Product title: 14px, normal weight, black
+  - Regular price: 13px, normal weight, grey
+  - Sale price: 13px, bold weight, purple
+  - Original price: 11px, normal weight, grey, strikethrough
+- **FR-6.4**: Maintain responsive grid spacing: 24px horizontal, 48px vertical.
 
-FR-3 Product Image
-- FR-3.1: Display large product image using imageUrl.
-- FR-3.2: Show placeholder while loading; show error icon if image fails to load.
-- FR-3.3: Image responsive: max width 100%, maintain aspect ratio.
+## Non-Functional Requirements
 
-FR-4 Product Title & Price
-- FR-4.1: Display product title as h1 heading (48px font, bold, purple color).
-- FR-4.2: Display price as large text (32px font, bold, purple color).
-- FR-4.3: If sale item, show originalPrice (struck through, grey, 18px) and salePrice (bold, purple, 32px).
+### NFR-1 Performance
+- Featured products list loads instantly (no async operations).
+- Product images load in <500ms (optimized assets).
+- Navigation to Product Page is immediate (<100ms).
+- No unnecessary re-renders; use `const` constructors for static widgets.
 
-FR-5 Color Dropdown
-- FR-5.1: Render dropdown if availableColors is not empty.
-- FR-5.2: Options: list of colors from product.availableColors array (e.g., ['Purple', 'Black', 'White']).
-- FR-5.3: Placeholder: "Select Color" (initial state).
-- FR-5.4: On change: Update selectedColor state.
-- FR-5.5: Validation: Required if colors exist; show error if user tries to add to cart without selecting.
+### NFR-2 Maintainability
+- Featured products list is defined in a single location (easy to update).
+- Use existing `Product` model (no new data structures).
+- Reuse existing `ProductCard` widget with minimal modifications.
+- Code is well-commented and follows existing app patterns.
 
-FR-6 Size Dropdown
-- FR-6.1: Render dropdown if availableSizes is not empty.
-- FR-6.2: Options: list of sizes from product.availableSizes array (e.g., ['XS', 'S', 'M', 'L', 'XL']).
-- FR-6.3: Placeholder: "Select Size" (initial state).
-- FR-6.4: On change: Update selectedSize state.
-- FR-6.5: Validation: Required if sizes exist; show error if user tries to add to cart without selecting.
+### NFR-3 Consistency
+- Featured products section matches homepage design (colors, spacing, typography).
+- Product cards match design of cards on Sale/Clothing pages.
+- Navigation behavior is consistent with rest of app.
+- Use existing purple theme color (#4d2963) for branding.
 
-FR-7 Quantity Selector
-- FR-7.1: Default quantity: 1.
-- FR-7.2: Increment button (+): Increase quantity by 1 (max: product.maxStock or 10 if not specified).
-- FR-7.3: Decrement button (-): Decrease quantity by 1 (min: 1, disable button if quantity is 1).
-- FR-7.4: Input field: Allow direct numeric input; validate on blur (must be integer between 1 and maxStock).
-- FR-7.5: Style: Compact horizontal layout (- | number | +); buttons 40x40px, input 60px width.
+### NFR-4 Scalability
+- Featured products list can easily be expanded (e.g., to 6 or 8 products).
+- Product selection can be changed by updating `kFeaturedProducts` list.
+- System supports future dynamic product loading (e.g., from API or database).
 
-FR-8 Add to Cart Button
-- FR-8.1: Validate required options: if availableColors exists, selectedColor must be set; if availableSizes exists, selectedSize must be set.
-- FR-8.2: Button disabled (grey background) if validation fails.
-- FR-8.3: Button enabled (purple background, white text) if validation passes.
-- FR-8.4: On click: Add {productId, title, price, selectedColor, selectedSize, selectedQuantity, imageUrl} to cart state/service.
-- FR-8.5: Show success feedback: Snackbar or toast "Added to cart!".
+## Implementation Notes & Examples
 
-FR-9 Buy Now Button
-- FR-9.1: Validate required options (same as Add to Cart).
-- FR-9.2: Button disabled (grey border/text) if validation fails.
-- FR-9.3: Button enabled (purple border/text, white background) if validation passes.
-- FR-9.4: On click: Navigate to checkout page with product configuration as route arguments or state.
-- FR-9.5: Route: '/checkout' with arguments {productId, selectedColor, selectedSize, selectedQuantity}.
-
-FR-10 Product Description
-- FR-10.1: Display full product description text below buttons.
-- FR-10.2: Support line breaks and basic formatting (plain text or Markdown).
-- FR-10.3: Scrollable if content exceeds viewport; responsive width.
-- FR-10.4: Style: 16px font, grey text, line height 1.5.
-
-FR-11 Navigation & Routing
-- FR-11.1: Route: '/product/:id' or '/product' with product ID in route arguments.
-- FR-11.2: On load: Fetch product data by ID from catalog/provider or use passed product object.
-- FR-11.3: Back navigation: Browser back button or app navigation returns to previous page (Sale, Clothing, etc.).
-- FR-11.4: Product cards on Sale/Clothing pages navigate to ProductPage with correct product ID.
-
-Non-Functional Requirements
-
-NFR-1 Performance
-- Product data loads in <500ms (if fetching from API/database).
-- Image loads efficiently; use cached images where possible.
-- State updates (color, size, quantity) respond immediately (<50ms).
-
-NFR-2 Maintainability
-- Reuse existing components: AppScaffold, dropdowns (or create reusable ProductOptionDropdown widget).
-- Extract product card navigation logic into shared utility/service.
-- Keep ProductPage logic simple and testable; separate UI and business logic.
-
-NFR-3 Consistency
-- Match design patterns from Sale/Clothing pages: colors, fonts, spacing, button styles.
-- Use purple theme color (#4d2963) for primary actions and accents.
-- Maintain responsive breakpoints: >800px desktop, 600-800px tablet, <600px mobile.
-
-Implementation Notes & Examples
-
-Product Model (Example)
+### Example: Featured Products Data
 ```dart
-class Product {
-  final String id;
-  final String title;
-  final double price;
-  final double? originalPrice; // Null if not on sale
-  final String imageUrl;
-  final List<String> availableColors;
-  final List<String> availableSizes;
-  final String description;
-  final int maxStock;
+// filepath: lib/constants/featured_products.dart
+import 'package:union_shop/models/product.dart';
 
-  Product({
-    required this.id,
-    required this.title,
-    required this.price,
-    this.originalPrice,
-    required this.imageUrl,
-    this.availableColors = const [],
-    this.availableSizes = const [],
-    required this.description,
-    this.maxStock = 10,
-  });
-}
+const List<Product> kFeaturedProducts = [
+  // Product 1: Clothing (Hoodie)
+  Product(
+    id: 'clothing-hoodie-purple-001',
+    title: 'Portsmouth University Hoodie',
+    price: 35.00,
+    imageUrl: 'assets/images/hoodie_purple.jpg',
+    availableColors: ['Purple', 'Black', 'Navy'],
+    availableSizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    description: 'Stay warm and stylish with our classic Portsmouth University hoodie. Made from premium cotton blend fabric with embroidered logo.',
+    maxStock: 10,
+  ),
+
+  // Product 2: Merchandise (Mug)
+  Product(
+    id: 'merch-mug-portsmouth-001',
+    title: 'Portsmouth City Mug',
+    price: 8.99,
+    imageUrl: 'assets/images/PortsmouthCityMagnet1.jpg',
+    availableColors: ['White'],
+    availableSizes: [],
+    description: 'Enjoy your morning coffee in style with our Portsmouth City mug. Features iconic Portsmouth landmarks.',
+    maxStock: 50,
+  ),
+
+  // Product 3: Sale Item (T-Shirt)
+  Product(
+    id: 'clothing-tshirt-signature-sale',
+    title: 'Signature Portsmouth T-Shirt',
+    price: 12.99,
+    originalPrice: 18.99,
+    imageUrl: 'assets/images/tshirt_signature.jpg',
+    availableColors: ['Purple', 'White', 'Black'],
+    availableSizes: ['XS', 'S', 'M', 'L', 'XL'],
+    description: 'Classic Portsmouth University t-shirt with signature logo. Now on sale!',
+    maxStock: 20,
+  ),
+
+  // Product 4: Popular Item (Tote Bag)
+  Product(
+    id: 'merch-tote-bag-001',
+    title: 'Portsmouth University Tote Bag',
+    price: 9.99,
+    imageUrl: 'assets/images/tote_bag.jpg',
+    availableColors: ['Natural', 'Purple'],
+    availableSizes: [],
+    description: 'Eco-friendly cotton tote bag perfect for carrying books, groceries, or gym gear. Features embroidered Portsmouth logo.',
+    maxStock: 30,
+  ),
+];
 ```
 
-State Management (Example using setState)
+### Example: Homepage Integration
 ```dart
-class _ProductPageState extends State<ProductPage> {
-  late Product _product;
-  String? _selectedColor;
-  String? _selectedSize;
-  int _selectedQuantity = 1;
+// filepath: lib/main.dart
+// ...existing imports...
+import 'package:union_shop/constants/featured_products.dart';
+
+class _HomeScreenState extends State<HomeScreen> {
+  // ...existing code...
 
   @override
-  void initState() {
-    super.initState();
-    // Load product data from route arguments or provider
-    _product = _loadProduct();
-  }
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      currentRoute: '/',
+      child: Column(
+        children: [
+          _buildHeroCarousel(),
 
-  bool get _canAddToCart {
-    if (_product.availableColors.isNotEmpty && _selectedColor == null) return false;
-    if (_product.availableSizes.isNotEmpty && _selectedSize == null) return false;
-    return true;
-  }
-
-  void _addToCart() {
-    if (!_canAddToCart) {
-      _showError('Please select all required options');
-      return;
-    }
-    // Add to cart logic
-    CartService.instance.addItem(
-      productId: _product.id,
-      color: _selectedColor,
-      size: _selectedSize,
-      quantity: _selectedQuantity,
-    );
-    _showSuccess('Added to cart!');
-  }
-
-  void _buyNow() {
-    if (!_canAddToCart) {
-      _showError('Please select all required options');
-      return;
-    }
-    // Navigate to checkout
-    Navigator.pushNamed(context, '/checkout', arguments: {
-      'productId': _product.id,
-      'color': _selectedColor,
-      'size': _selectedSize,
-      'quantity': _selectedQuantity,
-    });
-  }
-}
-```
-
-UI Layout (Example structure)
-```dart
-@override
-Widget build(BuildContext context) {
-  final isDesktop = MediaQuery.of(context).size.width > 800;
-
-  return AppScaffold(
-    currentRoute: '/product',
-    child: SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.all(40.0),
-        child: isDesktop
-            ? Row( // Desktop: Two columns
-                crossAxisAlignment: CrossAxisAlignment.start,
+          // Products Section
+          Container(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(40.0),
+              child: Column(
                 children: [
-                  Expanded(child: _buildProductImage()),
-                  const SizedBox(width: 40),
-                  Expanded(child: _buildProductDetails()),
-                ],
-              )
-            : Column( // Mobile: Single column
-                children: [
-                  _buildProductImage(),
-                  const SizedBox(height: 24),
-                  _buildProductDetails(),
+                  const Text(
+                    'FEATURED PRODUCTS',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: MediaQuery.of(context).size.width > 600 ? 2 : 1,
+                      crossAxisSpacing: 24,
+                      mainAxisSpacing: 48,
+                      childAspectRatio: 0.75, // Adjust based on card height
+                    ),
+                    itemCount: kFeaturedProducts.length,
+                    itemBuilder: (context, index) {
+                      return ProductCard(product: kFeaturedProducts[index]);
+                    },
+                  ),
                 ],
               ),
+            ),
+          ),
+        ],
       ),
-    ),
-  );
+    );
+  }
 }
 ```
 
-Subtasks (Actionable)
+### Example: Updated ProductCard
+```dart
+// filepath: lib/main.dart
+class ProductCard extends StatelessWidget {
+  final Product product;
 
-- [ ] **Subtask 1**: Define Product model with all required fields (id, title, price, originalPrice, imageUrl, availableColors, availableSizes, description, maxStock).
+  const ProductCard({
+    super.key,
+    required this.product,
+  });
 
-- [ ] **Subtask 2**: Update ProductPage to StatefulWidget and add state variables (selectedColor, selectedSize, selectedQuantity).
+  @override
+  Widget build(BuildContext context) {
+    final bool isOnSale = product.originalPrice != null;
 
-- [ ] **Subtask 3**: Implement product data loading (from route arguments or product ID lookup).
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          '/product',
+          arguments: product,
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Image.asset(
+              product.imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey[300],
+                  child: const Center(
+                    child: Icon(Icons.image_not_supported, color: Colors.grey),
+                  ),
+                );
+              },
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 4),
+              Text(
+                product.title,
+                style: const TextStyle(fontSize: 14, color: Colors.black),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              if (isOnSale) ...[
+                // Show both original and sale price
+                Row(
+                  children: [
+                    Text(
+                      '£${product.originalPrice!.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '£${product.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF4d2963),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ] else ...[
+                // Show regular price only
+                Text(
+                  '£${product.price.toStringAsFixed(2)}',
+                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
 
-- [ ] **Subtask 4**: Build responsive layout (two-column desktop, single-column mobile).
+### Example: Product Page Route Handling
+```dart
+// filepath: lib/views/product_page.dart
+class ProductPage extends StatefulWidget {
+  const ProductPage({super.key});
 
-- [ ] **Subtask 5**: Implement product image section with placeholder and error handling.
+  @override
+  State<ProductPage> createState() => _ProductPageState();
+}
 
-- [ ] **Subtask 6**: Implement product title and price display (with sale price support).
+class _ProductPageState extends State<ProductPage> {
+  late Product _product;
 
-- [ ] **Subtask 7**: Create color dropdown widget (conditionally rendered, updates selectedColor state).
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Extract product from route arguments
+    final args = ModalRoute.of(context)!.settings.arguments;
+    if (args is Product) {
+      _product = args;
+    } else {
+      // Fallback or error handling
+      throw Exception('Product data not provided to ProductPage');
+    }
+  }
 
-- [ ] **Subtask 8**: Create size dropdown widget (conditionally rendered, updates selectedSize state).
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      currentRoute: '/product',
+      child: SingleChildScrollView(
+        child: // ...build product page UI using _product data...
+      ),
+    );
+  }
+}
+```
 
-- [ ] **Subtask 9**: Implement quantity selector (increment/decrement buttons + numeric input with validation).
+## Subtasks (Actionable)
 
-- [ ] **Subtask 10**: Implement Add to Cart button (validation, state update, success feedback).
+- [ ] **Subtask 1**: Ensure `Product` model exists with all required fields (id, title, price, originalPrice, imageUrl, availableColors, availableSizes, description, maxStock). If not, create it in `lib/models/product.dart`.
 
-- [ ] **Subtask 11**: Implement Buy Now button (validation, navigation to checkout).
+- [ ] **Subtask 2**: Create featured products data file (`lib/constants/featured_products.dart`) with `kFeaturedProducts` list containing 4 diverse products.
 
-- [ ] **Subtask 12**: Implement product description display (multi-line text with formatting).
+- [ ] **Subtask 3**: Add 4 new product images to `assets/images/` directory (e.g., hoodie, mug, t-shirt, tote bag).
 
-- [ ] **Subtask 13**: Add validation logic (ensure required options selected before enabling buttons).
+- [ ] **Subtask 4**: Update `pubspec.yaml` to include new image assets (or ensure `assets/images/` directory is already included).
 
-- [ ] **Subtask 14**: Add accessibility features (semantic labels, keyboard navigation, focus indicators).
+- [ ] **Subtask 5**: Update `ProductCard` widget to accept `Product` object instead of individual string parameters.
 
-- [ ] **Subtask 15**: Wire navigation from product cards (Sale, Clothing pages) to ProductPage with product ID.
+- [ ] **Subtask 6**: Add sale price display logic to `ProductCard` (show originalPrice struck through if present).
 
-- [ ] **Subtask 16**: Add widget tests:
-  - Test: Selecting color/size updates state.
-  - Test: Quantity selector increments/decrements correctly.
-  - Test: Add to Cart button disabled until options selected.
-  - Test: Add to Cart adds correct item to cart.
-  - Test: Buy Now navigates to checkout with correct data.
+- [ ] **Subtask 7**: Update `ProductCard` `onTap` handler to navigate to Product Page with product object as route argument.
+
+- [ ] **Subtask 8**: Replace hardcoded `ProductCard` widgets in `HomeScreen` with `GridView.builder` that maps over `kFeaturedProducts`.
+
+- [ ] **Subtask 9**: Update section title from "PRODUCTS SECTION" to "FEATURED PRODUCTS" (optional, for clarity).
+
+- [ ] **Subtask 10**: Update Product Page to receive and display product data from route arguments (extract using `ModalRoute.of(context)!.settings.arguments`).
+
+- [ ] **Subtask 11**: Test navigation: Verify clicking each featured product card navigates to Product Page with correct data.
+
+- [ ] **Subtask 12**: Test responsive layout: Verify grid displays 2 columns on desktop, 1 column on mobile.
+
+- [ ] **Subtask 13**: Test image loading: Verify all product images load correctly; missing images show error placeholder.
+
+- [ ] **Subtask 14**: Test sale price display: Verify sale items show both original (struck through) and sale price (bold, purple).
 
 ---
 
