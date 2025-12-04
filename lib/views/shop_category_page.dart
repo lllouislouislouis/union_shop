@@ -67,13 +67,8 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
 
   // Load products based on category
   void _loadProducts() {
-    // TODO: Replace with real product data from catalog/provider
-    // For now, use mock sale products filtered by category
-    _allProducts = mockSaleProducts
-        .where((product) => widget.category == 'clothing'
-            ? product.category == 'Clothing'
-            : true) // Load all for now, filter later
-        .toList();
+    // Load all products - filtering will be handled by the filter dropdown
+    _allProducts = List.from(mockSaleProducts);
   }
 
   // Apply category filter to products
@@ -354,69 +349,73 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
         ],
       );
     } else {
-      // Horizontal row on desktop/tablet
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Left side: Filter and Sort with labels
-          Row(
-            children: [
-              // Filter with label
-              Row(
-                children: [
-                  Text(
-                    'Filter by',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
+      // Horizontal row on desktop/tablet - wrapped in SingleChildScrollView to prevent overflow
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Left side: Filter and Sort with labels
+            Row(
+              children: [
+                // Filter with label
+                Row(
+                  children: [
+                    Text(
+                      'Filter by',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  CategoryFilterDropdown(
-                    selectedCategory: _selectedCategory,
-                    categories: filterOptions,
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedCategory = newValue;
-                        _applyFilters();
-                      });
-                    },
-                    fullWidth: false,
-                  ),
-                ],
-              ),
-              const SizedBox(width: 24),
-              // Sort with label
-              Row(
-                children: [
-                  Text(
-                    'Sort by',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
+                    const SizedBox(width: 12),
+                    CategoryFilterDropdown(
+                      selectedCategory: _selectedCategory,
+                      categories: filterOptions,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedCategory = newValue;
+                          _applyFilters();
+                        });
+                      },
+                      fullWidth: false,
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  SortDropdown(
-                    selectedSort: _selectedSort,
-                    sortOptions: sortOptions,
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedSort = newValue;
-                        _applySorting();
-                      });
-                    },
-                    fullWidth: false,
-                  ),
-                ],
-              ),
-            ],
-          ),
-          // Right side: Product count
-          ProductCountDisplay(count: _filteredProducts.length),
-        ],
+                  ],
+                ),
+                const SizedBox(width: 24),
+                // Sort with label
+                Row(
+                  children: [
+                    Text(
+                      'Sort by',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    SortDropdown(
+                      selectedSort: _selectedSort,
+                      sortOptions: sortOptions,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedSort = newValue;
+                          _applySorting();
+                        });
+                      },
+                      fullWidth: false,
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 24),
+                // Product count
+                ProductCountDisplay(count: _filteredProducts.length),
+              ],
+            ),
+          ],
+        ),
       );
     }
   }

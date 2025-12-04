@@ -3,7 +3,6 @@ import 'package:union_shop/widgets/app_scaffold.dart';
 import 'package:union_shop/widgets/category_filter_dropdown.dart';
 import 'package:union_shop/widgets/sort_dropdown.dart';
 import 'package:union_shop/widgets/product_count_display.dart';
-import 'package:union_shop/widgets/sale_product_card.dart';
 import '../models/sale_product.dart';
 
 class SalePage extends StatefulWidget {
