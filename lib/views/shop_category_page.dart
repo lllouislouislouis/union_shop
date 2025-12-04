@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:union_shop/providers/products_provider.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
 import 'package:union_shop/widgets/category_filter_dropdown.dart';
 import 'package:union_shop/widgets/sort_dropdown.dart';
@@ -66,10 +68,39 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
     super.dispose();
   }
 
-  // Load products based on category
+  // Load products based on category - now from Firebase via Provider
   void _loadProducts() {
-    // Load all products - filtering will be handled by the filter dropdown
-    _allProducts = List.from(mockSaleProducts);
+    // Get products from ProductsProvider (Firebase)
+    final productsProvider =
+        Provider.of<ProductsProvider>(context, listen: false);
+
+    // Convert Firebase Product objects to SaleProduct objects for display
+    _allProducts = productsProvider.allProducts
+        .map((product) => SaleProduct(
+              id: product.id,
+              title: product.title,
+              imageUrl: product.imageUrl,
+              originalPrice: product.originalPrice ?? product.price,
+              salePrice: product.price,
+              saleEndDate: DateTime.now().add(const Duration(days: 30)),
+              category: _getCategoryFromProduct(product),
+            ))
+        .toList();
+
+    debugPrint('Loaded ${_allProducts.length} products from Firebase');
+  }
+
+  // Helper to determine category from product
+  String _getCategoryFromProduct(Product product) {
+    // Try to extract category from imageUrl or use default
+    if (product.imageUrl.contains('clothing')) return 'Clothing';
+    if (product.imageUrl.contains('merchandise')) return 'Merchandise';
+    if (product.imageUrl.contains('graduation')) return 'Graduation';
+    if (product.imageUrl.contains('stationery')) return 'Stationery';
+    if (product.imageUrl.contains('pride')) return 'Pride';
+    if (product.imageUrl.contains('sports')) return 'Sports';
+    if (product.imageUrl.contains('personalisation')) return 'Personalisation';
+    return 'Other';
   }
 
   // Apply category filter to products
@@ -194,41 +225,76 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
 
     return AppScaffold(
       currentRoute: route,
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        child: Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: Column(
-            children: [
-              // Top spacing
-              const SizedBox(height: 64),
+      child: Consumer<ProductsProvider>(
+        builder: (context, productsProvider, _) {
+          // Load products if needed
+          if (_allProducts.isEmpty && !productsProvider.isLoading) {
+            _loadProducts();
+            _applyFilters();
+          }
 
-              // Heading Section
-              _buildHeadingSection(),
+          // Show loading state
+          if (productsProvider.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-              const SizedBox(height: 32),
+          // Show error state
+          if (productsProvider.errorMessage != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.red[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Error: ${productsProvider.errorMessage}'),
+                ],
+              ),
+            );
+          }
 
-              // Filter & Sort Controls (only if enabled)
-              if (widget.enableFiltersAndSort) ...[
-                _buildFilterSortControls(isMobile),
-                const SizedBox(height: 24),
-              ],
+          return SingleChildScrollView(
+            controller: _scrollController,
+            child: Container(
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Column(
+                children: [
+                  // Top spacing
+                  const SizedBox(height: 64),
 
-              // Product Grid
-              _buildProductGrid(gridColumns),
+                  // Heading Section
+                  _buildHeadingSection(),
 
-              // Pagination Controls
-              if (_totalPages > 1) ...[
-                const SizedBox(height: 48),
-                _buildPaginationControls(),
-              ],
+                  const SizedBox(height: 32),
 
-              // Bottom spacing
-              const SizedBox(height: 64),
-            ],
-          ),
-        ),
+                  // Filter & Sort Controls (only if enabled)
+                  if (widget.enableFiltersAndSort) ...[
+                    _buildFilterSortControls(isMobile),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Product Grid
+                  _buildProductGrid(gridColumns),
+
+                  // Pagination Controls
+                  if (_totalPages > 1) ...[
+                    const SizedBox(height: 48),
+                    _buildPaginationControls(),
+                  ],
+
+                  // Bottom spacing
+                  const SizedBox(height: 64),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
