@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:union_shop/models/product.dart';
+import 'package:union_shop/data/mock_products.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
 import 'package:union_shop/widgets/filter_bar.dart';
 import 'package:union_shop/widgets/sort_dropdown.dart';
@@ -7,12 +9,10 @@ import 'package:union_shop/widgets/product_card.dart';
 
 class ShopCategoryPage extends StatefulWidget {
   final String category;
-  final bool enableFiltersAndSort; // Enable filter/sort controls
-  final List<String>?
-      filterOptions; // e.g., ['All', 'Clothing', 'Hoodies', ...]
+  final bool enableFiltersAndSort;
+  final List<String>? filterOptions;
   final String? initialFilter;
-  final List<String>?
-      sortOptions; // e.g., ['Popularity', 'Price: Low to High', ...]
+  final List<String>? sortOptions;
   final String? initialSort;
 
   const ShopCategoryPage({
@@ -32,24 +32,21 @@ class ShopCategoryPage extends StatefulWidget {
 class _ShopCategoryPageState extends State<ShopCategoryPage> {
   late String _selectedFilter;
   late String _selectedSort;
-  late List<dynamic> _allProducts;
-  late List<dynamic> _filteredProducts;
+  late List<Product> _allProducts;
+  late List<Product> _filteredProducts;
 
   @override
   void initState() {
     super.initState();
-    _selectedFilter =
-        widget.initialFilter ?? (widget.filterOptions?.first ?? 'All');
-    _selectedSort =
-        widget.initialSort ?? (widget.sortOptions?.first ?? 'Popularity');
+    _selectedFilter = widget.initialFilter ?? (widget.filterOptions?.first ?? 'All');
+    _selectedSort = widget.initialSort ?? (widget.sortOptions?.first ?? 'Popularity');
     _loadProducts();
     _applyFiltersAndSort();
   }
 
   void _loadProducts() {
-    // FR-3.1: Load products for the category
-    // TODO: Replace with actual product service/API call
-    _allProducts = _getMockProductsForCategory(widget.category);
+    // FR-3.1: Load products for the category from mock data
+    _allProducts = getProductsByCategory(widget.category);
   }
 
   void _applyFiltersAndSort() {
@@ -59,7 +56,7 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
     // Apply filter
     if (widget.enableFiltersAndSort && _selectedFilter != 'All') {
       _filteredProducts = _filteredProducts
-          .where((p) => (p.category as String?) == _selectedFilter)
+          .where((p) => p.category == _selectedFilter)
           .toList();
     }
 
@@ -68,16 +65,14 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
       _filteredProducts.sort((a, b) {
         switch (_selectedSort) {
           case 'Price: Low to High':
-            return (a.price as num).compareTo(b.price as num);
+            return a.price.compareTo(b.price);
           case 'Price: High to Low':
-            return (b.price as num).compareTo(a.price as num);
+            return b.price.compareTo(a.price);
           case 'Newest':
-            return (b.dateAdded as DateTime?)
-                    ?.compareTo(a.dateAdded as DateTime? ?? DateTime.now()) ??
-                0;
+            return b.dateAdded.compareTo(a.dateAdded);
           case 'Popularity':
           default:
-            return 0; // Maintain original order
+            return (b.popularity ?? 0).compareTo(a.popularity ?? 0);
         }
       });
     }
@@ -90,46 +85,15 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
     });
   }
 
-  void _onSortChanged(String newSort) {
-    setState(() {
-      _selectedSort = newSort;
-      _applyFiltersAndSort();
-    });
-  }
+void _onSortChanged(String newSort) {
+  setState(() {
+    _selectedSort = newSort;
+    _applyFiltersAndSort();
+  });
+}
 
-  List<dynamic> _getMockProductsForCategory(String category) {
-    // TODO: Replace with actual product data from service
-    // For now, return mock products
-    return [
-      MockProduct(
-        id: '1',
-        title: 'Product 1',
-        price: 25.00,
-        imageUrl: 'assets/images/product1.jpg',
-        category: 'Clothing',
-        dateAdded: DateTime.now(),
-      ),
-      MockProduct(
-        id: '2',
-        title: 'Product 2',
-        price: 35.00,
-        imageUrl: 'assets/images/product2.jpg',
-        category: 'Hoodies',
-        dateAdded: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      MockProduct(
-        id: '3',
-        title: 'Product 3',
-        price: 15.00,
-        imageUrl: 'assets/images/product3.jpg',
-        category: 'Clothing',
-        dateAdded: DateTime.now().subtract(const Duration(days: 5)),
-      ),
-    ];
-  }
-
-  @override
-  Widget build(BuildContext context) {
+@override
+Widget build(BuildContext context) {
     final pageTitle =
         widget.category[0].toUpperCase() + widget.category.substring(1);
 
@@ -212,10 +176,34 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
                   final product = _filteredProducts[index];
                   return ProductCard(
                     product: product,
-                    priceLabel: '£${(product.price as num).toStringAsFixed(2)}',
+                    priceLabel: '£${product.price.toStringAsFixed(2)}',
+                    badge: product.isNew
+                        ? Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF4d2963),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'NEW',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
+                        : null,
                     onTap: () {
-                      // Navigate to product page
-                      debugPrint('Tapped product: ${product.id}');
+                      // FR-4.2: Navigate to product page
+                      Navigator.pushNamed(
+                        context,
+                        '/product',
+                        arguments: {'productId': product.id},
+                      );
                     },
                   );
                 },
@@ -257,23 +245,4 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
     if (width > 600) return 2;
     return 1;
   }
-}
-
-// Mock product model for now
-class MockProduct {
-  final String id;
-  final String title;
-  final double price;
-  final String imageUrl;
-  final String category;
-  final DateTime dateAdded;
-
-  MockProduct({
-    required this.id,
-    required this.title,
-    required this.price,
-    required this.imageUrl,
-    required this.category,
-    required this.dateAdded,
-  });
 }
