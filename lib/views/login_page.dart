@@ -16,11 +16,39 @@ class _LoginPageState extends State<LoginPage> {
   // FR-20.6: Password visibility toggle state
   bool _isPasswordVisible = false;
 
+  // FR-21.5: Loading state for login button
+  bool _isLoading = false;
+
   @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  // FR-21.5: Handle login button press with placeholder feedback
+  void _handleLogin() {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate a brief loading state
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        // FR-21.5: Show placeholder message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login functionality coming soon!'),
+            duration: Duration(seconds: 2),
+            backgroundColor: Color(0xFF4d2963),
+          ),
+        );
+      }
+    });
   }
 
   @override
@@ -177,13 +205,86 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Placeholder for login button (to be added in next subtask)
-                  Container(
-                    height: 48,
-                    color: Colors.grey[100],
-                    child: const Center(
-                      child: Text('Login button coming next...'),
+                  // FR-21.1-21.4: Login button
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : _handleLogin,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF4d2963), // FR-21.2
+                      disabledBackgroundColor: Colors.grey[400],
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8), // FR-21.4
+                      ),
                     ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'LOGIN',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // FR-21.6, FR-21.7: Additional links
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // FR-21.6: Forgot Password link
+                      TextButton(
+                        onPressed: () {
+                          // Non-functional at this stage
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Password recovery coming soon!',
+                              ),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            color: Color(0xFF4d2963),
+                            fontSize: 14,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                      const Text('·', style: TextStyle(color: Colors.grey)),
+                      // FR-21.7: Sign Up link
+                      TextButton(
+                        onPressed: () {
+                          // Non-functional at this stage
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Sign up coming soon!'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            color: Color(0xFF4d2963),
+                            fontSize: 14,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
