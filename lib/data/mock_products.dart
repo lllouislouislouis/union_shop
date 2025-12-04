@@ -2,7 +2,6 @@ import 'package:union_shop/models/product.dart';
 
 /// Mock clothing products for development and testing
 final List<Product> mockClothingProducts = [
-  // Hoodies
   Product(
     id: 'clothing_001',
     title: 'PSUT Purple Hoodie',
@@ -33,8 +32,6 @@ final List<Product> mockClothingProducts = [
     popularity: 75,
     isNew: true,
   ),
-
-  // T-Shirts
   Product(
     id: 'clothing_004',
     title: 'PSUT Classic T-Shirt Purple',
@@ -75,8 +72,6 @@ final List<Product> mockClothingProducts = [
     popularity: 68,
     isNew: true,
   ),
-
-  // Jackets
   Product(
     id: 'clothing_008',
     title: 'PSUT Windbreaker Purple',
@@ -107,8 +102,6 @@ final List<Product> mockClothingProducts = [
     popularity: 71,
     isNew: true,
   ),
-
-  // Merchandise
   Product(
     id: 'clothing_011',
     title: 'PSUT Sweatpants Purple',
@@ -134,7 +127,7 @@ final List<Product> mockClothingProducts = [
 /// Get products filtered by category
 List<Product> getProductsByCategory(String category) {
   if (category.toLowerCase() == 'clothing') {
-    return mockClothingProducts;
+    return List<Product>.from(mockClothingProducts);
   }
-  return [];
+  return <Product>[];
 }
