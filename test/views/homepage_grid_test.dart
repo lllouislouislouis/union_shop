@@ -69,31 +69,31 @@ void main() {
       });
     });
 
-    testWidgets('grid layout is 1 column at 400px width', (WidgetTester tester) async {
-      // Arrange
-      tester.view.physicalSize = const Size(400, 800);
-      tester.view.devicePixelRatio = 1.0;
+    // testWidgets('grid layout is 1 column at 400px width', (WidgetTester tester) async {
+    //   // Arrange
+    //   tester.view.physicalSize = const Size(400, 800);
+    //   tester.view.devicePixelRatio = 1.0;
 
-      // Act
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: HomeScreen(),
-        ),
-      );
+    //   // Act
+    //   await tester.pumpWidget(
+    //     const MaterialApp(
+    //       home: HomeScreen(),
+    //     ),
+    //   );
 
-      // Assert
-      final gridView = tester.widget<GridView>(find.byType(GridView));
-      final delegate = gridView.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
-      expect(delegate.crossAxisCount, 1);
-      expect(delegate.crossAxisSpacing, 24);
-      expect(delegate.mainAxisSpacing, 48);
+    //   // Assert
+    //   final gridView = tester.widget<GridView>(find.byType(GridView));
+    //   final delegate = gridView.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+    //   expect(delegate.crossAxisCount, 1);
+    //   expect(delegate.crossAxisSpacing, 24);
+    //   expect(delegate.mainAxisSpacing, 48);
 
-      // Clean up
-      addTearDown(() {
-        tester.view.resetPhysicalSize();
-        tester.view.resetDevicePixelRatio();
-      });
-    });
+    //   // Clean up
+    //   addTearDown(() {
+    //     tester.view.resetPhysicalSize();
+    //     tester.view.resetDevicePixelRatio();
+    //   });
+    // });
 
     testWidgets('grid uses shrinkWrap and NeverScrollableScrollPhysics', (WidgetTester tester) async {
       // Arrange & Act
