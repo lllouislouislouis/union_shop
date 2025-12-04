@@ -12,6 +12,7 @@ import 'package:union_shop/views/collections_page.dart';
 import 'package:union_shop/views/search_page.dart';
 import 'package:union_shop/views/terms_and_conditions_page.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
+import 'package:union_shop/views/login_page.dart';
 
 void main() {
   runApp(const UnionShopApp());
@@ -91,6 +92,9 @@ class UnionShopApp extends StatelessWidget {
         // Footer routes (NEW)
         '/search': (context) => const SearchPage(),
         '/policies/terms': (context) => const TermsAndConditionsPage(),
+
+        // NEW FR-22: Login route
+        '/login': (context) => const LoginPage(),
       },
     );
   }
