@@ -1,0 +1,140 @@
+import 'package:union_shop/models/product.dart';
+
+/// Mock clothing products for development and testing
+final List<Product> mockClothingProducts = [
+  // Hoodies
+  Product(
+    id: 'clothing_001',
+    title: 'PSUT Purple Hoodie',
+    price: 34.99,
+    imageUrl: 'assets/images/clothing/hoodie_purple.jpg',
+    category: 'Hoodies',
+    dateAdded: DateTime.now().subtract(const Duration(days: 10)),
+    popularity: 95,
+    isNew: false,
+  ),
+  Product(
+    id: 'clothing_002',
+    title: 'PSUT Black Hoodie',
+    price: 34.99,
+    imageUrl: 'assets/images/clothing/hoodie_black.jpg',
+    category: 'Hoodies',
+    dateAdded: DateTime.now().subtract(const Duration(days: 8)),
+    popularity: 88,
+    isNew: false,
+  ),
+  Product(
+    id: 'clothing_003',
+    title: 'PSUT Navy Hoodie',
+    price: 34.99,
+    imageUrl: 'assets/images/clothing/hoodie_navy.jpg',
+    category: 'Hoodies',
+    dateAdded: DateTime.now(),
+    popularity: 75,
+    isNew: true,
+  ),
+
+  // T-Shirts
+  Product(
+    id: 'clothing_004',
+    title: 'PSUT Classic T-Shirt Purple',
+    price: 14.99,
+    imageUrl: 'assets/images/clothing/tshirt_purple.jpg',
+    category: 'T-Shirts',
+    dateAdded: DateTime.now().subtract(const Duration(days: 15)),
+    popularity: 92,
+    isNew: false,
+  ),
+  Product(
+    id: 'clothing_005',
+    title: 'PSUT Classic T-Shirt White',
+    price: 14.99,
+    imageUrl: 'assets/images/clothing/tshirt_white.jpg',
+    category: 'T-Shirts',
+    dateAdded: DateTime.now().subtract(const Duration(days: 12)),
+    popularity: 85,
+    isNew: false,
+  ),
+  Product(
+    id: 'clothing_006',
+    title: 'PSUT Vintage T-Shirt Black',
+    price: 16.99,
+    imageUrl: 'assets/images/clothing/tshirt_vintage_black.jpg',
+    category: 'T-Shirts',
+    dateAdded: DateTime.now().subtract(const Duration(days: 2)),
+    popularity: 70,
+    isNew: true,
+  ),
+  Product(
+    id: 'clothing_007',
+    title: 'PSUT Vintage T-Shirt Navy',
+    price: 16.99,
+    imageUrl: 'assets/images/clothing/tshirt_vintage_navy.jpg',
+    category: 'T-Shirts',
+    dateAdded: DateTime.now().subtract(const Duration(days: 1)),
+    popularity: 68,
+    isNew: true,
+  ),
+
+  // Jackets
+  Product(
+    id: 'clothing_008',
+    title: 'PSUT Windbreaker Purple',
+    price: 49.99,
+    imageUrl: 'assets/images/clothing/jacket_windbreaker.jpg',
+    category: 'Jackets',
+    dateAdded: DateTime.now().subtract(const Duration(days: 20)),
+    popularity: 82,
+    isNew: false,
+  ),
+  Product(
+    id: 'clothing_009',
+    title: 'PSUT Bomber Jacket Black',
+    price: 59.99,
+    imageUrl: 'assets/images/clothing/jacket_bomber_black.jpg',
+    category: 'Jackets',
+    dateAdded: DateTime.now().subtract(const Duration(days: 5)),
+    popularity: 79,
+    isNew: false,
+  ),
+  Product(
+    id: 'clothing_010',
+    title: 'PSUT Bomber Jacket Navy',
+    price: 59.99,
+    imageUrl: 'assets/images/clothing/jacket_bomber_navy.jpg',
+    category: 'Jackets',
+    dateAdded: DateTime.now(),
+    popularity: 71,
+    isNew: true,
+  ),
+
+  // Clothing (generic)
+  Product(
+    id: 'clothing_011',
+    title: 'PSUT Sweatpants Purple',
+    price: 24.99,
+    imageUrl: 'assets/images/clothing/sweatpants.jpg',
+    category: 'Clothing',
+    dateAdded: DateTime.now().subtract(const Duration(days: 7)),
+    popularity: 76,
+    isNew: false,
+  ),
+  Product(
+    id: 'clothing_012',
+    title: 'PSUT Cap Purple',
+    price: 12.99,
+    imageUrl: 'assets/images/clothing/cap.jpg',
+    category: 'Clothing',
+    dateAdded: DateTime.now().subtract(const Duration(days: 3)),
+    popularity: 65,
+    isNew: false,
+  ),
+];
+
+/// Get products filtered by category
+List<Product> getProductsByCategory(String category) {
+  if (category.toLowerCase() == 'clothing') {
+    return mockClothingProducts;
+  }
+  return [];
+}
