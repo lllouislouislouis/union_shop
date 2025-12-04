@@ -3,7 +3,8 @@ import 'package:union_shop/widgets/app_scaffold.dart';
 import 'package:union_shop/widgets/category_filter_dropdown.dart';
 import 'package:union_shop/widgets/sort_dropdown.dart';
 import 'package:union_shop/widgets/product_count_display.dart';
-import '../models/sale_product.dart';
+import 'package:union_shop/models/sale_product.dart';
+import 'package:union_shop/models/product.dart';
 
 class SalePage extends StatefulWidget {
   const SalePage({super.key});
@@ -269,14 +270,32 @@ class _SalePageState extends State<SalePage> {
         crossAxisCount: columns,
         crossAxisSpacing: 24,
         mainAxisSpacing: 32,
-        childAspectRatio: 0.75, // Adjust based on card content
+        childAspectRatio: 0.75,
       ),
       itemCount: _displayedProducts.length,
       itemBuilder: (context, index) {
+        final saleProduct = _displayedProducts[index];
         return SaleProductCard(
-          product: _displayedProducts[index],
+          product: saleProduct,
           onTap: () {
-            Navigator.pushNamed(context, '/product');
+            // Convert SaleProduct to Product and navigate
+            final product = Product(
+              id: saleProduct.id,
+              title: saleProduct.title,
+              price: saleProduct.salePrice,
+              originalPrice: saleProduct.originalPrice,
+              imageUrl: saleProduct.imageUrl,
+              availableColors: const [],
+              availableSizes: const [],
+              description:
+                  'Sale Product: ${saleProduct.title}\n\nDiscount: ${saleProduct.discountPercentage}% off',
+              maxStock: 50,
+            );
+            Navigator.pushNamed(
+              context,
+              '/product',
+              arguments: product,
+            );
           },
         );
       },
