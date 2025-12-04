@@ -1,7 +1,7 @@
 import 'package:union_shop/models/product.dart';
 
 /// Featured products displayed on the homepage
-/// 
+///
 /// This list contains 4 curated products representing different categories:
 /// 1. Clothing item (hoodie with color and size options)
 /// 2. Merchandise item (mug)
@@ -33,7 +33,7 @@ final List<Product> kFeaturedProducts = [
     id: 'merch-mug-portsmouth-001',
     title: 'Portsmouth City Mug',
     price: 8.99,
-    imageUrl: 'assets/images/PortsmouthCityMagnet1.jpg',
+    imageUrl: 'assets/images/coffee_mug.jpg',
     availableColors: ['White'],
     availableSizes: [],
     description:

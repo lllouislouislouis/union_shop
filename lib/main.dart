@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:union_shop/models/carousel_slide.dart';
+import 'package:union_shop/models/product.dart';
+import 'package:union_shop/constants/featured_products.dart';
 import 'package:union_shop/views/about_page.dart';
 import 'package:union_shop/views/product_page.dart';
 import 'package:union_shop/views/sale_page.dart';
@@ -263,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen>
           //Hero Carousel Section
           _buildHeroCarousel(),
 
-          // Products Section
+          // Featured Products Section
           Container(
             color: Colors.white,
             child: Padding(
@@ -271,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen>
               child: Column(
                 children: [
                   const Text(
-                    'PRODUCTS SECTION',
+                    'FEATURED PRODUCTS',
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.black,
@@ -279,35 +281,22 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ),
                   const SizedBox(height: 48),
-                  GridView.count(
+                  GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount:
-                        MediaQuery.of(context).size.width > 600 ? 2 : 1,
-                    crossAxisSpacing: 24,
-                    mainAxisSpacing: 48,
-                    children: const [
-                      ProductCard(
-                        title: 'Placeholder Product 1',
-                        price: '£10.00',
-                        imageUrl: 'assets/images/PortsmouthCityMagnet1.jpg',
-                      ),
-                      ProductCard(
-                        title: 'Placeholder Product 2',
-                        price: '£15.00',
-                        imageUrl: 'assets/images/PortsmouthCityMagnet1.jpg',
-                      ),
-                      ProductCard(
-                        title: 'Placeholder Product 3',
-                        price: '£20.00',
-                        imageUrl: 'assets/images/PortsmouthCityMagnet1.jpg',
-                      ),
-                      ProductCard(
-                        title: 'Placeholder Product 4',
-                        price: '£25.00',
-                        imageUrl: 'assets/images/PortsmouthCityMagnet1.jpg',
-                      ),
-                    ],
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount:
+                          MediaQuery.of(context).size.width > 600 ? 2 : 1,
+                      crossAxisSpacing: 24,
+                      mainAxisSpacing: 48,
+                      childAspectRatio: 0.75,
+                    ),
+                    itemCount: kFeaturedProducts.length,
+                    itemBuilder: (context, index) {
+                      return ProductCard(
+                        product: kFeaturedProducts[index],
+                      );
+                    },
                   ),
                 ],
               ),
@@ -576,29 +565,31 @@ class _HomeScreenState extends State<HomeScreen>
 }
 
 class ProductCard extends StatelessWidget {
-  final String title;
-  final String price;
-  final String imageUrl;
+  final Product product;
 
   const ProductCard({
     super.key,
-    required this.title,
-    required this.price,
-    required this.imageUrl,
+    required this.product,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool isOnSale = product.isOnSale;
+
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/product');
+        Navigator.pushNamed(
+          context,
+          '/product',
+          arguments: product,
+        );
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Image.asset(
-              imageUrl,
+              product.imageUrl,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
@@ -615,15 +606,42 @@ class ProductCard extends StatelessWidget {
             children: [
               const SizedBox(height: 4),
               Text(
-                title,
+                product.title,
                 style: const TextStyle(fontSize: 14, color: Colors.black),
                 maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
-              Text(
-                price,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
-              ),
+              if (isOnSale) ...[
+                // Show both original and sale price
+                Row(
+                  children: [
+                    Text(
+                      '£${product.originalPrice!.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '£${product.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF4d2963),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ] else ...[
+                // Show regular price only
+                Text(
+                  '£${product.price.toStringAsFixed(2)}',
+                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                ),
+              ],
             ],
           ),
         ],
