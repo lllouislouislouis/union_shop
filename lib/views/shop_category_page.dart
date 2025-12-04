@@ -55,9 +55,18 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
 
     // Apply filter
     if (widget.enableFiltersAndSort && _selectedFilter != 'All') {
-      _filteredProducts = _filteredProducts
-          .where((p) => p.category == _selectedFilter)
-          .toList();
+      if (_selectedFilter == 'Popular') {
+        // AC-6: Filter to top 50% by popularity
+        final sortedByPopularity = List.from(_filteredProducts)
+          ..sort((a, b) => (b.popularity ?? 0).compareTo(a.popularity ?? 0));
+        final midpoint = (sortedByPopularity.length / 2).ceil();
+        _filteredProducts = sortedByPopularity.take(midpoint).toList();
+      } else {
+        // Filter by category
+        _filteredProducts = _filteredProducts
+            .where((p) => p.category == _selectedFilter)
+            .toList();
+      }
     }
 
     // Apply sort
@@ -85,15 +94,15 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
     });
   }
 
-void _onSortChanged(String newSort) {
-  setState(() {
-    _selectedSort = newSort;
-    _applyFiltersAndSort();
-  });
-}
+  void _onSortChanged(String newSort) {
+    setState(() {
+      _selectedSort = newSort;
+      _applyFiltersAndSort();
+    });
+  }
 
-@override
-Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     final pageTitle =
         widget.category[0].toUpperCase() + widget.category.substring(1);
 

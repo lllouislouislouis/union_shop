@@ -42,13 +42,18 @@ class UnionShopApp extends StatelessWidget {
 
         // Shop category routes (FR-16)
         '/shop/clothing': (context) => const ShopCategoryPage(
-          category: 'clothing',
-          enableFiltersAndSort: true,
-          filterOptions: ['All', 'Clothing', 'Hoodies', 'T-Shirts', 'Jackets'],
-          initialFilter: 'All',
-          sortOptions: ['Popularity', 'Price: Low to High', 'Price: High to Low', 'Newest'],
-          initialSort: 'Popularity',
-        ),
+              category: 'clothing',
+              enableFiltersAndSort: true,
+              filterOptions: ['All', 'Clothing', 'Merchandise', 'Popular'],
+              initialFilter: 'All',
+              sortOptions: [
+                'Popularity',
+                'Price: Low to High',
+                'Price: High to Low',
+                'Newest'
+              ],
+              initialSort: 'Popularity',
+            ),
         '/shop/merchandise': (context) =>
             const ShopCategoryPage(category: 'merchandise'),
         '/shop/halloween': (context) =>
