@@ -62,6 +62,9 @@ class _AppHeaderState extends State<AppHeader> {
   // Track whether the mobile menu is open
   bool _isMobileMenuOpen = false;
 
+  // FR-18.4: Track profile icon hover state (desktop only)
+  bool _isProfileIconHovering = false;
+
   // Dropdown state management (FR-1.1)
   bool _isShopDropdownOpen = false;
   bool _isPrintShackDropdownOpen = false;
@@ -409,9 +412,30 @@ class _AppHeaderState extends State<AppHeader> {
                         icon: const Icon(Icons.search),
                         onPressed: placeholderCallbackForButtons,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.person_outline),
-                        onPressed: placeholderCallbackForButtons,
+                      // FR-18.1-18.5: Profile icon button for login
+                      MouseRegion(
+                        onEnter: (_) {
+                          setState(() => _isProfileIconHovering = true);
+                        },
+                        onExit: (_) {
+                          setState(() => _isProfileIconHovering = false);
+                        },
+                        cursor: SystemMouseCursors.click,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.person_outline,
+                            color: _isProfileIconHovering
+                                ? const Color(0xFF4d2963).withValues(
+                                    alpha: 0.7) // FR-18.4: Hover effect
+                                : const Color(
+                                    0xFF4d2963), // FR-18.3: Primary color
+                          ),
+                          tooltip: 'Login', // FR-18: Accessibility tooltip
+                          onPressed: () {
+                            // FR-18.5: Navigate to login page
+                            Navigator.pushNamed(context, '/login');
+                          },
+                        ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.shopping_bag_outlined),
