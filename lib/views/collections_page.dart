@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:union_shop/models/collection_item.dart';
-import 'package:union_shop/views/shop_category_page.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
 
 // FR-3.2: Sample collection items
@@ -88,13 +87,21 @@ class CollectionsPage extends StatelessWidget {
       return;
     }
 
-    // Fallback: push a ShopCategoryPage with the collection slug
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ShopCategoryPage(category: item.slug),
-      ),
-    );
+    // Map collection slugs to named routes
+    final routeMap = {
+      'clothing': '/shop/clothing',
+      'merchandise': '/shop/merchandise',
+      'graduation': '/shop/graduation',
+      'portsmouth': '/shop/portsmouth',
+      'pride': '/shop/pride',
+      'stationery': '/shop/stationery',
+      'sports': '/shop/sports',
+    };
+
+    final route = routeMap[item.slug];
+    if (route != null) {
+      Navigator.pushNamed(context, route);
+    }
   }
 
   @override
