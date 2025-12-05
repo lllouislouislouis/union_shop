@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 import 'package:union_shop/views/login_page.dart';
 import 'package:union_shop/widgets/app_scaffold.dart';
+import 'package:union_shop/providers/cart_provider.dart';
+import 'package:union_shop/providers/products_provider.dart';
 
 void main() {
   group('LoginPage Widget Tests', () {
-    // Helper to build the widget with MaterialApp
+    // Helper to build the widget with MaterialApp and required providers
     Widget buildLoginPageApp() {
-      return MaterialApp(
-        home: const LoginPage(),
-        routes: {
-          '/login': (context) => const LoginPage(),
-        },
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => CartProvider()),
+          ChangeNotifierProvider(create: (context) => ProductsProvider()),
+        ],
+        child: MaterialApp(
+          home: const LoginPage(),
+          routes: {
+            '/login': (context) => const LoginPage(),
+          },
+        ),
       );
     }
 
