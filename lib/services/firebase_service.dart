@@ -34,6 +34,7 @@ class FirebaseService implements FirebaseServiceBase {
   ///
   /// Returns a list of Product objects
   /// Throws exception if fetch fails
+  @override
   Future<List<Product>> getAllProducts() async {
     try {
       final QuerySnapshot snapshot =
@@ -62,6 +63,7 @@ class FirebaseService implements FirebaseServiceBase {
   ///
   /// [category] - The category name to filter by
   /// Returns list of products in that category
+  @override
   Future<List<Product>> getProductsByCategory(String category) async {
     try {
       final QuerySnapshot snapshot = await _firestore
@@ -92,6 +94,7 @@ class FirebaseService implements FirebaseServiceBase {
   ///
   /// [productId] - The ID of the product to fetch
   /// Returns Product object or null if not found
+  @override
   Future<Product?> getProductById(String productId) async {
     try {
       final DocumentSnapshot doc =
@@ -116,6 +119,7 @@ class FirebaseService implements FirebaseServiceBase {
   /// [imagePath] - Path to image in Storage (e.g., 'products/hoodie.jpg')
   /// Returns download URL as string
   /// Throws exception if file not found
+  @override
   Future<String> getImageUrl(String imagePath) async {
     try {
       final String url = await _storage.ref(imagePath).getDownloadURL();
@@ -218,6 +222,7 @@ class FirebaseService implements FirebaseServiceBase {
   ///
   /// Returns a Stream of product lists
   /// Useful for live updates when products change
+  @override
   Stream<List<Product>> watchAllProducts() {
     return _firestore.collection(productsCollection).snapshots().map(
       (snapshot) {

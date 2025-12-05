@@ -11,10 +11,15 @@ import 'package:union_shop/providers/products_provider.dart';
 
 /// Lightweight fake FirebaseService for tests that returns empty data.
 class _FakeFirebaseService implements FirebaseServiceBase {
+  @override
   Future<List<Product>> getAllProducts() async => [];
+  @override
   Future<List<Product>> getProductsByCategory(String category) async => [];
+  @override
   Future<Product?> getProductById(String id) async => null;
+  @override
   Future<String> getImageUrl(String path) async => '';
+  @override
   Stream<List<Product>> watchAllProducts() => Stream.value([]);
 }
 
@@ -112,7 +117,7 @@ void main() {
 
     // Provide an items list where the clothing item has an explicit route
     final itemsWithRoute = [
-      CollectionItem(
+      const CollectionItem(
         slug: 'clothing',
         title: 'Clothing',
         imagePath: 'assets/images/collections/clothing.jpg',
