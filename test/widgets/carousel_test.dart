@@ -256,10 +256,11 @@ void main() {
       await tester.pump(); // Start navigation
       await tester.pump(const Duration(seconds: 1)); // Complete navigation
 
-      // Should navigate to Collections page
-      expect(find.text('Collections'), findsOneWidget);
-      expect(find.text('Browse all our product collections here.'),
-          findsOneWidget);
+      // Should navigate to Collections page - verify by grid key and collection tiles
+      expect(find.byKey(const Key('collections_grid')), findsOneWidget);
+      // Verify at least some collection items are visible
+      expect(find.text('Clothing'), findsOneWidget);
+      expect(find.text('Merchandise'), findsOneWidget);
     });
 
     testWidgets('Desktop view shows text and button overlay',
