@@ -4,6 +4,25 @@ import 'package:union_shop/views/product_page.dart';
 import 'package:provider/provider.dart';
 import 'package:union_shop/providers/cart_provider.dart';
 import 'package:union_shop/providers/products_provider.dart';
+import 'package:union_shop/services/firebase_service.dart';
+import 'package:union_shop/models/product.dart';
+
+class _FakeFirebaseService implements FirebaseServiceBase {
+  @override
+  Future<List<Product>> getAllProducts() async => [];
+
+  @override
+  Future<List<Product>> getProductsByCategory(String category) async => [];
+
+  @override
+  Future<Product?> getProductById(String productId) async => null;
+
+  @override
+  Future<String> getImageUrl(String imagePath) async => '';
+
+  @override
+  Stream<List<Product>> watchAllProducts() => Stream.value([]);
+}
 
 void main() {
   group('Product Page Tests', () {
@@ -13,7 +32,9 @@ void main() {
         providers: [
           ChangeNotifierProvider(create: (_) => CartProvider()),
           ChangeNotifierProvider(
-            create: (_) => ProductsProvider()..fetchAllProducts(),
+            create: (_) =>
+                ProductsProvider(firebaseService: _FakeFirebaseService())
+                  ..fetchAllProducts(),
           ),
         ],
         child: const MaterialApp(home: ProductPage()),
