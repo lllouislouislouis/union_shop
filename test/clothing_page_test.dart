@@ -392,23 +392,30 @@ void main() {
       await tester.tap(find.byType(DropdownButton<String>).first);
       await tester.pumpAndSettle();
 
-      // Select "Clothing"
-      await tester.tap(find.text('T-shirts').hitTestable());
+      // Select "T-Shirts"
+      await tester.tap(find.text('T-Shirts').hitTestable());
       await tester.pumpAndSettle();
 
-      // Verify only Clothing filter is active (product count displayed)
-      expect(find.textContaining('Jerseys'), findsOneWidget);
+      // Verify T-Shirts filter is now selected (shown in dropdown)
+      expect(find.text('T-Shirts'), findsWidgets); // Shows in dropdown value
 
       // Open filter dropdown again
       await tester.tap(find.byType(DropdownButton<String>).first);
       await tester.pumpAndSettle();
 
-      // Select "Merchandise" - this should replace "Clothing" selection
+      // Select "Hoodies" - this should replace "T-Shirts" selection
       await tester.tap(find.text('Hoodies').hitTestable());
       await tester.pumpAndSettle();
 
-      // Verify only Merchandise filter is active (product count displayed)
-      expect(find.textContaining('Jerseys'), findsOneWidget);
+      // Verify only Hoodies filter is now selected (shown in dropdown)
+      expect(find.text('Hoodies'), findsWidgets); // Shows in dropdown value
+
+      // Verify T-Shirts is no longer the selected value (not visible as dropdown value)
+      final dropdownValues = find.descendant(
+        of: find.byType(DropdownButton<String>).first,
+        matching: find.text('T-Shirts'),
+      );
+      expect(dropdownValues, findsNothing);
     });
   });
 
