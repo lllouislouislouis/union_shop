@@ -366,9 +366,9 @@ void main() {
             enableFiltersAndSort: true,
             filterOptions: [
               'All Categories',
-              'Clothing',
-              'Merchandise',
-              'PSUT',
+              'T-Shirts',
+              'Hoodies',
+              'Jerseys',
             ],
             initialFilter: 'All Categories',
             sortOptions: [
@@ -393,22 +393,22 @@ void main() {
       await tester.pumpAndSettle();
 
       // Select "Clothing"
-      await tester.tap(find.text('Clothing').hitTestable());
+      await tester.tap(find.text('T-shirts').hitTestable());
       await tester.pumpAndSettle();
 
       // Verify only Clothing filter is active (product count displayed)
-      expect(find.textContaining('product'), findsOneWidget);
+      expect(find.textContaining('Jerseys'), findsOneWidget);
 
       // Open filter dropdown again
       await tester.tap(find.byType(DropdownButton<String>).first);
       await tester.pumpAndSettle();
 
       // Select "Merchandise" - this should replace "Clothing" selection
-      await tester.tap(find.text('Merchandise').hitTestable());
+      await tester.tap(find.text('Hoodies').hitTestable());
       await tester.pumpAndSettle();
 
       // Verify only Merchandise filter is active (product count displayed)
-      expect(find.textContaining('product'), findsOneWidget);
+      expect(find.textContaining('Jerseys'), findsOneWidget);
     });
   });
 
@@ -427,9 +427,9 @@ void main() {
             enableFiltersAndSort: true,
             filterOptions: [
               'All Categories',
-              'Clothing',
-              'Merchandise',
-              'PSUT',
+              'T-shirts',
+              'Hoodies',
+              'Jerseys',
             ],
             initialFilter: 'All Categories',
             sortOptions: ['Featured'],
