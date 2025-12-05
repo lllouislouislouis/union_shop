@@ -69,9 +69,9 @@ class UnionShopApp extends StatelessWidget {
                 enableFiltersAndSort: true,
                 filterOptions: [
                   'All Categories',
-                  'Clothing',
-                  'Merchandise',
-                  'PSUT',
+                  'T-Shirts',
+                  'Hoodies',
+                  'Jersey',
                 ],
                 initialFilter: 'All Categories',
                 sortOptions: [
