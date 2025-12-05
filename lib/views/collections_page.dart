@@ -92,7 +92,28 @@ class CollectionsPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ShopCategoryPage(category: item.slug),
+        builder: (_) => ShopCategoryPage(
+          category: item.slug,
+          enableFiltersAndSort: true,
+          filterOptions: const [
+            'All Categories',
+            'T-Shirts',
+            'Hoodies',
+            'Jersey',
+          ],
+          initialFilter: 'All Categories',
+          sortOptions: const [
+            'Featured',
+            'Best Selling',
+            'Alphabetically, A-Z',
+            'Alphabetically, Z-A',
+            'Price: Low to High',
+            'Price: High to Low',
+            'Date, old to new',
+            'Date, new to old',
+          ],
+          initialSort: 'Featured',
+        ),
       ),
     );
   }
@@ -177,7 +198,7 @@ class _CollectionTileState extends State<CollectionTile> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: _isHovering || _isFocused
-                            ? [
+                        ? [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 8,

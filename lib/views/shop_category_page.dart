@@ -93,15 +93,22 @@ class _ShopCategoryPageState extends State<ShopCategoryPage> {
 
   // Helper to determine category from product
   String _getCategoryFromProduct(Product product) {
-    // Try to extract category from imageUrl or use default
-    if (product.imageUrl.contains('clothing')) return 'Clothing';
-    if (product.imageUrl.contains('merchandise')) return 'Merchandise';
-    if (product.imageUrl.contains('graduation')) return 'Graduation';
-    if (product.imageUrl.contains('stationery')) return 'Stationery';
-    if (product.imageUrl.contains('pride')) return 'Pride';
-    if (product.imageUrl.contains('sports')) return 'Sports';
-    if (product.imageUrl.contains('personalisation')) return 'Personalisation';
-    return 'Other';
+    final urlLower = product.imageUrl.toLowerCase();
+    final titleLower = product.title.toLowerCase();
+
+    // Check both URL and title for better categorization
+    if (urlLower.contains('tshirt') || titleLower.contains('t-shirt')) {
+      return 'T-Shirts';
+    }
+    if (urlLower.contains('hoodie') || titleLower.contains('hoodie')) {
+      return 'Hoodies';
+    }
+    if (urlLower.contains('jacket') || titleLower.contains('jacket')) {
+      return 'Jersey';
+    }
+
+    // Default to "All" so it shows up when "All Categories" is selected
+    return 'All';
   }
 
   // Apply category filter to products
